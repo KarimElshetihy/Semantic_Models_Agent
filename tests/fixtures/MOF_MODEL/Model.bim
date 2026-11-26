@@ -1,0 +1,3642 @@
+{
+  "name": "SemanticModel",
+  "compatibilityLevel": 1500,
+  "model": {
+    "culture": "en-US",
+    "dataSources": [
+      {
+        "type": "structured",
+        "name": "Oracle/oracle-host:1521/oracle_service",
+        "connectionDetails": {
+          "protocol": "oracle",
+          "address": {
+            "server": "oracle-host:1521/oracle_service"
+          },
+          "authentication": null,
+          "query": null
+        },
+        "options": {
+          "hierarchicalNavigation": true
+        },
+        "credential": {
+          "AuthenticationKind": "UsernamePassword",
+          "kind": "Oracle",
+          "path": "oracle-host:1521/oracle_service",
+          "Username": "oracle_user"
+        }
+      }
+    ],
+    "tables": [
+      {
+        "name": "FUND LEVELS",
+        "columns": [
+          {
+            "name": "FUND_LEVEL_CODE",
+            "dataType": "string",
+            "sourceColumn": "FUND_LEVEL_CODE"
+          },
+          {
+            "name": "FUND_LEVEL",
+            "dataType": "string",
+            "sourceColumn": "FUND_LEVEL",
+            "sortByColumn": "FUND_LEVEL_CODE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "--FUND LEVELS",
+                "SELECT DISTINCT",
+                "--    substr(flex_value, 1, 1) fund_level_id,",
+                "    flex_value fund_level_code,",
+                "    CASE",
+                "        WHEN t.description IN ( 'موارد ذاتية أخري', 'موارد ذاتية أخري مدرجة بموازنات الجهات' ) THEN",
+                "            'موارد ذاتية'",
+                "        ELSE",
+                "            t.description",
+                "    END        fund_level",
+                "FROM",
+                "         gfmis_fnd_flex_values_vl v",
+                "    INNER JOIN gfmis_fnd_flex_values_tl t ON v.flex_value_id = t.flex_value_id",
+                "WHERE",
+                "    flex_value_set_id IN ( 1014147, 1017903 ) --BALANCING BODIES & ECONOMIC BODIES",
+                "    AND t.language = 'AR'",
+                "    AND flex_value IN ( '100000000', '200000000', '400000000', '501010101', '501010201' )",
+                "ORDER BY",
+                "    1",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "BUDGET TYPE",
+        "columns": [
+          {
+            "name": "BUDGET_TYPE_CODE",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_TYPE_CODE"
+          },
+          {
+            "name": "BUDGET_TYPE",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_TYPE",
+            "sortByColumn": "BUDGET_TYPE_CODE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "--BUDGET TYPE",
+                "SELECT DISTINCT",
+                "    flex_value    budget_type_code,",
+                "    t.description budget_type",
+                "FROM",
+                "         gfmis_fnd_flex_values_vl v",
+                "    INNER JOIN gfmis_fnd_flex_values_tl t ON v.flex_value_id = t.flex_value_id",
+                "WHERE",
+                "    flex_value_set_id IN ( 1014153 ) --BALANCING BODIES & ECONOMIC BODIES",
+                "    AND t.language = 'AR'",
+                "    AND flex_value < '9'",
+                "ORDER BY",
+                "    1",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "UNITS HIERARCHY",
+        "columns": [
+          {
+            "name": "UNIT_CODE",
+            "dataType": "string",
+            "sourceColumn": "UNIT_CODE"
+          },
+          {
+            "name": "UNIT_NAME",
+            "dataType": "string",
+            "sourceColumn": "UNIT_NAME"
+          },
+          {
+            "name": "UNIT_TYPE",
+            "dataType": "string",
+            "sourceColumn": "UNIT_TYPE"
+          },
+          {
+            "name": "MINISTRY_CODE",
+            "dataType": "string",
+            "sourceColumn": "MINISTRY_CODE"
+          },
+          {
+            "name": "MINISTRY",
+            "dataType": "string",
+            "sourceColumn": "MINISTRY"
+          },
+          {
+            "name": "FUNCTIONAL_CHILD_ID",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_CHILD_ID"
+          },
+          {
+            "name": "FUNCTIONAL_SECTOR_ID",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_SECTOR_ID"
+          },
+          {
+            "name": "FUNCTIONAL_CHILD",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_CHILD"
+          },
+          {
+            "name": "FUNCTIONAL_SECTOR",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_SECTOR"
+          },
+          {
+            "name": "AREA_CODE",
+            "dataType": "string",
+            "sourceColumn": "AREA_CODE"
+          },
+          {
+            "name": "AREA_NAME",
+            "dataType": "string",
+            "sourceColumn": "AREA_NAME"
+          },
+          {
+            "name": "INSTITUTION_CODE",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTION_CODE"
+          },
+          {
+            "name": "INSTITUTION_NAME",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTION_NAME"
+          },
+          {
+            "name": "INSTITUTIONAL_SECTOR_CODE",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTIONAL_SECTOR_CODE"
+          },
+          {
+            "name": "INSTITUTIONAL_SECTOR_NAME",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTIONAL_SECTOR_NAME"
+          },
+          {
+            "type": "calculated",
+            "name": "AREA_CODE_NAME",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " 'UNITS HIERARCHY'[AREA_CODE] & \" - \" & 'UNITS HIERARCHY'[AREA_NAME]"
+          },
+          {
+            "name": "GOVERNORATE_ID",
+            "dataType": "double",
+            "sourceColumn": "GOVERNORATE_ID"
+          },
+          {
+            "name": "IS_ACTIVE",
+            "dataType": "int64",
+            "sourceColumn": "IS_ACTIVE"
+          },
+          {
+            "name": "EFFECTIVE_DATE_FROM",
+            "dataType": "dateTime",
+            "sourceColumn": "EFFECTIVE_DATE_FROM"
+          },
+          {
+            "name": "EFFECTIVE_DATE_TO",
+            "dataType": "dateTime",
+            "sourceColumn": "EFFECTIVE_DATE_TO"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "        au.*,",
+                "        CASE",
+                "            WHEN institution_name = 'محافظة القاهرة'       THEN",
+                "                1",
+                "            WHEN institution_name = 'محافظة الجيزة'        THEN",
+                "                2",
+                "            WHEN institution_name = 'محافظة الإسكندرية'    THEN",
+                "                3",
+                "            WHEN institution_name = 'محافظة الدقهلية'      THEN",
+                "                4",
+                "            WHEN institution_name = 'محافظة البحر الأحمر'  THEN",
+                "                5",
+                "            WHEN institution_name = 'محافظة البحيرة'       THEN",
+                "                6",
+                "            WHEN institution_name = 'محافظة الفيوم'        THEN",
+                "                7",
+                "            WHEN institution_name = 'محافظة الغربية'       THEN",
+                "                8",
+                "            WHEN institution_name = 'محافظة الاسماعيلية'   THEN",
+                "                9",
+                "            WHEN institution_name = 'محافظة المنوفية'      THEN",
+                "                10",
+                "            WHEN institution_name = 'محافظة المنيا'        THEN",
+                "                11",
+                "            WHEN institution_name = 'محافظة القليوبية'     THEN",
+                "                12",
+                "            WHEN institution_name = 'محافظة الوادى الجديد' THEN",
+                "                13",
+                "            WHEN institution_name = 'محافظة السويس'        THEN",
+                "                14",
+                "            WHEN institution_name = 'محافظة أسوان'         THEN",
+                "                15",
+                "            WHEN institution_name = 'محافظة اسيوط'         THEN",
+                "                16",
+                "            WHEN institution_name = 'محافظة بنى سويف'      THEN",
+                "                17",
+                "            WHEN institution_name = 'محافظة بورسعيد'       THEN",
+                "                18",
+                "            WHEN institution_name = 'محافظة دمياط'         THEN",
+                "                19",
+                "            WHEN institution_name = 'محافظة الشرقية'       THEN",
+                "                20",
+                "            WHEN institution_name = 'محافظة جنوب سيناء'    THEN",
+                "                21",
+                "            WHEN institution_name = 'محافظة كفر الشيخ'     THEN",
+                "                22",
+                "            WHEN institution_name = 'محافظة مطروح'         THEN",
+                "                23",
+                "            WHEN institution_name = 'محافظة الأقصر'        THEN",
+                "                24",
+                "            WHEN institution_name = 'محافظة قنا'           THEN",
+                "                25",
+                "            WHEN institution_name = 'محافظة شمال سيناء'    THEN",
+                "                26",
+                "            WHEN institution_name = 'محافظة سوهاج'         THEN",
+                "                27",
+                "            ELSE",
+                "                NULL",
+                "        END AS governorate_id",
+                "    FROM",
+                "        gfmis_au_hierarchy_master au",
+                "    ",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "GFMIS",
+        "columns": [
+          {
+            "name": "LEDGER_ID",
+            "dataType": "double",
+            "sourceColumn": "LEDGER_ID"
+          },
+          {
+            "name": "PERIOD_NAME",
+            "dataType": "dateTime",
+            "sourceColumn": "PERIOD_NAME"
+          },
+          {
+            "name": "ACTUAL_FLAG",
+            "dataType": "string",
+            "sourceColumn": "ACTUAL_FLAG"
+          },
+          {
+            "name": "BUDGET_ID",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_ID"
+          },
+          {
+            "name": "AMOUNT",
+            "dataType": "double",
+            "sourceColumn": "AMOUNT"
+          },
+          {
+            "name": "ALRABT_ALASLY",
+            "dataType": "double",
+            "sourceColumn": "ALRABT_ALASLY"
+          },
+          {
+            "name": "ALRABT_ALMO3ADAL",
+            "dataType": "double",
+            "sourceColumn": "ALRABT_ALMO3ADAL"
+          },
+          {
+            "name": "FE3LYAT",
+            "dataType": "double",
+            "sourceColumn": "FE3LYAT"
+          },
+          {
+            "name": "BALANCING_OR_ECONOMIC",
+            "dataType": "string",
+            "sourceColumn": "BALANCING_OR_ECONOMIC"
+          },
+          {
+            "name": "FUND_CODE",
+            "dataType": "string",
+            "sourceColumn": "FUND_CODE"
+          },
+          {
+            "name": "UNIT_CODE",
+            "dataType": "string",
+            "sourceColumn": "UNIT_CODE"
+          },
+          {
+            "name": "BUDGET_CATEGORY_CODE",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_CODE"
+          },
+          {
+            "type": "calculated",
+            "name": "DATE_KEY",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(GFMIS[PERIOD_NAME], \"YYYYMMDD\")"
+          },
+          {
+            "type": "calculated",
+            "name": "Refresh Time",
+            "dataType": "dateTime",
+            "isDataTypeInferred": true,
+            "expression": "now()",
+            "formatString": "MM/dd/yyyy hh:mm:ss AM/PM",
+            "annotations": [
+              {
+                "name": "Format",
+                "value": "<Format Format=\"DateTimeCustom\"><DateTimes><DateTime LCID=\"1033\" Group=\"GeneralLongDateTime\" FormatString=\"MM/dd/yyyy hh:mm:ss tt\" /></DateTimes></Format>"
+              }
+            ]
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CURRENT_YEAR",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    ledger_id,",
+                "    actual_flag,",
+                "    fund_code,",
+                "    unit_code,",
+                "    budget_category_code,",
+                "    budget_id,",
+                "    amount,",
+                "    alrabt_alasly,",
+                "    alrabt_almo3adal,",
+                "    fe3lyat,",
+                "    balancing_or_economic,",
+                "    period_name",
+                "FROM",
+                "    gfmis_aeu_balances",
+                "WHERE",
+                "    (",
+                "        SELECT",
+                "            CASE",
+                "                WHEN to_char(period_name, 'MM') < '07' THEN",
+                "                    to_char(period_name, 'YYYY')",
+                "                ELSE",
+                "                    to_char(add_months(period_name, 6), 'YYYY')",
+                "            END",
+                "        FROM",
+                "            dual",
+                "    ) = (",
+                "        SELECT",
+                "            CASE",
+                "                WHEN to_char(sysdate, 'MM') < '07' THEN",
+                "                    to_char(sysdate, 'YYYY')",
+                "                ELSE",
+                "                    to_char(add_months(sysdate, 6), 'YYYY')",
+                "            END",
+                "        FROM",
+                "            dual",
+                "    )",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>let",
+                  "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                  "",
+                  "SELECT",
+                  " ledger_id,",
+                  "    actual_flag,",
+                  "    fund_code,",
+                  "    unit_code,",
+                  "    budget_category_code,",
+                  "    budget_id,",
+                  "    amount,",
+                  "    alrabt_alasly,",
+                  "    alrabt_almo3adal,",
+                  "    fe3lyat,",
+                  "    balancing_or_economic,",
+                  "    period_name",
+                  "FROM gfmis_aeu_balances",
+                  "WHERE EXTRACT(YEAR FROM period_name) =",
+                  "  (SELECT",
+                  "    CASE",
+                  "      WHEN TO_CHAR(sysdate, 'MM') < '07'",
+                  "      THEN TO_CHAR(sysdate, 'YYYY')",
+                  "      ELSE TO_CHAR(add_months(sysdate, 6), 'YYYY')",
+                  "    END",
+                  "  FROM dual",
+                  "  )",
+                  "",
+                  "\")",
+                  "in",
+                  "    Source</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "PREVIOUS_YEARS",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    ledger_id,",
+                "    actual_flag,",
+                "    fund_code,",
+                "    unit_code,",
+                "    budget_category_code,",
+                "    budget_id,",
+                "    amount,",
+                "    alrabt_alasly,",
+                "    alrabt_almo3adal,",
+                "    fe3lyat,",
+                "    balancing_or_economic,",
+                "    period_name",
+                "FROM",
+                "    gfmis_aeu_balances",
+                "WHERE",
+                "    (",
+                "        SELECT",
+                "            CASE",
+                "                WHEN to_char(period_name, 'MM') < '07' THEN",
+                "                    to_char(period_name, 'YYYY')",
+                "                ELSE",
+                "                    to_char(add_months(period_name, 6), 'YYYY')",
+                "            END",
+                "        FROM",
+                "            dual",
+                "    ) < (",
+                "        SELECT",
+                "            CASE",
+                "                WHEN to_char(sysdate, 'MM') < '07' THEN",
+                "                    to_char(sysdate, 'YYYY')",
+                "                ELSE",
+                "                    to_char(add_months(sysdate, 6), 'YYYY')",
+                "            END",
+                "        FROM",
+                "            dual",
+                "    )",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>let",
+                  "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                  "",
+                  "SELECT",
+                  "    ledger_id,",
+                  "    actual_flag,",
+                  "    fund_code,",
+                  "    unit_code,",
+                  "    budget_category_code,",
+                  "    budget_id,",
+                  "    amount,",
+                  "    alrabt_alasly,",
+                  "    alrabt_almo3adal,",
+                  "    fe3lyat,",
+                  "    balancing_or_economic,",
+                  "    period_name",
+                  "FROM",
+                  "    gfmis_aeu_balances",
+                  "WHERE",
+                  "    (",
+                  "        SELECT",
+                  "            CASE",
+                  "                WHEN to_char(period_name, 'MM') < '07' THEN",
+                  "                    to_char(period_name, 'YYYY')",
+                  "                ELSE",
+                  "                    to_char(add_months(period_name, 6), 'YYYY')",
+                  "            END",
+                  "        FROM",
+                  "            dual",
+                  "    ) < (",
+                  "        SELECT",
+                  "            CASE",
+                  "                WHEN to_char(sysdate, 'MM') < '07' THEN",
+                  "                    to_char(sysdate, 'YYYY')",
+                  "                ELSE",
+                  "                    to_char(add_months(sysdate, 6), 'YYYY')",
+                  "            END",
+                  "        FROM",
+                  "            dual",
+                  "    )",
+                  "",
+                  "\")",
+                  "in",
+                  "    Source</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "measures": [
+          {
+            "name": "01.RABT_ASLY",
+            "expression": [
+              " ",
+              "CALCULATE(",
+              "\t     ABS(SUM(GFMIS[ALRABT_ALASLY])),",
+              "\t     FILTER(",
+              "\t                 ALL(DIM_DATE),",
+              "\t\t DIM_DATE[FISCAL_YEAR_RANGE] = MAX(DIM_DATE[FISCAL_YEAR_RANGE]) &&",
+              "\t\t DIM_DATE[DATE_KEY] <= MAX(DIM_DATE[DATE_KEY])",
+              "\t\t ),",
+              "                     DATESBETWEEN(GFMIS[PERIOD_NAME], MIN('UNITS HIERARCHY'[EFFECTIVE_DATE_FROM]), MAX('UNITS HIERARCHY'[EFFECTIVE_DATE_TO]))",
+              "\t)"
+            ],
+            "formatString": "#,0"
+          },
+          {
+            "name": "02.RABT_MO3ADAL",
+            "expression": [
+              " ",
+              "CALCULATE(",
+              "\t     ABS(SUM(GFMIS[ALRABT_ALMO3ADAL])),",
+              "\t     FILTER(",
+              "\t                 ALL(DIM_DATE),",
+              "\t\t DIM_DATE[FISCAL_YEAR_RANGE] = MAX(DIM_DATE[FISCAL_YEAR_RANGE]) &&",
+              "\t\t DIM_DATE[DATE_KEY] <= MAX(DIM_DATE[DATE_KEY])",
+              "\t\t ),",
+              "                     DATESBETWEEN(GFMIS[PERIOD_NAME], MIN('UNITS HIERARCHY'[EFFECTIVE_DATE_FROM]), MAX('UNITS HIERARCHY'[EFFECTIVE_DATE_TO]))",
+              "\t)"
+            ],
+            "formatString": "#,0"
+          },
+          {
+            "name": "03.FE3LYAT",
+            "expression": [
+              "",
+              "CALCULATE(",
+              "\t     ABS(SUM(GFMIS[FE3LYAT])),",
+              "\t     FILTER(",
+              "\t                 ALL(DIM_DATE),",
+              "\t\t DIM_DATE[FISCAL_YEAR_RANGE] = MAX(DIM_DATE[FISCAL_YEAR_RANGE]) &&",
+              "\t\t DIM_DATE[DATE_KEY] <= MAX(DIM_DATE[DATE_KEY])",
+              "\t\t ),",
+              "                     DATESBETWEEN(GFMIS[PERIOD_NAME], MIN('UNITS HIERARCHY'[EFFECTIVE_DATE_FROM]), MAX('UNITS HIERARCHY'[EFFECTIVE_DATE_TO]))",
+              "\t)"
+            ],
+            "formatString": "#,0"
+          },
+          {
+            "name": "03.FE3LYAT_TO_MO3ADAL",
+            "expression": " DIVIDE([03.FE3LYAT],[02.RABT_MO3ADAL],0)",
+            "formatString": "#,0.0%;-#,0.0%;#,0.0%"
+          },
+          {
+            "name": "FISCAL_YEAR",
+            "expression": " \"20\" & INT(RIGHT(MAX(GFMIS[PERIOD_NAME]),2)) -1 & \" - \" & \"20\" & INT(RIGHT(MAX(GFMIS[PERIOD_NAME]),2))"
+          },
+          {
+            "name": "04.TA3DILAT",
+            "expression": " [02.RABT_MO3ADAL] - [01.RABT_ASLY]",
+            "formatString": "#,0.00"
+          },
+          {
+            "name": "04.TA3DILAT_TO_ASLY",
+            "expression": " DIVIDE([04.TA3DILAT],[01.RABT_ASLY],0)",
+            "formatString": "#,0.0%;-#,0.0%;#,0.0%"
+          },
+          {
+            "name": "05.E3TEMADAT_REMAINING",
+            "expression": " [02.RABT_MO3ADAL] - [03.FE3LYAT]",
+            "formatString": "#,0.00"
+          },
+          {
+            "name": "05.E3TEMADAT",
+            "expression": " [03.FE3LYAT]- [02.RABT_MO3ADAL]",
+            "formatString": "#,0.00"
+          },
+          {
+            "name": "05.TANFIZ_PERCENTAGE",
+            "expression": " DIVIDE([03.FE3LYAT],[02.RABT_MO3ADAL],0)",
+            "formatString": "#,0.0%;-#,0.0%;#,0.0%"
+          },
+          {
+            "name": "01.RABT_ASLY_FORMATTED",
+            "expression": [
+              " ",
+              "VAR VALUE_ = [01.RABT_ASLY] ",
+              " ",
+              "RETURN",
+              " ",
+              "SWITCH(",
+              "        TRUE(),",
+              "        ABS(Value_) < 1000, FORMAT(Value_, \"#,##0.00\"),",
+              "        ABS(Value_) >= 1000 && ABS(Value_) < 1000000, FORMAT(Value_ / 1000, \"#,##0.00\") & \" K\",",
+              "        ABS(Value_) >= 1000000 && ABS(Value_) < 1000000000, FORMAT(Value_ / 1000000, \"#,##0.00\") & \" M\",",
+              "        ABS(Value_) >= 1000000000, FORMAT(Value_ / 1000000000, \"#,##0.00\") & \" B\"",
+              "    )"
+            ]
+          },
+          {
+            "name": "02.RABT_MO3ADAL_FORMATTED",
+            "expression": [
+              " ",
+              "VAR VALUE_ = [02.RABT_MO3ADAL]",
+              " ",
+              "RETURN",
+              " ",
+              "SWITCH(",
+              "        TRUE(),",
+              "        ABS(Value_) < 1000, FORMAT(Value_, \"#,##0.00\"),",
+              "        ABS(Value_) >= 1000 && ABS(Value_) < 1000000, FORMAT(Value_ / 1000, \"#,##0.00\") & \" K\",",
+              "        ABS(Value_) >= 1000000 && ABS(Value_) < 1000000000, FORMAT(Value_ / 1000000, \"#,##0.00\") & \" M\",",
+              "        ABS(Value_) >= 1000000000, FORMAT(Value_ / 1000000000, \"#,##0.00\") & \" B\"",
+              "    )"
+            ]
+          },
+          {
+            "name": "03.FE3LYAT_FORMATTED",
+            "expression": [
+              " ",
+              "VAR VALUE_ = [03.FE3LYAT]",
+              " ",
+              "RETURN",
+              " ",
+              "SWITCH(",
+              "        TRUE(),",
+              "        ABS(Value_) < 1000, FORMAT(Value_, \"#,##0.00\"),",
+              "        ABS(Value_) >= 1000 && ABS(Value_) < 1000000, FORMAT(Value_ / 1000, \"#,##0.00\") & \" K\",",
+              "        ABS(Value_) >= 1000000 && ABS(Value_) < 1000000000, FORMAT(Value_ / 1000000, \"#,##0.00\") & \" M\",",
+              "        ABS(Value_) >= 1000000000, FORMAT(Value_ / 1000000000, \"#,##0.00\") & \" B\"",
+              "    )"
+            ]
+          },
+          {
+            "name": "aslyformated2",
+            "expression": [
+              "",
+              "VAR Value_ = [01.RABT_ASLY]",
+              " ",
+              "RETURN",
+              "SWITCH(",
+              "    TRUE(),",
+              "    ABS(Value_) < 1000, FORMAT(Value_, \"#,##0.00\"),",
+              "    ABS(Value_) >= 1000 && ABS(Value_) < 1000000, FORMAT(Value_ / 1000, \"#,##0\") & \" K\",",
+              "    ABS(Value_) >= 1000000 && ABS(Value_) < 1000000000, FORMAT(Value_ / 1000000, \"#,##0\") & \" M\",",
+              "    ABS(Value_) >= 1000000000, FORMAT(Value_ / 1000000000, \"#,##0\") & \" B\"",
+              ")"
+            ]
+          },
+          {
+            "name": "mo3dlformated2",
+            "expression": [
+              "",
+              "VAR Value_ = [02.RABT_MO3ADAL]",
+              " ",
+              "RETURN",
+              "SWITCH(",
+              "    TRUE(),",
+              "    ABS(Value_) < 1000, FORMAT(Value_, \"#,##0.00\"),",
+              "    ABS(Value_) >= 1000 && ABS(Value_) < 1000000, FORMAT(Value_ / 1000, \"#,##0\") & \" K\",",
+              "    ABS(Value_) >= 1000000 && ABS(Value_) < 1000000000, FORMAT(Value_ / 1000000, \"#,##0\") & \" M\",",
+              "    ABS(Value_) >= 1000000000, FORMAT(Value_ / 1000000000, \"#,##0\") & \" B\"",
+              ")"
+            ]
+          },
+          {
+            "name": "fe3lytformated2",
+            "expression": [
+              "",
+              "VAR Value_ = [03.FE3LYAT]",
+              " ",
+              "RETURN",
+              "SWITCH(",
+              "    TRUE(),",
+              "    ABS(Value_) < 1000, FORMAT(Value_, \"#,##0.00\"),",
+              "    ABS(Value_) >= 1000 && ABS(Value_) < 1000000, FORMAT(Value_ / 1000, \"#,##0\") & \" K\",",
+              "    ABS(Value_) >= 1000000 && ABS(Value_) < 1000000000, FORMAT(Value_ / 1000000, \"#,##0\") & \" M\",",
+              "    ABS(Value_) >= 1000000000, FORMAT(Value_ / 1000000000, \"#,##0\") & \" B\"",
+              ")"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "TSA",
+        "columns": [
+          {
+            "name": "BALANCE",
+            "dataType": "double",
+            "sourceColumn": "BALANCE"
+          },
+          {
+            "name": "CREDIT_BALANCE",
+            "dataType": "double",
+            "sourceColumn": "CREDIT_BALANCE"
+          },
+          {
+            "name": "DEBIT_BALANCE",
+            "dataType": "double",
+            "sourceColumn": "DEBIT_BALANCE"
+          },
+          {
+            "name": "DAILY_CREDIT_TRX_COUNT",
+            "dataType": "double",
+            "sourceColumn": "DAILY_CREDIT_TRX_COUNT"
+          },
+          {
+            "name": "DAILY_CREDIT_BALANCE",
+            "dataType": "double",
+            "sourceColumn": "DAILY_CREDIT_BALANCE"
+          },
+          {
+            "name": "DAILY_DEBIT_TRX_COUNT",
+            "dataType": "double",
+            "sourceColumn": "DAILY_DEBIT_TRX_COUNT"
+          },
+          {
+            "name": "DAILY_DEBIT_BALANCE",
+            "dataType": "double",
+            "sourceColumn": "DAILY_DEBIT_BALANCE"
+          },
+          {
+            "name": "ACCOUNT_TYPE_ID",
+            "dataType": "double",
+            "sourceColumn": "ACCOUNT_TYPE_ID"
+          },
+          {
+            "name": "ACCOUNT_NUMBER",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NUMBER"
+          },
+          {
+            "name": "ACCOUNT_NAME",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NAME"
+          },
+          {
+            "name": "ACC_ID",
+            "dataType": "double",
+            "sourceColumn": "ACC_ID"
+          },
+          {
+            "name": "BUDGET_CATEGORY_CODE",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_CODE"
+          },
+          {
+            "name": "POSTING_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "POSTING_DATE"
+          },
+          {
+            "name": "UNIT_CODE",
+            "dataType": "string",
+            "sourceColumn": "UNIT_CODE"
+          },
+          {
+            "name": "ID",
+            "dataType": "double",
+            "sourceColumn": "ID"
+          },
+          {
+            "name": "BUDGET_CATEGORY_TYPE_ID",
+            "dataType": "double",
+            "sourceColumn": "BUDGET_CATEGORY_TYPE_ID"
+          },
+          {
+            "name": "CODE",
+            "dataType": "string",
+            "sourceColumn": "CODE"
+          },
+          {
+            "name": "AR_NAME",
+            "dataType": "string",
+            "sourceColumn": "AR_NAME"
+          },
+          {
+            "name": "BUDGET_CATEGORY_GFMIS_TYPE",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_GFMIS_TYPE"
+          },
+          {
+            "name": "BUDGET_CATEGORY_TSA_TYPE",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_TSA_TYPE"
+          },
+          {
+            "type": "calculated",
+            "name": "DATE_KEY",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "FORMAT(TSA[POSTING_DATE], \"YYYYMMDD\")"
+          },
+          {
+            "name": "LOADING_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "LOADING_DATE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "TSA",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT ",
+                "    *",
+                "FROM ",
+                "    tsa_aeu_balances",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>let",
+                  "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                  "",
+                  "SELECT ",
+                  "    *",
+                  "FROM ",
+                  "    tsa_aeu_balances",
+                  "",
+                  "\")",
+                  "in",
+                  "    Source</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "measures": [
+          {
+            "name": "01.MONSAREF_BANKY",
+            "expression": [
+              " CALCULATE([BALANCE_], FILTER(DIM_DATE, DIM_DATE[FISCAL_MONTH] = MAX(DIM_DATE[FISCAL_MONTH])),",
+              "                     DATESBETWEEN(TSA[POSTING_DATE], MIN('UNITS HIERARCHY'[EFFECTIVE_DATE_FROM]), MAX('UNITS HIERARCHY'[EFFECTIVE_DATE_TO]))",
+              "\t)"
+            ]
+          },
+          {
+            "name": "01.MONSAREF_BANKY_FORMATTED",
+            "expression": [
+              " ",
+              "VAR VALUE_ = [01.MONSAREF_BANKY]",
+              "RETURN",
+              "SWITCH(",
+              "    TRUE(),",
+              "    ABS(VALUE_) < 1000, FORMAT(VALUE_, \"#,##0.00\"),",
+              "    ABS(VALUE_) >= 1000 && ABS(VALUE_) < 1000000, FORMAT(VALUE_ / 1000, \"#,##0.00\") & \" K\",",
+              "    ABS(VALUE_) >= 1000000 && ABS(VALUE_) < 1000000000, FORMAT(VALUE_ / 1000000, \"#,##0.00\") & \" M\",",
+              "    ABS(VALUE_) >= 1000000000, FORMAT(VALUE_ / 1000000000, \"#,##0.00\") & \" B\"",
+              ")"
+            ]
+          },
+          {
+            "name": "02.DIFF_FE3LEYAT_MONSAREF_BANKY",
+            "expression": " GFMIS[03.FE3LYAT] - TSA[01.MONSAREF_BANKY]",
+            "formatString": "#,0.00"
+          },
+          {
+            "name": "monsfrformated",
+            "expression": [
+              "",
+              "VAR VALUE_ = [01.MONSAREF_BANKY]",
+              "RETURN",
+              "SWITCH(",
+              "    TRUE(),",
+              "    ABS(VALUE_) < 1000, FORMAT(VALUE_, \"#,##0\"),",
+              "    ABS(VALUE_) >= 1000 && ABS(VALUE_) < 1000000, FORMAT(VALUE_ / 1000, \"#,##0\") & \" K\",",
+              "    ABS(VALUE_) >= 1000000 && ABS(VALUE_) < 1000000000, FORMAT(VALUE_ / 1000000, \"#,##0\") & \" M\",",
+              "    ABS(VALUE_) >= 1000000000, FORMAT(VALUE_ / 1000000000, \"#,##0\") & \" B\"",
+              ")"
+            ]
+          },
+          {
+            "name": "BALANCE_",
+            "expression": [
+              " ABS(SUM(TSA[BALANCE]))",
+              ""
+            ],
+            "formatString": "#,0.00"
+          }
+        ]
+      },
+      {
+        "name": "BUDGET_CATEGORY_TYPE",
+        "columns": [
+          {
+            "name": "BUDGET_CATEGORY_TYPE_ID",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_TYPE_ID"
+          },
+          {
+            "name": "BUDGET_CATEGORY_TYPE_CODE",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_TYPE_CODE"
+          },
+          {
+            "name": "BUDGET_CATEGORY_TYPE",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_TYPE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "--BUDGET CATEGORY TYPE",
+                "SELECT DISTINCT",
+                "    substr(flex_value, 1, 1) budget_category_type_id,",
+                "    flex_value               budget_category_type_code,",
+                "    t.description            budget_category_type",
+                "FROM",
+                "         gfmis_fnd_flex_values_vl v",
+                "    INNER JOIN gfmis_fnd_flex_values_tl t ON v.flex_value_id = t.flex_value_id",
+                "WHERE",
+                "    flex_value_set_id IN ( 1014151, 1017907 ) --BALANCING BODIES & ECONOMIC BODIES",
+                "    AND t.language = 'AR'",
+                "    AND flex_value = substr(flex_value, 1, 1)",
+                "                     || '0000000'",
+                "ORDER BY",
+                "    1",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "BUDGET_CATEGORY",
+        "columns": [
+          {
+            "name": "BUDGET_CATEGORY_TYPE",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_TYPE",
+            "sortByColumn": "BUDGET_CATEGORY_TYPE_CODE"
+          },
+          {
+            "name": "BUDGET_CATEGORY_TYPE_CODE",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_TYPE_CODE"
+          },
+          {
+            "name": "BUDGET_CATEGORY_ID",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_ID"
+          },
+          {
+            "name": "BUDGET_CATEGORY_CODE",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_CODE"
+          },
+          {
+            "name": "BUDGET_CATEGORY",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY"
+          },
+          {
+            "name": "TYPE",
+            "dataType": "string",
+            "sourceColumn": "TYPE",
+            "sortByColumn": "TYPE_ID"
+          },
+          {
+            "name": "BALANCING_OR_ECONOMIC",
+            "dataType": "string",
+            "sourceColumn": "BALANCING_OR_ECONOMIC"
+          },
+          {
+            "type": "calculated",
+            "name": "BUDGET_CATEGORY_WITH_CODE",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "BUDGET_CATEGORY[BUDGET_CATEGORY_ID] & \"-\" & BUDGET_CATEGORY[BUDGET_CATEGORY]"
+          },
+          {
+            "name": "TYPE_ID",
+            "dataType": "string",
+            "sourceColumn": "TYPE_ID"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "--### BUDGET CATEGORIES MAPPING (GFMIS/TSA)###",
+                "WITH tsa_budget_categories AS (",
+                "    SELECT",
+                "        id,",
+                "        budget_category_type_id,",
+                "        code,",
+                "        ar_name,",
+                "        CASE",
+                "            WHEN code = '01'",
+                "                 AND budget_category_type_id = 1 THEN",
+                "                '21100000'",
+                "            WHEN code = '02'",
+                "                 AND budget_category_type_id = 1 THEN",
+                "                '21200000'",
+                "            WHEN code = '03'",
+                "                 AND budget_category_type_id = 1 THEN",
+                "                '21300000'",
+                "            WHEN code = '04'",
+                "                 AND budget_category_type_id = 1 THEN",
+                "                '21400000'",
+                "            WHEN code = '05'",
+                "                 AND budget_category_type_id = 1 THEN",
+                "                '21500000'",
+                "            WHEN code = '06'",
+                "                 AND budget_category_type_id = 1 THEN",
+                "                '21600000'",
+                "            WHEN code = '07'",
+                "                 AND budget_category_type_id = 1 THEN",
+                "                '22700000'",
+                "            WHEN code = '08'",
+                "                 AND budget_category_type_id = 1 THEN",
+                "                '23800000'",
+                "            WHEN code = '09'",
+                "                 AND budget_category_type_id = 1 THEN",
+                "                '21600000'",
+                "            WHEN code = '01'",
+                "                 AND budget_category_type_id = 2 THEN",
+                "                '11100000'",
+                "            WHEN code = '02'",
+                "                 AND budget_category_type_id = 2 THEN",
+                "                '11200000'",
+                "            WHEN code = '03'",
+                "                 AND budget_category_type_id = 2 THEN",
+                "                '11300000'",
+                "            WHEN code = '04'",
+                "                 AND budget_category_type_id = 2 THEN",
+                "                '12400000'",
+                "            WHEN code = '05'",
+                "                 AND budget_category_type_id = 2 THEN",
+                "                '13500000'",
+                "        END door_code",
+                "    FROM",
+                "        tsa_budget_category bc",
+                "    WHERE",
+                "        budget_category_type_id IN ( 1, 2 )",
+                "), gfmis_balancing_doors AS (",
+                "    SELECT DISTINCT",
+                "        substr(flex_value, 1, 3) door_id,",
+                "        flex_value               door_code,",
+                "        t.description            door_name,",
+                "        CASE",
+                "            WHEN substr(flex_value, 1, 1) = 2 THEN",
+                "                n'إستخدامات'",
+                "            WHEN substr(flex_value, 1, 1) = 1 THEN",
+                "                n'موارد'",
+                "            ELSE",
+                "                n'أخرى'",
+                "        END                      budget_category_type",
+                "    FROM",
+                "             gfmis_fnd_flex_values_vl v",
+                "        INNER JOIN gfmis_fnd_flex_values_tl t ON v.flex_value_id = t.flex_value_id",
+                "    WHERE",
+                "        flex_value_set_id IN ( 1014151 )",
+                "        AND t.language = 'AR'",
+                "        AND flex_value = substr(flex_value, 1, 3)",
+                "                         || '00000'",
+                "        AND flex_value <> substr(flex_value, 1, 2)",
+                "                          || '000000'",
+                "        AND substr(flex_value, 1, 1) IN ( '1', '2' )",
+                "), economic_groups AS (",
+                "    SELECT DISTINCT",
+                "        substr(flex_value, 1, 4) group_id,",
+                "        flex_value               group_code,",
+                "        t.description            group_name,",
+                "        CASE",
+                "            WHEN substr(flex_value, 1, 1) = '5' THEN",
+                "                '1'",
+                "            ELSE",
+                "                substr(flex_value, 2, 1)",
+                "        END                      type_id,",
+                "        CASE",
+                "            WHEN substr(flex_value, 2, 1) IN ( '1' )  THEN",
+                "                n'مصروفات و إيرادات جارية'",
+                "            WHEN substr(flex_value, 2, 1) IN ( '2' ) THEN",
+                "                n'مصروفات و إيرادات رأس مالية'",
+                "            ELSE",
+                "                n'مصروفات و إيرادات جارية'",
+                "        END                      group_type,",
+                "        CASE",
+                "            WHEN substr(flex_value, 1, 1) = '3'   THEN",
+                "                n'إستخدامات'",
+                "            WHEN substr(flex_value, 1, 3) = '511' THEN",
+                "                n'إستخدامات'",
+                "            WHEN substr(flex_value, 1, 3) = '512' THEN",
+                "                n'موارد'",
+                "            ELSE",
+                "                n'موارد'",
+                "        END                      budget_category_type,",
+                "        CASE",
+                "            WHEN substr(flex_value, 1, 1) IN ( '3' ) THEN",
+                "                '2'",
+                "            WHEN substr(flex_value, 1, 3) = '511' THEN",
+                "                '2'",
+                "            WHEN substr(flex_value, 1, 3) = '512' THEN",
+                "                '1'",
+                "            ELSE",
+                "                '1'",
+                "        END                      budget_category_type_code",
+                "    FROM",
+                "             gfmis_fnd_flex_values_vl v",
+                "        INNER JOIN gfmis_fnd_flex_values_tl t ON v.flex_value_id = t.flex_value_id",
+                "    WHERE",
+                "        flex_value_set_id IN ( 1017907 )",
+                "        AND t.language = 'AR'",
+                "        AND flex_value = substr(flex_value, 1, 4)",
+                "                         || '000000'",
+                "        AND substr(flex_value, 4, 1) NOT IN ( '0' )",
+                "        --AND substr(flex_value, 1, 3) IN ( '311', '321', '322', '411', '421', '422', '423', '511', '512' )",
+                "    ORDER BY",
+                "        1",
+                "), budget_categories AS (",
+                "    SELECT",
+                "        door_id               budget_category_id,",
+                "        gbc.door_code         budget_category_code,",
+                "        CASE",
+                "            WHEN coalesce(ar_name, door_name) IN ( 'الباب السادس : شراء الأصول غير المالية (الاستثمارات)', 'الباب السادس : شراء الأصول غير المالية (الموازنيه)' )",
+                "            THEN",
+                "                'الباب السادس : شراء الأصول غير المالية'",
+                "            ELSE",
+                "                coalesce(ar_name, door_name)",
+                "        END                   budget_category,",
+                "        '0'                   type_id,",
+                "        n'لا يوجد'            type,",
+                "        budget_category_type,",
+                "        substr(door_id, 1, 1) budget_category_type_code,",
+                "        'هيئات موازنية'       balancing_or_economic",
+                "    FROM",
+                "        gfmis_balancing_doors gbc",
+                "        LEFT JOIN tsa_budget_categories tbc ON to_char(gbc.door_code) = to_char(tbc.door_code)",
+                "    UNION",
+                "    SELECT",
+                "        group_id,",
+                "        group_code,",
+                "        group_name,",
+                "        type_id,",
+                "        group_type,",
+                "        budget_category_type,",
+                "        budget_category_type_code,",
+                "        'هيئات اقتصادية' balancing_or_economic",
+                "    FROM",
+                "        economic_groups",
+                ")",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    budget_categories",
+                "WHERE",
+                "    budget_category_id NOT IN ( '149', '249' )",
+                "ORDER BY",
+                "    balancing_or_economic,",
+                "    budget_category_type",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "GPS_PROJECTS_ELECTRONIC_PAYMENTS",
+        "columns": [
+          {
+            "name": "PAYMENT_ORDER_ID",
+            "dataType": "double",
+            "sourceColumn": "PAYMENT_ORDER_ID"
+          },
+          {
+            "name": "PAYMENT_ORDER_AMOUNT",
+            "dataType": "double",
+            "sourceColumn": "PAYMENT_ORDER_AMOUNT"
+          },
+          {
+            "name": "ACCOUNT_AMOUNT",
+            "dataType": "double",
+            "sourceColumn": "ACCOUNT_AMOUNT"
+          },
+          {
+            "name": "PROJECT_CODE",
+            "dataType": "string",
+            "sourceColumn": "PROJECT_CODE"
+          },
+          {
+            "name": "PROJECT_NAME",
+            "dataType": "string",
+            "sourceColumn": "PROJECT_NAME"
+          },
+          {
+            "name": "UNIT_CODE",
+            "dataType": "string",
+            "sourceColumn": "UNIT_CODE"
+          },
+          {
+            "name": "SETTLEMENT_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "SETTLEMENT_DATE"
+          },
+          {
+            "type": "calculated",
+            "name": "DATE_KEY",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(GPS_PROJECTS_ELECTRONIC_PAYMENTS[SETTLEMENT_DATE], \"YYYYMMDD\")"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "        po.id      payment_order_id,",
+                "        po.amount  payment_order_amount,",
+                "        nib.amount account_amount,",
+                "        nib.code   project_code,",
+                "        CASE",
+                "            WHEN nib.code IS NULL THEN",
+                "                'دائنون'",
+                "            ELSE",
+                "                to_char(nib.name)",
+                "        END        project_name,",
+                "        au.code    unit_code,",
+                "        po.settlement_date",
+                "    FROM",
+                "             gps_payment_order po",
+                "        INNER JOIN gps_payment_order_nib_project nib ON nib.payment_order_id = po.id",
+                "        INNER JOIN gps_accounting_units          au ON au.id = po.acc_unit_id",
+                "    WHERE",
+                "        nib.po_settlement_date BETWEEN CASE",
+                "                                           WHEN to_char(sysdate, 'MMDD') >= '0701' THEN",
+                "                                               TO_DATE('01-JUL-' || to_char(sysdate, 'YY'),",
+                "                                                       'DD-MON-YY')",
+                "                                           ELSE",
+                "                                               TO_DATE('01-JUL-'",
+                "                                                       || to_char(add_months(sysdate, - 12),",
+                "                                                                  'YY'),",
+                "                                                       'DD-MON-YY')",
+                "                                       END AND CASE",
+                "                                                   WHEN to_char(sysdate, 'MMDD') >= '0701' THEN",
+                "                                                       TO_DATE('30-JUN-'",
+                "                                                               || to_char(add_months(sysdate, 12),",
+                "                                                                          'YY'),",
+                "                                                               'DD-MON-YY')",
+                "                                                   ELSE",
+                "                                                       TO_DATE('30-JUN-' || to_char(sysdate, 'YY'),",
+                "                                                               'DD-MON-YY')",
+                "                                               END",
+                "        AND po.executor_id = 2",
+                "        AND po.status_id IN ( 8, 9, 20, 21 )",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "PROJECTS_EP_COUNT",
+            "expression": " DISTINCTCOUNT(GPS_PROJECTS_ELECTRONIC_PAYMENTS[PROJECT_CODE])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "ELECTRONIC_PAYMENTS_AMOUNT",
+            "expression": " SUM(GPS_PROJECTS_ELECTRONIC_PAYMENTS[ACCOUNT_AMOUNT])",
+            "formatString": "#,0.00"
+          }
+        ]
+      },
+      {
+        "name": "GPS_PROJECTS_LKP",
+        "columns": [
+          {
+            "name": "PROJECT_CODE",
+            "dataType": "string",
+            "sourceColumn": "PROJECT_CODE"
+          },
+          {
+            "name": "PROJECT_NAME",
+            "dataType": "string",
+            "sourceColumn": "PROJECT_NAME"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "        project_code,",
+                "        project_name",
+                "    FROM",
+                "        (",
+                "            SELECT DISTINCT",
+                "                code project_code,",
+                "                name project_name,",
+                "                DENSE_RANK()",
+                "                OVER(PARTITION BY code",
+                "                     ORDER BY",
+                "                         name",
+                "                )    r",
+                "            FROM",
+                "                gps_payment_order_nib_project",
+                "            WHERE",
+                "                code IS NOT NULL",
+                "        )",
+                "    WHERE",
+                "        r = 1",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "PROJECTS_APPROVED_PAYMENTS",
+        "columns": [
+          {
+            "name": "PROJECT_CODE",
+            "dataType": "double",
+            "sourceColumn": "PROJECT_CODE"
+          },
+          {
+            "name": "PROJECT_NAME",
+            "dataType": "string",
+            "sourceColumn": "PROJECT_NAME"
+          },
+          {
+            "name": "UNIT_CODE",
+            "dataType": "double",
+            "sourceColumn": "UNIT_CODE"
+          },
+          {
+            "name": "BALANCE",
+            "dataType": "double",
+            "sourceColumn": "BALANCE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "        im_code project_code,",
+                "        project_name,",
+                "        au_code unit_code,",
+                "        amount balance",
+                "    FROM",
+                "        mop_projects_sheet",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "PROJECTS_AP_COUNT",
+            "expression": " DISTINCTCOUNT(PROJECTS_APPROVED_PAYMENTS[PROJECT_CODE])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "APPROVED_PAYMENTS",
+            "expression": " SUM(PROJECTS_APPROVED_PAYMENTS[BALANCE])",
+            "formatString": "#,0"
+          }
+        ]
+      },
+      {
+        "name": "PAYROLL_LKPS",
+        "columns": [
+          {
+            "name": "PAYROLL_ID",
+            "dataType": "double",
+            "sourceColumn": "PAYROLL_ID"
+          },
+          {
+            "name": "UNIT_CODE",
+            "dataType": "string",
+            "sourceColumn": "UNIT_CODE"
+          },
+          {
+            "name": "UNIT_NAME",
+            "dataType": "string",
+            "sourceColumn": "UNIT_NAME"
+          },
+          {
+            "name": "AREA_CODE",
+            "dataType": "string",
+            "sourceColumn": "AREA_CODE"
+          },
+          {
+            "name": "AREA_NAME",
+            "dataType": "string",
+            "sourceColumn": "AREA_NAME"
+          },
+          {
+            "name": "UNIT_TYPE",
+            "dataType": "string",
+            "sourceColumn": "UNIT_TYPE"
+          },
+          {
+            "name": "FUNCTIONAL_SECTOR_CODE",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_SECTOR_CODE"
+          },
+          {
+            "name": "FUNCTIONAL_SECTOR",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_SECTOR"
+          },
+          {
+            "name": "INSTITUTIONAL_SECTOR_CODE",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTIONAL_SECTOR_CODE"
+          },
+          {
+            "name": "INSTITUTIONAL_SECTOR",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTIONAL_SECTOR"
+          },
+          {
+            "name": "IS_MINISTRY",
+            "dataType": "double",
+            "sourceColumn": "IS_MINISTRY"
+          },
+          {
+            "name": "GOVERNORATE_ID",
+            "dataType": "double",
+            "sourceColumn": "GOVERNORATE_ID"
+          },
+          {
+            "name": "GOVERNORATE_NAME_AR",
+            "dataType": "string",
+            "sourceColumn": "GOVERNORATE_NAME_AR"
+          },
+          {
+            "name": "GOVERNORATE_NAME_EN",
+            "dataType": "string",
+            "sourceColumn": "GOVERNORATE_NAME_EN"
+          },
+          {
+            "name": "LAT",
+            "dataType": "double",
+            "sourceColumn": "LAT"
+          },
+          {
+            "name": "LNG",
+            "dataType": "double",
+            "sourceColumn": "LNG"
+          },
+          {
+            "name": "INSTITUTION_CODE",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTION_CODE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "WITH lkp_attributes AS (",
+                "    SELECT",
+                "        payroll_id,",
+                "        segment2                      unit_code,",
+                "        descr_segment2                unit_name,",
+                "        code_bu                       area_code,",
+                "        descr_bu                      area_name,",
+                "        budget_type                   unit_type,",
+                "        coalesce(code_attr1, '00000') functional_sector_code,",
+                "        coalesce(descr_attr1, 'أخرى') functional_sector,",
+                "        coalesce(code_attr2, '0000')  institutional_sector_code,",
+                "        coalesce(descr_attr2, 'أخرى') institutional_sector,",
+                "        CASE",
+                "            WHEN code_attr2 IS NOT NULL THEN",
+                "                1",
+                "            ELSE",
+                "                0",
+                "        END                           is_ministry,",
+                "        descr_attr9                   governorate,",
+                "        CASE",
+                "            WHEN descr_attr9 = 'القاهرة'       THEN",
+                "                1",
+                "            WHEN descr_attr9 = 'الجيزة'        THEN",
+                "                2",
+                "            WHEN descr_attr9 = 'الإسكندرية'    THEN",
+                "                3",
+                "            WHEN descr_attr9 = 'الدقهلية'      THEN",
+                "                4",
+                "            WHEN descr_attr9 = 'البحر الأحمر'  THEN",
+                "                5",
+                "            WHEN descr_attr9 = 'البحيرة'       THEN",
+                "                6",
+                "            WHEN descr_attr9 = 'الفيوم'        THEN",
+                "                7",
+                "            WHEN descr_attr9 = 'الغربية'       THEN",
+                "                8",
+                "            WHEN descr_attr9 = 'الإسماعيلية'   THEN",
+                "                9",
+                "            WHEN descr_attr9 = 'المنوفية'      THEN",
+                "                10",
+                "            WHEN descr_attr9 = 'المنيا'        THEN",
+                "                11",
+                "            WHEN descr_attr9 = 'القليوبية'     THEN",
+                "                12",
+                "            WHEN descr_attr9 = 'الوادي الجديد' THEN",
+                "                13",
+                "            WHEN descr_attr9 = 'السويس'        THEN",
+                "                14",
+                "            WHEN descr_attr9 = 'أسوان'         THEN",
+                "                15",
+                "            WHEN descr_attr9 = 'أسيوط'         THEN",
+                "                16",
+                "            WHEN descr_attr9 = 'بني سويف'      THEN",
+                "                17",
+                "            WHEN descr_attr9 = 'بورسعيد'       THEN",
+                "                18",
+                "            WHEN descr_attr9 = 'دمياط'         THEN",
+                "                19",
+                "            WHEN descr_attr9 = 'الشرقية'       THEN",
+                "                20",
+                "            WHEN descr_attr9 = 'جنوب سيناء'    THEN",
+                "                21",
+                "            WHEN descr_attr9 = 'كفر الشيخ'     THEN",
+                "                22",
+                "            WHEN descr_attr9 = 'مطروح'         THEN",
+                "                23",
+                "            WHEN descr_attr9 = 'الاقصر'        THEN",
+                "                24",
+                "            WHEN descr_attr9 = 'قنا'           THEN",
+                "                25",
+                "            WHEN descr_attr9 = 'شمال سيناء'    THEN",
+                "                26",
+                "            WHEN descr_attr9 = 'سوهاج'         THEN",
+                "                27",
+                "            ELSE",
+                "                0",
+                "        END                           AS governorate_id,",
+                "        code_attr9                    governorate_code",
+                "    FROM",
+                "        gfmis_xxpay_gfn_attributes_v",
+                "), lkps_details AS (",
+                "    SELECT",
+                "        a.payroll_id,",
+                "        a.unit_code,",
+                "        a.unit_name,",
+                "        a.area_code,",
+                "        a.area_name,",
+                "        substr(a.unit_code,1,3)||'00000' institution_code,",
+                "        a.unit_type,",
+                "        a.functional_sector_code,",
+                "        a.functional_sector,",
+                "        a.institutional_sector_code,",
+                "        a.institutional_sector,",
+                "        a.is_ministry,",
+                "        a.governorate_id,",
+                "        coalesce(governorate_name_ar, 'أخرى')  governorate_name_ar,",
+                "        coalesce(governorate_name_en, 'Other') governorate_name_en,",
+                "        lat,",
+                "        lng",
+                "    FROM",
+                "        lkp_attributes     a",
+                "        LEFT JOIN egypt_governorates g ON a.governorate_id = g.governorate_id",
+                ")",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    lkps_details",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "PAYROLL_TRX",
+        "columns": [
+          {
+            "name": "PAYROLL_ID",
+            "dataType": "double",
+            "sourceColumn": "PAYROLL_ID"
+          },
+          {
+            "name": "TOTAL_EARNINGS",
+            "dataType": "double",
+            "sourceColumn": "TOTAL_EARNINGS"
+          },
+          {
+            "name": "TOTAL_DEDUCTIONS",
+            "dataType": "double",
+            "sourceColumn": "TOTAL_DEDUCTIONS"
+          },
+          {
+            "name": "PERIOD_NAME",
+            "dataType": "dateTime",
+            "sourceColumn": "PERIOD_NAME"
+          },
+          {
+            "name": "RUN_TYPE_ID",
+            "dataType": "string",
+            "sourceColumn": "RUN_TYPE_ID"
+          },
+          {
+            "name": "CREATION_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "CREATION_DATE"
+          },
+          {
+            "name": "GENDER",
+            "dataType": "string",
+            "sourceColumn": "GENDER"
+          },
+          {
+            "name": "ASSIGNMENT_STATUS_TYPE_ID",
+            "dataType": "double",
+            "sourceColumn": "ASSIGNMENT_STATUS_TYPE_ID"
+          },
+          {
+            "name": "GRADE_CATEGORY",
+            "dataType": "string",
+            "sourceColumn": "GRADE_CATEGORY"
+          },
+          {
+            "name": "JOB_CATEGORY",
+            "dataType": "string",
+            "sourceColumn": "JOB_CATEGORY"
+          },
+          {
+            "name": "EMPLOYMENT_CATEGORY",
+            "dataType": "string",
+            "sourceColumn": "EMPLOYMENT_CATEGORY"
+          },
+          {
+            "name": "SALARY_BASIS_CATEGORY",
+            "dataType": "string",
+            "sourceColumn": "SALARY_BASIS_CATEGORY"
+          },
+          {
+            "name": "FUND_LEVEL",
+            "dataType": "string",
+            "sourceColumn": "FUND_LEVEL"
+          },
+          {
+            "type": "calculated",
+            "name": "DATE_KEY",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(PAYROLL_TRX[PERIOD_NAME], \"YYYYMMDD\")"
+          },
+          {
+            "name": "PERSON_ID",
+            "dataType": "double",
+            "sourceColumn": "PERSON_ID"
+          },
+          {
+            "name": "ASSIGNMENT_ID",
+            "dataType": "double",
+            "sourceColumn": "ASSIGNMENT_ID"
+          },
+          {
+            "name": "ASSIGNMENT_ACTION_ID",
+            "dataType": "double",
+            "sourceColumn": "ASSIGNMENT_ACTION_ID"
+          },
+          {
+            "name": "AGE",
+            "dataType": "double",
+            "sourceColumn": "AGE"
+          },
+          {
+            "name": "YEARS_TO_RETIRE",
+            "dataType": "double",
+            "sourceColumn": "YEARS_TO_RETIRE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CURRENT_YEAR",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "        det.person_id,",
+                "        ded.assignment_id,",
+                "        ded.payroll_id,",
+                "        total_earnings,",
+                "        total_deductions,",
+                "        to_date('01 ' || time_period_name, 'DD MM YYYY')                                 period_name,",
+                "        run_type_id,",
+                "        assignment_action_id,",
+                "        creation_date,",
+                "        CASE",
+                "            WHEN sex = 'M' THEN",
+                "                'ذكر'",
+                "            WHEN sex = 'F' THEN",
+                "                'أنثى'",
+                "            ELSE",
+                "                'غير محدد'",
+                "        END                                                                              gender,",
+                "        floor(months_between(sysdate, date_of_birth) / 12)                               age,",
+                "        abs(floor(months_between(sysdate, to_date(retirement_date, 'DD-MM-YYYY')) / 12)) AS years_to_retire,",
+                "        assignment_status_type_id,",
+                "        coalesce(grad_name, 'غير محدد')                                                  grade_category,",
+                "        coalesce(job_name, 'غير محدد')                                                   job_category,",
+                "        coalesce(employment_category, 'غير محدد')                                        employment_category,",
+                "        coalesce(salary_basis_name, 'غير محدد')                                          salary_basis_category,",
+                "        coalesce(asgnment_fund, 'غير محدد')                                              fund_level",
+                "    FROM",
+                "             gfmis_xxpay_gfn_total_earn_ded_v ded",
+                "        INNER JOIN gfmis_xxpay_gfn_per_asg_det_v det ON det.assignment_id = ded.assignment_id",
+                "                                                        AND det.payroll_id = ded.payroll_id",
+                "    WHERE",
+                "        substr(time_period_name, - 4, 4) = EXTRACT(YEAR FROM sysdate)",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>let",
+                  "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                  "",
+                  "WITH payroll_details AS (",
+                  "    SELECT",
+                  "        det.person_id,",
+                  "        COUNT(DISTINCT person_id)",
+                  "        OVER(PARTITION BY ded.payroll_id, assignment_status_type_id)                     employee_cnt,",
+                  "        ded.assignment_id,",
+                  "        ded.payroll_id,",
+                  "        total_earnings,",
+                  "        total_deductions,",
+                  "        to_date('01 ' || time_period_name, 'DD MM YYYY')                                 period_name,",
+                  "        run_type_id,",
+                  "        assignment_action_id,",
+                  "        creation_date,",
+                  "        CASE",
+                  "            WHEN sex = 'M' THEN",
+                  "                'ذكر'",
+                  "            WHEN sex = 'F' THEN",
+                  "                'أنثى'",
+                  "            ELSE",
+                  "                'غير محدد'",
+                  "        END                                                                              gender,",
+                  "        floor(months_between(sysdate, date_of_birth) / 12)                               age,",
+                  "        abs(floor(months_between(sysdate, to_date(retirement_date, 'DD-MM-YYYY')) / 12)) AS years_to_retire,",
+                  "        assignment_status_type_id,",
+                  "        coalesce(grad_name, 'غير محدد')                                                  grade_category,",
+                  "        coalesce(job_name, 'غير محدد')                                                   job_category,",
+                  "        coalesce(employment_category, 'غير محدد')                                        employment_category,",
+                  "        coalesce(salary_basis_name, 'غير محدد')                                          salary_basis_category,",
+                  "        coalesce(asgnment_fund, 'غير محدد')                                              fund_level",
+                  "    FROM",
+                  "             gfmis_xxpay_gfn_total_earn_ded_v ded",
+                  "        INNER JOIN gfmis_xxpay_gfn_per_asg_det_v det ON det.assignment_id = ded.assignment_id",
+                  "                                                        AND det.payroll_id = ded.payroll_id",
+                  "    WHERE",
+                  "        substr(time_period_name, - 4, 4) = EXTRACT(YEAR FROM sysdate)",
+                  "), payroll_agg AS (",
+                  "    SELECT",
+                  "        COUNT(DISTINCT person_id)     employee_per_payroll_count,",
+                  "        MAX(employee_cnt)             employee_count,",
+                  "        COUNT(DISTINCT assignment_id) assignment_count,",
+                  "        ( payroll_id )                payroll_id,",
+                  "        SUM(total_earnings)           total_earnings,",
+                  "        SUM(total_deductions)         total_deductions,",
+                  "        period_name,",
+                  "        run_type_id,",
+                  "        creation_date,",
+                  "        gender,",
+                  "        assignment_status_type_id,",
+                  "        grade_category,",
+                  "        job_category,",
+                  "        employment_category,",
+                  "        salary_basis_category,",
+                  "        fund_level",
+                  "    FROM",
+                  "        payroll_details",
+                  "    GROUP BY",
+                  "        payroll_id,",
+                  "        period_name,",
+                  "        run_type_id,",
+                  "        creation_date,",
+                  "        gender,",
+                  "        assignment_status_type_id,",
+                  "        grade_category,",
+                  "        job_category,",
+                  "        employment_category,",
+                  "        salary_basis_category,",
+                  "        fund_level",
+                  ")",
+                  "SELECT",
+                  "    *",
+                  "FROM",
+                  "    payroll_agg",
+                  "WHERE 1 = 0",
+                  "",
+                  "\")",
+                  "in",
+                  "    Source</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "PREVIOUS_YEAR",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    det.person_id,",
+                "    ded.assignment_id,",
+                "    ded.payroll_id,",
+                "    total_earnings,",
+                "    total_deductions,",
+                "    TO_DATE('01 ' || time_period_name, 'DD MM YYYY')          period_name,",
+                "    run_type_id,",
+                "    assignment_action_id,",
+                "    creation_date,",
+                "    CASE",
+                "        WHEN sex = 'M' THEN",
+                "            'ذكر'",
+                "        WHEN sex = 'F' THEN",
+                "            'أنثى'",
+                "        ELSE",
+                "            'غير محدد'",
+                "    END                                                       gender,",
+                "    floor(months_between(sysdate, date_of_birth) / 12)        age,",
+                "    abs(floor(months_between(sysdate,",
+                "                             TO_DATE(retirement_date, 'DD-MM-YYYY')) / 12)) AS years_to_retire,",
+                "    assignment_status_type_id,",
+                "    coalesce(grad_name, 'غير محدد')                           grade_category,",
+                "    coalesce(job_name, 'غير محدد')                            job_category,",
+                "    coalesce(employment_category, 'غير محدد')                 employment_category,",
+                "    coalesce(salary_basis_name, 'غير محدد')                   salary_basis_category,",
+                "    coalesce(asgnment_fund, 'غير محدد')                       fund_level",
+                "FROM",
+                "         gfmis_xxpay_gfn_total_earn_ded_v ded",
+                "    INNER JOIN gfmis_xxpay_gfn_per_asg_det_v det ON det.assignment_id = ded.assignment_id",
+                "                                                    AND det.payroll_id = ded.payroll_id",
+                "WHERE",
+                "    substr(time_period_name, - 4, 4) IN (",
+                "        SELECT",
+                "            EXTRACT(YEAR FROM sysdate) - level AS previous_year",
+                "        FROM",
+                "            dual",
+                "        CONNECT BY",
+                "            level <= 3",
+                "    )",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>let",
+                  "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                  "",
+                  "SELECT",
+                  "    det.person_id,",
+                  "    ded.assignment_id,",
+                  "    ded.payroll_id,",
+                  "    total_earnings,",
+                  "    total_deductions,",
+                  "    TO_DATE('01 ' || time_period_name, 'DD MM YYYY')          period_name,",
+                  "    run_type_id,",
+                  "    assignment_action_id,",
+                  "    creation_date,",
+                  "    CASE",
+                  "        WHEN sex = 'M' THEN",
+                  "            'ذكر'",
+                  "        WHEN sex = 'F' THEN",
+                  "            'أنثى'",
+                  "        ELSE",
+                  "            'غير محدد'",
+                  "    END                                                       gender,",
+                  "    floor(months_between(sysdate, date_of_birth) / 12)        age,",
+                  "    abs(floor(months_between(sysdate,",
+                  "                             TO_DATE(retirement_date, 'DD-MM-YYYY')) / 12)) AS years_to_retire,",
+                  "    assignment_status_type_id,",
+                  "    coalesce(grad_name, 'غير محدد')                           grade_category,",
+                  "    coalesce(job_name, 'غير محدد')                            job_category,",
+                  "    coalesce(employment_category, 'غير محدد')                 employment_category,",
+                  "    coalesce(salary_basis_name, 'غير محدد')                   salary_basis_category,",
+                  "    coalesce(asgnment_fund, 'غير محدد')                       fund_level",
+                  "FROM",
+                  "         gfmis_xxpay_gfn_total_earn_ded_v ded",
+                  "    INNER JOIN gfmis_xxpay_gfn_per_asg_det_v det ON det.assignment_id = ded.assignment_id",
+                  "                                                    AND det.payroll_id = ded.payroll_id",
+                  "WHERE",
+                  "    substr(time_period_name, - 4, 4) IN (",
+                  "        SELECT",
+                  "            EXTRACT(YEAR FROM sysdate) - level AS previous_year",
+                  "        FROM",
+                  "            dual",
+                  "        CONNECT BY",
+                  "            level <= 3",
+                  "    )",
+                  "",
+                  "\")",
+                  "in",
+                  "    Source</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "measures": [
+          {
+            "name": "#.PAYROLL_COUNT",
+            "expression": " DISTINCTCOUNT(PAYROLL_TRX[PAYROLL_ID])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "#.EMPLOYEES_COUNT",
+            "expression": " DISTINCTCOUNT(PAYROLL_TRX[PERSON_ID])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "#.EARNINGS_AMT",
+            "expression": " SUM(PAYROLL_TRX[TOTAL_EARNINGS])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "#.DEDUCTIONS_AMT",
+            "expression": " SUM(PAYROLL_TRX[TOTAL_DEDUCTIONS])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "#.AGE_AVERAGE",
+            "expression": " AVERAGE(PAYROLL_TRX[AGE])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "#.YEARS_TO_RETIRE_AVERAGE",
+            "expression": " AVERAGE(PAYROLL_TRX[YEARS_TO_RETIRE])",
+            "formatString": "#,0"
+          }
+        ]
+      },
+      {
+        "name": "PAYROLL_BASIS_CATEGORIES",
+        "columns": [
+          {
+            "name": "PAY_BASIS_ID",
+            "dataType": "double",
+            "sourceColumn": "PAY_BASIS_ID"
+          },
+          {
+            "name": "NAME_BEFORE_UPDATE",
+            "dataType": "string",
+            "sourceColumn": "NAME_BEFORE_UPDATE"
+          },
+          {
+            "name": "NAME_AFTER_UPDATE",
+            "dataType": "string",
+            "sourceColumn": "NAME_AFTER_UPDATE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    gfmis_xxpay_int_sal_bas_map",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "RLS_GOVERNORATES",
+        "columns": [
+          {
+            "name": "USERNAME",
+            "dataType": "string",
+            "sourceColumn": "USERNAME"
+          },
+          {
+            "name": "MATCHING_CODE",
+            "dataType": "string",
+            "sourceColumn": "MATCHING_CODE"
+          },
+          {
+            "name": "TYPE",
+            "dataType": "string",
+            "sourceColumn": "TYPE"
+          },
+          {
+            "name": "LKP_LEVEL",
+            "dataType": "string",
+            "sourceColumn": "LKP_LEVEL"
+          },
+          {
+            "name": "CREATED_AT",
+            "dataType": "dateTime",
+            "sourceColumn": "CREATED_AT"
+          },
+          {
+            "name": "MODIFIED_AT",
+            "dataType": "dateTime",
+            "sourceColumn": "MODIFIED_AT"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT ",
+                "    * ",
+                "FROM rls_mof",
+                "WHERE ",
+                "    type = 'Governorate'",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "RLS_MINISTRIES",
+        "columns": [
+          {
+            "name": "USERNAME",
+            "dataType": "string",
+            "sourceColumn": "USERNAME"
+          },
+          {
+            "name": "MATCHING_CODE",
+            "dataType": "string",
+            "sourceColumn": "MATCHING_CODE"
+          },
+          {
+            "name": "TYPE",
+            "dataType": "string",
+            "sourceColumn": "TYPE"
+          },
+          {
+            "name": "LKP_LEVEL",
+            "dataType": "string",
+            "sourceColumn": "LKP_LEVEL"
+          },
+          {
+            "name": "CREATED_AT",
+            "dataType": "dateTime",
+            "sourceColumn": "CREATED_AT"
+          },
+          {
+            "name": "MODIFIED_AT",
+            "dataType": "dateTime",
+            "sourceColumn": "MODIFIED_AT"
+          },
+          {
+            "name": "BUSINESS_NAME",
+            "dataType": "string",
+            "sourceColumn": "BUSINESS_NAME"
+          },
+          {
+            "name": "RELATED_ENTITY",
+            "dataType": "string",
+            "sourceColumn": "RELATED_ENTITY"
+          },
+          {
+            "name": "SSAS_CUBE",
+            "dataType": "string",
+            "sourceColumn": "SSAS_CUBE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT ",
+                "    * ",
+                "FROM rls_mof",
+                "WHERE ",
+                "    type = 'Ministry'",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "RLS_UNIVERSITIES",
+        "columns": [
+          {
+            "name": "USERNAME",
+            "dataType": "string",
+            "sourceColumn": "USERNAME"
+          },
+          {
+            "name": "MATCHING_CODE",
+            "dataType": "string",
+            "sourceColumn": "MATCHING_CODE"
+          },
+          {
+            "name": "TYPE",
+            "dataType": "string",
+            "sourceColumn": "TYPE"
+          },
+          {
+            "name": "LKP_LEVEL",
+            "dataType": "string",
+            "sourceColumn": "LKP_LEVEL"
+          },
+          {
+            "name": "CREATED_AT",
+            "dataType": "dateTime",
+            "sourceColumn": "CREATED_AT"
+          },
+          {
+            "name": "MODIFIED_AT",
+            "dataType": "dateTime",
+            "sourceColumn": "MODIFIED_AT"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT ",
+                "    * ",
+                "FROM rls_mof",
+                "WHERE ",
+                "    type = 'University'",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DIM_DATE",
+        "dataCategory": "Time",
+        "columns": [
+          {
+            "name": "DATE_KEY",
+            "dataType": "string",
+            "sourceColumn": "date_key"
+          },
+          {
+            "name": "CALENDAR_DATE",
+            "dataType": "dateTime",
+            "isKey": true,
+            "sourceColumn": "calendar_date"
+          },
+          {
+            "name": "YEAR",
+            "dataType": "string",
+            "sourceColumn": "year"
+          },
+          {
+            "name": "QUARTER",
+            "dataType": "string",
+            "sourceColumn": "quarter"
+          },
+          {
+            "name": "QUARTER_NAME",
+            "dataType": "string",
+            "sourceColumn": "quarter_name"
+          },
+          {
+            "name": "MONTH_NAME",
+            "dataType": "string",
+            "sourceColumn": "month_name",
+            "sortByColumn": "FISCAL_MONTH"
+          },
+          {
+            "name": "MONTH_SHORT_NAME",
+            "dataType": "string",
+            "sourceColumn": "month_short_name"
+          },
+          {
+            "name": "DAY_NAME",
+            "dataType": "string",
+            "sourceColumn": "day_name"
+          },
+          {
+            "name": "DAY_SHORT_NAME",
+            "dataType": "string",
+            "sourceColumn": "day_short_name"
+          },
+          {
+            "name": "START_OF_MONTH",
+            "dataType": "dateTime",
+            "sourceColumn": "start_of_month"
+          },
+          {
+            "name": "END_OF_MONTH",
+            "dataType": "dateTime",
+            "sourceColumn": "end_of_month"
+          },
+          {
+            "name": "START_OF_QUARTER",
+            "dataType": "dateTime",
+            "sourceColumn": "start_of_quarter"
+          },
+          {
+            "name": "END_OF_QUARTER",
+            "dataType": "dateTime",
+            "sourceColumn": "end_of_quarter"
+          },
+          {
+            "name": "FISCAL_YEAR",
+            "dataType": "int64",
+            "sourceColumn": "fiscal_year"
+          },
+          {
+            "name": "FISCAL_YEAR_RANGE",
+            "dataType": "string",
+            "sourceColumn": "fiscal_year_range",
+            "sortByColumn": "FISCAL_YEAR"
+          },
+          {
+            "name": "FISCAL_MONTH",
+            "dataType": "int64",
+            "sourceColumn": "fiscal_month"
+          },
+          {
+            "name": "LAST_REFRESH",
+            "dataType": "dateTime",
+            "sourceColumn": "last_refresh"
+          },
+          {
+            "name": "MONTH_YEAR",
+            "dataType": "string",
+            "sourceColumn": "month_year",
+            "sortByColumn": "FISCAL_MONTH"
+          },
+          {
+            "name": "CALENDAR_DATE_FORMATTED",
+            "dataType": "string",
+            "sourceColumn": "calendar_date_formatted"
+          },
+          {
+            "name": "MONTH",
+            "dataType": "int64",
+            "sourceColumn": "month"
+          },
+          {
+            "name": "MONTH_CH",
+            "dataType": "string",
+            "sourceColumn": "month_ch"
+          },
+          {
+            "name": "WEEK",
+            "dataType": "string",
+            "sourceColumn": "week"
+          },
+          {
+            "name": "DAY",
+            "dataType": "string",
+            "sourceColumn": "day"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #date(2014, 7, 1),",
+                "    Today = Date.From(DateTime.LocalNow()),",
+                "    DateList = List.Dates(Source, Duration.Days(Today - Source) + 1, #duration(1,0,0,0)),",
+                "    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {\"calendar_date\"}),",
+                "",
+                "    // Format and enrich columns",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(DateTable,{{\"calendar_date\", type date}}),",
+                "    #\"Added date_key\" = Table.AddColumn(#\"Changed Type\", \"date_key\", each Date.ToText([calendar_date], \"yyyyMMdd\"), type text),",
+                "    #\"Added calendar_date_formatted\" = Table.AddColumn(#\"Added date_key\", \"calendar_date_formatted\", each Date.ToText([calendar_date], \"yyyy-MM-dd\"), type text),",
+                "    #\"Added year\" = Table.AddColumn(#\"Added calendar_date_formatted\", \"year\", each Date.ToText([calendar_date], \"yyyy\"), type text),",
+                "    #\"Added quarter\" = Table.AddColumn(#\"Added year\", \"quarter\", each Text.From(Date.QuarterOfYear([calendar_date])), type text),",
+                "    #\"Added quarter_name\" = Table.AddColumn(#\"Added quarter\", \"quarter_name\", each \"Q\" & Text.From(Date.QuarterOfYear([calendar_date])), type text),",
+                "    #\"Added month\" = Table.AddColumn(#\"Added quarter_name\", \"month\", each Date.Month([calendar_date]), Int64.Type),",
+                "    #\"Added month_ch\" = Table.AddColumn(#\"Added month\", \"month_ch\", each Date.ToText([calendar_date], \"MM\"), type text),",
+                "    #\"Added month_name\" = Table.AddColumn(#\"Added month_ch\", \"month_name\", each Text.Upper(Date.ToText([calendar_date], \"MMMM\")), type text),",
+                "    #\"Added month_short_name\" = Table.AddColumn(#\"Added month_name\", \"month_short_name\", each Text.Upper(Date.ToText([calendar_date], \"MMM\")), type text),",
+                "    #\"Added month_year\" = Table.AddColumn(#\"Added month_short_name\", \"month_year\", each Text.Upper(Date.ToText([calendar_date], \"MMM\")) & \"-\" & Date.ToText([calendar_date], \"yyyy\"), type text),",
+                "    #\"Added week\" = Table.AddColumn(#\"Added month_year\", \"week\", each Date.ToText([calendar_date], \"ww\"), type text),",
+                "    #\"Added day\" = Table.AddColumn(#\"Added week\", \"day\", each Date.ToText([calendar_date], \"dd\"), type text),",
+                "    #\"Added day_name\" = Table.AddColumn(#\"Added day\", \"day_name\", each Text.Upper(Date.ToText([calendar_date], \"dddd\")), type text),",
+                "    #\"Added day_short_name\" = Table.AddColumn(#\"Added day_name\", \"day_short_name\", each Text.Upper(Date.ToText([calendar_date], \"ddd\")), type text),",
+                "    #\"Added start_of_month\" = Table.AddColumn(#\"Added day_short_name\", \"start_of_month\", each Date.StartOfMonth([calendar_date]), type date),",
+                "    #\"Added end_of_month\" = Table.AddColumn(#\"Added start_of_month\", \"end_of_month\", each Date.EndOfMonth([calendar_date]), type date),",
+                "    #\"Added start_of_quarter\" = Table.AddColumn(#\"Added end_of_month\", \"start_of_quarter\", each Date.StartOfQuarter([calendar_date]), type date),",
+                "    #\"Added end_of_quarter\" = Table.AddColumn(#\"Added start_of_quarter\", \"end_of_quarter\", each Date.EndOfQuarter([calendar_date]), type date),",
+                "",
+                "    // Fiscal logic",
+                "    #\"Added fiscal_year\" = Table.AddColumn(#\"Added end_of_quarter\", \"fiscal_year\", each if Date.Month([calendar_date]) >= 7 then Date.Year([calendar_date]) + 1 else Date.Year([calendar_date]), Int64.Type),",
+                "    #\"Added fiscal_year_range\" = Table.AddColumn(#\"Added fiscal_year\", \"fiscal_year_range\", each if Date.Month([calendar_date]) >= 7 then Text.From(Date.Year([calendar_date])) & \"-\" & Text.From(Date.Year([calendar_date]) + 1) else Text.From(Date.Year([calendar_date]) - 1) & \"-\" & Text.From(Date.Year([calendar_date])), type text),",
+                "    #\"Added fiscal_month\" = Table.AddColumn(#\"Added fiscal_year_range\", \"fiscal_month\", each if Date.Month([calendar_date]) >= 7 then Date.Month([calendar_date]) - 6 else Date.Month([calendar_date]) + 6, Int64.Type),",
+                "",
+                "    // Last refresh timestamp",
+                "    #\"Added last_refresh\" = Table.AddColumn(#\"Added fiscal_month\", \"last_refresh\", each DateTime.LocalNow(), type datetime)",
+                "in",
+                "    #\"Added last_refresh\""
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "_LAST_UPADATE",
+            "expression": " \"03-AUG-2026\""
+          }
+        ]
+      },
+      {
+        "name": "RLS_AREAS",
+        "columns": [
+          {
+            "name": "USERNAME",
+            "dataType": "string",
+            "sourceColumn": "USERNAME"
+          },
+          {
+            "name": "MATCHING_CODE",
+            "dataType": "string",
+            "sourceColumn": "MATCHING_CODE"
+          },
+          {
+            "name": "TYPE",
+            "dataType": "string",
+            "sourceColumn": "TYPE"
+          },
+          {
+            "name": "LKP_LEVEL",
+            "dataType": "string",
+            "sourceColumn": "LKP_LEVEL"
+          },
+          {
+            "name": "CREATED_AT",
+            "dataType": "dateTime",
+            "sourceColumn": "CREATED_AT"
+          },
+          {
+            "name": "MODIFIED_AT",
+            "dataType": "dateTime",
+            "sourceColumn": "MODIFIED_AT"
+          },
+          {
+            "name": "BUSINESS_NAME",
+            "dataType": "string",
+            "sourceColumn": "BUSINESS_NAME"
+          },
+          {
+            "name": "RELATED_ENTITY",
+            "dataType": "string",
+            "sourceColumn": "RELATED_ENTITY"
+          },
+          {
+            "name": "SSAS_CUBE",
+            "dataType": "string",
+            "sourceColumn": "SSAS_CUBE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT ",
+                "    * ",
+                "FROM rls_mof",
+                "WHERE ",
+                "    LKP_LEVEL = 'Area'",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "RLS_UNITS",
+        "columns": [
+          {
+            "name": "USERNAME",
+            "dataType": "string",
+            "sourceColumn": "USERNAME"
+          },
+          {
+            "name": "MATCHING_CODE",
+            "dataType": "string",
+            "sourceColumn": "MATCHING_CODE"
+          },
+          {
+            "name": "TYPE",
+            "dataType": "string",
+            "sourceColumn": "TYPE"
+          },
+          {
+            "name": "LKP_LEVEL",
+            "dataType": "string",
+            "sourceColumn": "LKP_LEVEL"
+          },
+          {
+            "name": "CREATED_AT",
+            "dataType": "dateTime",
+            "sourceColumn": "CREATED_AT"
+          },
+          {
+            "name": "MODIFIED_AT",
+            "dataType": "dateTime",
+            "sourceColumn": "MODIFIED_AT"
+          },
+          {
+            "name": "BUSINESS_NAME",
+            "dataType": "string",
+            "sourceColumn": "BUSINESS_NAME"
+          },
+          {
+            "name": "RELATED_ENTITY",
+            "dataType": "string",
+            "sourceColumn": "RELATED_ENTITY"
+          },
+          {
+            "name": "SSAS_CUBE",
+            "dataType": "string",
+            "sourceColumn": "SSAS_CUBE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT ",
+                "    * ",
+                "FROM rls_mof",
+                "WHERE ",
+                "    LKP_LEVEL = 'Unit'",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "fb350ce2-33f1-4801-8c2b-502fb87c6132",
+        "fromTable": "GFMIS",
+        "fromColumn": "BUDGET_ID",
+        "toTable": "BUDGET TYPE",
+        "toColumn": "BUDGET_TYPE_CODE"
+      },
+      {
+        "name": "63b3b314-7d04-4058-a966-02c6feedff1c",
+        "fromTable": "GFMIS",
+        "fromColumn": "FUND_CODE",
+        "toTable": "FUND LEVELS",
+        "toColumn": "FUND_LEVEL_CODE"
+      },
+      {
+        "name": "0249ee1e-6c4e-4b84-a24b-afb24baf292f",
+        "fromTable": "GFMIS",
+        "fromColumn": "UNIT_CODE",
+        "toTable": "UNITS HIERARCHY",
+        "toColumn": "UNIT_CODE"
+      },
+      {
+        "name": "b75ae756-f086-465a-9e96-a1834ae3be18",
+        "fromTable": "TSA",
+        "fromColumn": "UNIT_CODE",
+        "toTable": "UNITS HIERARCHY",
+        "toColumn": "UNIT_CODE"
+      },
+      {
+        "name": "415d2e3f-9b66-4366-bfb9-e3f3b0071b68",
+        "fromTable": "TSA",
+        "fromColumn": "BUDGET_CATEGORY_CODE",
+        "toTable": "FUND LEVELS",
+        "toColumn": "FUND_LEVEL_CODE"
+      },
+      {
+        "name": "d52b9e7b-7bd4-44da-8ec6-c292d2e6f5a3",
+        "fromTable": "GFMIS",
+        "fromColumn": "BUDGET_CATEGORY_CODE",
+        "toTable": "BUDGET_CATEGORY",
+        "toColumn": "BUDGET_CATEGORY_CODE"
+      },
+      {
+        "name": "683c956f-d947-4261-affd-e2681f768fdc",
+        "fromTable": "TSA",
+        "fromColumn": "BUDGET_CATEGORY_CODE",
+        "toTable": "BUDGET_CATEGORY",
+        "toColumn": "BUDGET_CATEGORY_CODE"
+      },
+      {
+        "name": "5e47e7bb-7243-4467-8bbc-2a93d086ffdf",
+        "fromTable": "GPS_PROJECTS_ELECTRONIC_PAYMENTS",
+        "fromColumn": "UNIT_CODE",
+        "toTable": "UNITS HIERARCHY",
+        "toColumn": "UNIT_CODE"
+      },
+      {
+        "name": "1ab226f8-2aa0-43bd-ab21-8b49e4221bbe",
+        "fromTable": "PROJECTS_APPROVED_PAYMENTS",
+        "fromColumn": "PROJECT_CODE",
+        "toTable": "GPS_PROJECTS_LKP",
+        "toColumn": "PROJECT_CODE",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "4f4dd56f-8d12-48e7-81bf-b344e4b73db7",
+        "fromTable": "PROJECTS_APPROVED_PAYMENTS",
+        "fromColumn": "UNIT_CODE",
+        "toTable": "UNITS HIERARCHY",
+        "toColumn": "UNIT_CODE",
+        "isActive": false
+      },
+      {
+        "name": "93ff3d32-af3b-4db3-9736-1179f8fb5642",
+        "fromTable": "GPS_PROJECTS_ELECTRONIC_PAYMENTS",
+        "fromColumn": "PROJECT_CODE",
+        "toTable": "GPS_PROJECTS_LKP",
+        "toColumn": "PROJECT_CODE",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "513c109c-6066-450b-a606-bfd0ed703ac9",
+        "fromTable": "PAYROLL_TRX",
+        "fromColumn": "SALARY_BASIS_CATEGORY",
+        "toTable": "PAYROLL_BASIS_CATEGORIES",
+        "toColumn": "NAME_BEFORE_UPDATE"
+      },
+      {
+        "name": "f17d7a6f-cd70-481f-a2ad-6582f21b49dc",
+        "fromTable": "PAYROLL_TRX",
+        "fromColumn": "PAYROLL_ID",
+        "toTable": "PAYROLL_LKPS",
+        "toColumn": "PAYROLL_ID"
+      },
+      {
+        "name": "b3486b37-cb1f-4d60-8fb6-677565b101dd",
+        "fromTable": "PAYROLL_LKPS",
+        "fromColumn": "UNIT_CODE",
+        "toTable": "UNITS HIERARCHY",
+        "toColumn": "UNIT_CODE"
+      },
+      {
+        "name": "a70ecd49-8083-4637-b9e2-151309220034",
+        "toCardinality": "many",
+        "fromTable": "RLS_MINISTRIES",
+        "fromColumn": "MATCHING_CODE",
+        "toTable": "UNITS HIERARCHY",
+        "toColumn": "MINISTRY_CODE",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "6c41ac5b-0158-4a8e-9beb-3624ebfe6a68",
+        "fromTable": "PAYROLL_TRX",
+        "fromColumn": "DATE_KEY",
+        "toTable": "DIM_DATE",
+        "toColumn": "DATE_KEY"
+      },
+      {
+        "name": "7690478d-23a2-46d5-923f-6ce39a3b3fe7",
+        "fromTable": "GFMIS",
+        "fromColumn": "DATE_KEY",
+        "toTable": "DIM_DATE",
+        "toColumn": "DATE_KEY"
+      },
+      {
+        "name": "f3f09398-9c9b-433c-baa7-e37b3dfaaf16",
+        "fromTable": "TSA",
+        "fromColumn": "DATE_KEY",
+        "toTable": "DIM_DATE",
+        "toColumn": "DATE_KEY"
+      },
+      {
+        "name": "a27c74f2-44b9-46b5-a07e-64fed43e4f5d",
+        "fromTable": "GPS_PROJECTS_ELECTRONIC_PAYMENTS",
+        "fromColumn": "DATE_KEY",
+        "toTable": "DIM_DATE",
+        "toColumn": "DATE_KEY"
+      },
+      {
+        "name": "833c3457-9f11-4f95-866e-f8704b0f9aa7",
+        "toCardinality": "many",
+        "fromTable": "UNITS HIERARCHY",
+        "fromColumn": "GOVERNORATE_ID",
+        "toTable": "RLS_GOVERNORATES",
+        "toColumn": "MATCHING_CODE",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "a529e85b-1f51-4a0b-8086-e3832f81839e",
+        "fromCardinality": "one",
+        "fromTable": "RLS_UNITS",
+        "fromColumn": "MATCHING_CODE",
+        "toTable": "UNITS HIERARCHY",
+        "toColumn": "UNIT_CODE",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "d9e47b25-06a0-42e9-b2d0-9931bfc4f73f",
+        "fromTable": "UNITS HIERARCHY",
+        "fromColumn": "AREA_CODE",
+        "toTable": "RLS_AREAS",
+        "toColumn": "MATCHING_CODE",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "78c170e5-cb09-41a0-9c3f-835fd25d0e76",
+        "fromTable": "UNITS HIERARCHY",
+        "fromColumn": "INSTITUTION_CODE",
+        "toTable": "RLS_UNIVERSITIES",
+        "toColumn": "MATCHING_CODE",
+        "crossFilteringBehavior": "bothDirections"
+      }
+    ],
+    "roles": [
+      {
+        "name": "ADMINS",
+        "modelPermission": "read",
+        "members": [
+          {
+            "memberName": "EFINANCE\\powerbi_user",
+            "memberId": "S-1-5-21-3074788175-2729239879-3747336330-24824"
+          },
+          {
+            "memberName": "EFINANCE\\Mohamed_Emran",
+            "memberId": "S-1-5-21-3074788175-2729239879-3747336330-1450"
+          },
+          {
+            "memberName": "EFINANCE\\Ahmed_Hosni",
+            "memberId": "S-1-5-21-3074788175-2729239879-3747336330-2148"
+          },
+          {
+            "memberName": "CLOUD\\aca_all",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51971"
+          },
+          {
+            "memberName": "CLOUD\\aca_all2",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51972"
+          },
+          {
+            "memberName": "CLOUD\\aca_all3",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51973"
+          },
+          {
+            "memberName": "CLOUD\\cabinet_all",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51978"
+          },
+          {
+            "memberName": "CLOUD\\mof_all",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52017"
+          },
+          {
+            "memberName": "EFINANCE\\Karim_ELShetihy",
+            "memberId": "S-1-5-21-3074788175-2729239879-3747336330-28909"
+          },
+          {
+            "memberName": "CLOUD\\MOF_Waleed",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-41145"
+          },
+          {
+            "memberName": "CLOUD\\CMC",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-54764"
+          },
+          {
+            "memberName": "EFINANCE\\EzzEldin_Mohamed",
+            "memberId": "S-1-5-21-3074788175-2729239879-3747336330-34809"
+          }
+        ]
+      },
+      {
+        "name": "Governorates",
+        "modelPermission": "read",
+        "members": [
+          {
+            "memberName": "CLOUD\\ACA_Alexandria",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42753"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Assiut",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42767"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Aswan",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42765"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Beheira",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42756"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Beni Suef",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42768"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Cairo",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42751"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Dakahlia",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42754"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Damietta",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42770"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Fayoum",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42757"
+          },
+          {
+            "memberName": "CLOUD\\aca_gharbia",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51974"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Gharbiya",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42758"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Giza",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42752"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Ismailia",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42759"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Kafr Al sheikh",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42773"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Luxor",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42775"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Matrouh",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42774"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Menofia",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42760"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Minya",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42761"
+          },
+          {
+            "memberName": "CLOUD\\ACA_New Valley",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42763"
+          },
+          {
+            "memberName": "CLOUD\\ACA_North Sinai",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42777"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Port Said",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42769"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Qaliubiya",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42762"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Qena",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42776"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Red Sea",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42755"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Sharkia",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42771"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Sohag",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42778"
+          },
+          {
+            "memberName": "CLOUD\\ACA_South Sinai",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42772"
+          },
+          {
+            "memberName": "CLOUD\\ACA_Suez",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-42764"
+          },
+          {
+            "memberName": "CLOUD\\gov_alexandria",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51981"
+          },
+          {
+            "memberName": "CLOUD\\gov_assuit",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51982"
+          },
+          {
+            "memberName": "CLOUD\\gov_aswan",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51983"
+          },
+          {
+            "memberName": "CLOUD\\gov_auxur",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51984"
+          },
+          {
+            "memberName": "CLOUD\\gov_beheira",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51985"
+          },
+          {
+            "memberName": "CLOUD\\gov_beni_suef",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51986"
+          },
+          {
+            "memberName": "CLOUD\\gov_cairo",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51987"
+          },
+          {
+            "memberName": "CLOUD\\gov_dakahlia",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51988"
+          },
+          {
+            "memberName": "CLOUD\\gov_damietta",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51989"
+          },
+          {
+            "memberName": "CLOUD\\gov_fayoum",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51990"
+          },
+          {
+            "memberName": "CLOUD\\gov_gharbia",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51991"
+          },
+          {
+            "memberName": "CLOUD\\gov_giza",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51992"
+          },
+          {
+            "memberName": "CLOUD\\gov_isamlia",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51993"
+          },
+          {
+            "memberName": "CLOUD\\gov_kafr_sheikh",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51994"
+          },
+          {
+            "memberName": "CLOUD\\gov_matrouh",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51995"
+          },
+          {
+            "memberName": "CLOUD\\gov_menia",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51996"
+          },
+          {
+            "memberName": "CLOUD\\gov_monufia",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51997"
+          },
+          {
+            "memberName": "CLOUD\\gov_new_valley",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51998"
+          },
+          {
+            "memberName": "CLOUD\\gov_north_sinai",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51999"
+          },
+          {
+            "memberName": "CLOUD\\gov_port_said",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52000"
+          },
+          {
+            "memberName": "CLOUD\\gov_qalyubia",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52001"
+          },
+          {
+            "memberName": "CLOUD\\gov_qena",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52002"
+          },
+          {
+            "memberName": "CLOUD\\gov_red_sea",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52003"
+          },
+          {
+            "memberName": "CLOUD\\gov_sharqia",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52004"
+          },
+          {
+            "memberName": "CLOUD\\gov_sohag",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52005"
+          },
+          {
+            "memberName": "CLOUD\\gov_south_sinai",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52006"
+          },
+          {
+            "memberName": "CLOUD\\gov_suez",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52007"
+          }
+        ],
+        "tablePermissions": [
+          {
+            "name": "RLS_GOVERNORATES",
+            "filterExpression": "UPPER(RLS_GOVERNORATES[USERNAME])=UPPER(USERNAME())",
+            "metadataPermission": "none"
+          },
+          {
+            "name": "RLS_UNIVERSITIES",
+            "metadataPermission": "none"
+          },
+          {
+            "name": "RLS_MINISTRIES",
+            "metadataPermission": "none"
+          },
+          {
+            "name": "UNITS HIERARCHY",
+            "filterExpression": [
+              "",
+              "FORMAT('UNITS HIERARCHY'[GOVERNORATE_ID], \"\") = LOOKUPVALUE(RLS_GOVERNORATES[MATCHING_CODE],RLS_GOVERNORATES[USERNAME],USERNAME()) && NOT ISBLANK('UNITS HIERARCHY'[GOVERNORATE_ID])"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Minstries",
+        "modelPermission": "read",
+        "members": [
+          {
+            "memberName": "CLOUD\\ACAW_MCIT",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-43402"
+          },
+          {
+            "memberName": "CLOUD\\ACAW_MOALR",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-43414"
+          },
+          {
+            "memberName": "CLOUD\\ACAW_MOE",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-43408"
+          },
+          {
+            "memberName": "CLOUD\\ACAW_MOF",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-43403"
+          },
+          {
+            "memberName": "CLOUD\\ACAW_MOFA",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-43412"
+          },
+          {
+            "memberName": "CLOUD\\ACAW_MOHP",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-43416"
+          },
+          {
+            "memberName": "CLOUD\\ACAW_MOHUD",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-43404"
+          },
+          {
+            "memberName": "CLOUD\\ACAW_MOJ",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-43413"
+          },
+          {
+            "memberName": "CLOUD\\ACAW_MOPMW",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-43406"
+          },
+          {
+            "memberName": "CLOUD\\ACAW_MORE",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-43405"
+          },
+          {
+            "memberName": "CLOUD\\ACAW_MOSSO",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-43409"
+          },
+          {
+            "memberName": "CLOUD\\ACAW_MOTI",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-43407"
+          },
+          {
+            "memberName": "CLOUD\\ACAW_MOTour",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-43415"
+          },
+          {
+            "memberName": "CLOUD\\ACAW_MOTran",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-43417"
+          },
+          {
+            "memberName": "CLOUD\\ACAW_MOYS",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-43411"
+          },
+          {
+            "memberName": "CLOUD\\mcit",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52008"
+          },
+          {
+            "memberName": "CLOUD\\azhar",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51976"
+          },
+          {
+            "memberName": "CLOUD\\cabinet",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51977"
+          },
+          {
+            "memberName": "CLOUD\\call_center",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51979"
+          },
+          {
+            "memberName": "CLOUD\\moa",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52009"
+          },
+          {
+            "memberName": "CLOUD\\moalr",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52010"
+          },
+          {
+            "memberName": "CLOUD\\moc",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52011"
+          },
+          {
+            "memberName": "CLOUD\\moca",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52012"
+          },
+          {
+            "memberName": "CLOUD\\mod",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52013"
+          },
+          {
+            "memberName": "CLOUD\\moe",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52014"
+          },
+          {
+            "memberName": "CLOUD\\moee",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52015"
+          },
+          {
+            "memberName": "CLOUD\\moenv",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52016"
+          },
+          {
+            "memberName": "CLOUD\\mofa",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52019"
+          },
+          {
+            "memberName": "CLOUD\\mof_inf",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52018"
+          },
+          {
+            "memberName": "CLOUD\\mohe",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52020"
+          },
+          {
+            "memberName": "CLOUD\\moi",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52021"
+          },
+          {
+            "memberName": "CLOUD\\moiic",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52022"
+          },
+          {
+            "memberName": "CLOUD\\moj",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52023"
+          },
+          {
+            "memberName": "CLOUD\\mold",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52024"
+          },
+          {
+            "memberName": "CLOUD\\momp",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52025"
+          },
+          {
+            "memberName": "CLOUD\\mopes",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52026"
+          },
+          {
+            "memberName": "CLOUD\\mopmar",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52027"
+          },
+          {
+            "memberName": "CLOUD\\mopmw",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52028"
+          },
+          {
+            "memberName": "CLOUD\\mosit",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52029"
+          },
+          {
+            "memberName": "CLOUD\\mosso",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52030"
+          },
+          {
+            "memberName": "CLOUD\\moti",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52031"
+          },
+          {
+            "memberName": "CLOUD\\motour",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52032"
+          },
+          {
+            "memberName": "CLOUD\\motran",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52033"
+          },
+          {
+            "memberName": "CLOUD\\mowri",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52034"
+          },
+          {
+            "memberName": "CLOUD\\moys",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52035"
+          },
+          {
+            "memberName": "CLOUD\\Parliament",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-30459"
+          },
+          {
+            "memberName": "CLOUD\\presidncy",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52036"
+          },
+          {
+            "memberName": "CLOUD\\MOHP_User",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52976"
+          },
+          {
+            "memberName": "CLOUD\\EEM",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-53093"
+          },
+          {
+            "memberName": "CLOUD\\MHUC",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-53092"
+          },
+          {
+            "memberName": "CLOUD\\MHUC_M",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-53101"
+          },
+          {
+            "memberName": "CLOUD\\MMP",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-53091"
+          },
+          {
+            "memberName": "CLOUD\\MMP_M",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-53100"
+          },
+          {
+            "memberName": "CLOUD\\MOHP_M",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-53099"
+          },
+          {
+            "memberName": "CLOUD\\MOPA",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-53097"
+          },
+          {
+            "memberName": "CLOUD\\MOPA_M",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-53103"
+          },
+          {
+            "memberName": "CLOUD\\coc",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51969"
+          },
+          {
+            "memberName": "CLOUD\\fra",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51980"
+          },
+          {
+            "memberName": "CLOUD\\CCL",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-53087"
+          },
+          {
+            "memberName": "CLOUD\\ESC",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-53088"
+          },
+          {
+            "memberName": "CLOUD\\SLA",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-53089"
+          },
+          {
+            "memberName": "CLOUD\\APA",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-53090"
+          },
+          {
+            "memberName": "CLOUD\\scc",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52037"
+          },
+          {
+            "memberName": "CLOUD\\SMOINFO",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52465"
+          }
+        ],
+        "tablePermissions": [
+          {
+            "name": "RLS_MINISTRIES",
+            "filterExpression": "UPPER(RLS_MINISTRIES[USERNAME])=UPPER(USERNAME())",
+            "metadataPermission": "none"
+          },
+          {
+            "name": "RLS_UNIVERSITIES",
+            "metadataPermission": "none"
+          },
+          {
+            "name": "RLS_GOVERNORATES",
+            "metadataPermission": "none"
+          },
+          {
+            "name": "UNITS HIERARCHY",
+            "filterExpression": [
+              " FORMAT('UNITS HIERARCHY'[MINISTRY_CODE], \"\") ",
+              "  = LOOKUPVALUE(RLS_MINISTRIES[MATCHING_CODE], RLS_MINISTRIES[USERNAME], UPPER(USERNAME())) ",
+              "  && NOT ISBLANK('UNITS HIERARCHY'[MINISTRY_CODE])"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Universities",
+        "modelPermission": "read",
+        "members": [
+          {
+            "memberName": "CLOUD\\univ_ain_shams",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52038"
+          },
+          {
+            "memberName": "CLOUD\\univ_alexandria",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52039"
+          },
+          {
+            "memberName": "CLOUD\\univ_arish",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52040"
+          },
+          {
+            "memberName": "CLOUD\\univ_assuit",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52041"
+          },
+          {
+            "memberName": "CLOUD\\univ_aswan",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52042"
+          },
+          {
+            "memberName": "CLOUD\\univ_banha",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52044"
+          },
+          {
+            "memberName": "CLOUD\\univ_beni_suef",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52045"
+          },
+          {
+            "memberName": "CLOUD\\univ_cairo",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52046"
+          },
+          {
+            "memberName": "CLOUD\\univ_damanhour",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52047"
+          },
+          {
+            "memberName": "CLOUD\\univ_damietta",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52048"
+          },
+          {
+            "memberName": "CLOUD\\univ_fayoum",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52049"
+          },
+          {
+            "memberName": "CLOUD\\univ_helwan",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52050"
+          },
+          {
+            "memberName": "CLOUD\\univ_japan",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52051"
+          },
+          {
+            "memberName": "CLOUD\\univ_kafr_el_sheik",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52052"
+          },
+          {
+            "memberName": "CLOUD\\univ_mansoura",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52053"
+          },
+          {
+            "memberName": "CLOUD\\univ_matroh",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52054"
+          },
+          {
+            "memberName": "CLOUD\\univ_menia",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52055"
+          },
+          {
+            "memberName": "CLOUD\\univ_monofia",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52056"
+          },
+          {
+            "memberName": "CLOUD\\univ_sadat",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52057"
+          },
+          {
+            "memberName": "CLOUD\\univ_said",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52058"
+          },
+          {
+            "memberName": "CLOUD\\univ_sohag",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52059"
+          },
+          {
+            "memberName": "CLOUD\\univ_south_valley",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52060"
+          },
+          {
+            "memberName": "CLOUD\\univ_suez",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52061"
+          },
+          {
+            "memberName": "CLOUD\\univ_suez_canal",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52062"
+          },
+          {
+            "memberName": "CLOUD\\univ_tanta",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52063"
+          },
+          {
+            "memberName": "CLOUD\\univ_zagazig",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52064"
+          },
+          {
+            "memberName": "CLOUD\\UNIV_LUXOR",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-53094"
+          },
+          {
+            "memberName": "CLOUD\\UNIV_NEW_VALLEY",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-53095"
+          },
+          {
+            "memberName": "CLOUD\\UNIV_Hurghada",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-53096"
+          }
+        ],
+        "tablePermissions": [
+          {
+            "name": "RLS_UNIVERSITIES",
+            "filterExpression": "UPPER(RLS_UNIVERSITIES[USERNAME]) = UPPER(USERNAME())",
+            "metadataPermission": "none"
+          },
+          {
+            "name": "RLS_MINISTRIES",
+            "metadataPermission": "none"
+          },
+          {
+            "name": "RLS_GOVERNORATES",
+            "metadataPermission": "none"
+          },
+          {
+            "name": "UNITS HIERARCHY",
+            "filterExpression": [
+              " FORMAT('UNITS HIERARCHY'[INSTITUTION_CODE], \"\") ",
+              "  = LOOKUPVALUE(",
+              "        RLS_UNIVERSITIES[MATCHING_CODE],",
+              "        RLS_UNIVERSITIES[USERNAME], UPPER(USERNAME())",
+              "    )",
+              "  && NOT ISBLANK('UNITS HIERARCHY'[INSTITUTION_CODE])"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Areas",
+        "modelPermission": "read",
+        "members": [
+          {
+            "memberName": "CLOUD\\univ_azhar",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-52043"
+          }
+        ],
+        "tablePermissions": [
+          {
+            "name": "UNITS HIERARCHY",
+            "filterExpression": [
+              "'UNITS HIERARCHY'[AREA_CODE] =",
+              "IF(",
+              "    NOT ISBLANK('UNITS HIERARCHY'[AREA_CODE]),",
+              "    LOOKUPVALUE(",
+              "        RLS_AREAS[MATCHING_CODE],",
+              "        RLS_AREAS[USERNAME], UPPER(USERNAME())",
+              "    )",
+              ")"
+            ]
+          },
+          {
+            "name": "RLS_AREAS",
+            "filterExpression": "UPPER(RLS_AREAS[USERNAME]) = UPPER(USERNAME())"
+          }
+        ]
+      },
+      {
+        "name": "Units",
+        "modelPermission": "read",
+        "members": [
+          {
+            "memberName": "CLOUD\\aca_info",
+            "memberId": "S-1-5-21-1602192305-4261011775-1723327600-51975"
+          }
+        ],
+        "tablePermissions": [
+          {
+            "name": "RLS_UNITS",
+            "filterExpression": "UPPER(RLS_UNITS[USERNAME]) = UPPER(USERNAME())"
+          },
+          {
+            "name": "UNITS HIERARCHY",
+            "filterExpression": [
+              "'UNITS HIERARCHY'[UNIT_CODE] =",
+              "LOOKUPVALUE(",
+              "    RLS_UNITS[MATCHING_CODE],",
+              "    RLS_UNITS[USERNAME], UPPER(USERNAME())",
+              ")",
+              "&& NOT ISBLANK('UNITS HIERARCHY'[UNIT_CODE])"
+            ]
+          }
+        ]
+      }
+    ],
+    "annotations": [
+      {
+        "name": "ClientCompatibilityLevel",
+        "value": "600"
+      }
+    ]
+  },
+  "id": "SemanticModel"
+}

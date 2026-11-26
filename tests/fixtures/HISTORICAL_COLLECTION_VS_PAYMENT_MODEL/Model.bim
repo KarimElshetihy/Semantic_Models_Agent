@@ -1,0 +1,3952 @@
+{
+  "name": "SemanticModel",
+  "compatibilityLevel": 1500,
+  "model": {
+    "culture": "en-US",
+    "dataSources": [
+      {
+        "type": "structured",
+        "name": "Oracle/oracle-host:1521/oracle_service",
+        "connectionDetails": {
+          "protocol": "oracle",
+          "address": {
+            "server": "oracle-host:1521/oracle_service"
+          },
+          "authentication": null,
+          "query": null
+        },
+        "options": {
+          "hierarchicalNavigation": true
+        },
+        "credential": {
+          "AuthenticationKind": "UsernamePassword",
+          "kind": "Oracle",
+          "path": "oracle-host:1521/oracle_service",
+          "Username": "oracle_user"
+        }
+      }
+    ],
+    "tables": [
+      {
+        "name": "EPAY",
+        "columns": [
+          {
+            "name": "TRX_COUNT",
+            "dataType": "double",
+            "sourceColumn": "TRX_COUNT"
+          },
+          {
+            "name": "TOTAL_AMOUNT",
+            "dataType": "double",
+            "sourceColumn": "TOTAL_AMOUNT"
+          },
+          {
+            "name": "TXN_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "TXN_DATE"
+          },
+          {
+            "name": "BUSINESS_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "BUSINESS_DATE"
+          },
+          {
+            "name": "SETTLEMENT_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "SETTLEMENT_DATE"
+          },
+          {
+            "name": "SP_ID",
+            "dataType": "int64",
+            "sourceColumn": "SP_ID"
+          },
+          {
+            "name": "FE_ID",
+            "dataType": "double",
+            "sourceColumn": "FE_ID"
+          },
+          {
+            "name": "SETT_BANK_ID",
+            "dataType": "double",
+            "sourceColumn": "SETT_BANK_ID"
+          },
+          {
+            "name": "AU_TSA_ID",
+            "dataType": "string",
+            "sourceColumn": "AU_TSA_ID"
+          },
+          {
+            "name": "AU_CODE",
+            "dataType": "string",
+            "sourceColumn": "AU_CODE"
+          },
+          {
+            "name": "EPAY_BUDGET_CODE",
+            "dataType": "string",
+            "sourceColumn": "EPAY_BUDGET_CODE"
+          },
+          {
+            "name": "CHANNEL_ID",
+            "dataType": "double",
+            "sourceColumn": "CHANNEL_ID"
+          },
+          {
+            "name": "RC_ENTITY_PI_ID",
+            "dataType": "int64",
+            "sourceColumn": "RC_ENTITY_PI_ID"
+          },
+          {
+            "name": "COLL_BANK_ID",
+            "dataType": "double",
+            "sourceColumn": "COLL_BANK_ID"
+          },
+          {
+            "name": "CURRENCY",
+            "dataType": "int64",
+            "sourceColumn": "CURRENCY"
+          },
+          {
+            "type": "calculated",
+            "name": "DATE_ID",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(EPAY[BUSINESS_DATE], \"YYYYMMDD\")"
+          },
+          {
+            "name": "TSA_FLAG",
+            "dataType": "string",
+            "sourceColumn": "TSA_FLAG"
+          },
+          {
+            "type": "calculated",
+            "name": "DATE_KEY_SETT",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(EPAY[SETTLEMENT_DATE], \"YYYYMMDD\")"
+          },
+          {
+            "type": "calculated",
+            "name": "Add Column2",
+            "dataType": "int64",
+            "isDataTypeInferred": true
+          },
+          {
+            "name": "DELIVERY_CHANNEL_TYPE_ID",
+            "dataType": "double",
+            "sourceColumn": "DELIVERY_CHANNEL_TYPE_ID"
+          },
+          {
+            "name": "FE_ENT_ID",
+            "dataType": "int64",
+            "sourceColumn": "FE_ENT_ID"
+          },
+          {
+            "name": "ACC_OFF_DTL_ID",
+            "dataType": "string",
+            "sourceColumn": "ACC_OFF_DTL_ID"
+          },
+          {
+            "type": "calculated",
+            "name": "SERVICE_ID",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " EPAY[SP_ID] & \"-\" & EPAY[ACC_OFF_DTL_ID]"
+          },
+          {
+            "type": "calculated",
+            "name": "ISSUER_ID",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": " 0"
+          },
+          {
+            "name": "SETTLEMENT_ENTITY_ID",
+            "dataType": "string",
+            "sourceColumn": "SETTLEMENT_ENTITY_ID"
+          },
+          {
+            "name": "SERVICE_ENTITY_ID",
+            "dataType": "string",
+            "sourceColumn": "SERVICE_ENTITY_ID"
+          },
+          {
+            "name": "DELIVERY_CHANNEL_ID",
+            "dataType": "string",
+            "sourceColumn": "DELIVERY_CHANNEL_ID"
+          },
+          {
+            "name": "ROOT_ID",
+            "dataType": "string",
+            "sourceColumn": "ROOT_ID"
+          },
+          {
+            "name": "SP_MAIN_ID",
+            "dataType": "string",
+            "sourceColumn": "SP_MAIN_ID"
+          },
+          {
+            "name": "SP_MAIN_OLD_ID",
+            "dataType": "string",
+            "sourceColumn": "SP_MAIN_OLD_ID"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "SELECT",
+                "    trx_count,",
+                "    total_amount,",
+                "    txn_date,",
+                "    business_date,",
+                "    settlement_date,",
+                "    'EP-' || sp_id AS root_id,",
+                "    'EP-'",
+                "                    || sp_id",
+                "                    || '-'",
+                "                    || a.acc_off_dtl_id",
+                "                                 AS sp_main_id,",
+                "    CASE",
+                "        WHEN sp_id IN ( '40021', '41985', '42275', '42518', '40430' ) THEN --ESC,DE,BMS,",
+                "            to_char('EP-'",
+                "                    || sp_id",
+                "                    || '-'",
+                "                    || a.acc_off_dtl_id)",
+                "        ELSE",
+                "            to_char('EP-' || sp_id)",
+                "    END                                         AS sp_main_old_id,",
+                "    sp_id,",
+                "    fe_id                                       fe_ent_id,",
+                "    pr.u_id                                     fe_id,",
+                "    sett_bank_id,",
+                "    coalesce(to_char(au_tsa_id), 'COMM')        au_tsa_id,",
+                "    au_code,",
+                "    coalesce(to_char(epay_budget_code), 'COMM') epay_budget_code,",
+                "    channel_id,",
+                "    rc_entity_pi_id,",
+                "    fe.u_id                                     AS coll_bank_id,",
+                "    currency,",
+                "    CASE",
+                "        WHEN a.rc_entity_pi_id = 21806 THEN",
+                "            'TSA'",
+                "        WHEN a.rc_entity_pi_id = 38803 THEN",
+                "            'TSA'",
+                "        WHEN a.rc_entity_pi_id = 2004  THEN",
+                "            'CBE'",
+                "        WHEN a.rc_entity_pi_id = 38804 THEN",
+                "            'CBE'",
+                "        ELSE",
+                "            'Comm'",
+                "    END                                         tsa_flag,",
+                "    a.delivery_channel_type_id,",
+                "    a.delivery_channel_id,",
+                "    a.acc_off_dtl_id,",
+                "    a.settlement_entity_id,",
+                "    a.service_entity_id",
+                "FROM",
+                "    epay_txn_hist_agg a",
+                "    LEFT JOIN con_fe_epay_map   fe ON a.coll_bank_id = fe.id",
+                "    LEFT JOIN con_fe_epay_map   pr ON a.fe_id = pr.id\")",
+                "in",
+                "    Source"
+              ]
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>let",
+                  "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                  "SELECT",
+                  "    trx_count,",
+                  "    total_amount,",
+                  "    txn_date,",
+                  "    business_date,",
+                  "    settlement_date,",
+                  "    sp_id,",
+                  "    fe_id fe_ent_id,",
+                  "    pr.u_id                                     fe_id,",
+                  "    sett_bank_id,",
+                  "    coalesce(to_char(au_tsa_id), 'COMM')        au_tsa_id,",
+                  "    au_code,",
+                  "    coalesce(to_char(epay_budget_code), 'COMM') epay_budget_code,",
+                  "    channel_id,",
+                  "    rc_entity_pi_id,",
+                  "    fe.u_id                                     AS coll_bank_id,",
+                  "    currency,",
+                  "    CASE",
+                  "        WHEN a.rc_entity_pi_id = 21806 THEN",
+                  "            'TSA'",
+                  "        WHEN a.rc_entity_pi_id = 38803 THEN",
+                  "            'TSA'",
+                  "        WHEN a.rc_entity_pi_id = 2004  THEN",
+                  "            'CBE'",
+                  "        WHEN a.rc_entity_pi_id = 38804 THEN",
+                  "            'CBE'",
+                  "        ELSE",
+                  "            'Comm'",
+                  "    END                                         tsa_flag,",
+                  "    delivery_channel_type_id,",
+                  "    acc_off_dtl_id",
+                  "FROM",
+                  "    epay_txn_hist_agg a",
+                  "    LEFT JOIN con_fe_epay_map   fe ON a.coll_bank_id = fe.id",
+                  "    LEFT JOIN con_fe_epay_map   pr ON a.fe_id = pr.id",
+                  "",
+                  "\")",
+                  "in",
+                  "    Source</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "measures": [
+          {
+            "name": "EP_TRX_COUNT",
+            "expression": " SUM(EPAY[TRX_COUNT])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "EP_TRX_AMT",
+            "expression": " SUM(EPAY[TOTAL_AMOUNT])",
+            "formatString": "#,0.00"
+          }
+        ]
+      },
+      {
+        "name": "GOV",
+        "columns": [
+          {
+            "name": "TRX_COUNT",
+            "dataType": "double",
+            "sourceColumn": "TRX_COUNT"
+          },
+          {
+            "name": "AMOUNT",
+            "dataType": "double",
+            "sourceColumn": "AMOUNT"
+          },
+          {
+            "name": "AUTHAMNT",
+            "dataType": "double",
+            "sourceColumn": "AUTHAMNT"
+          },
+          {
+            "name": "INTERCHANGEFEES",
+            "dataType": "double",
+            "sourceColumn": "INTERCHANGEFEES"
+          },
+          {
+            "name": "SETLDATE",
+            "dataType": "dateTime",
+            "sourceColumn": "SETLDATE"
+          },
+          {
+            "name": "SETTELMENT_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "SETTELMENT_DATE"
+          },
+          {
+            "name": "AU_CODE",
+            "dataType": "string",
+            "sourceColumn": "AU_CODE"
+          },
+          {
+            "name": "FE_ID",
+            "dataType": "double",
+            "sourceColumn": "FE_ID"
+          },
+          {
+            "name": "CHANNEL_ID",
+            "dataType": "double",
+            "sourceColumn": "CHANNEL_ID"
+          },
+          {
+            "name": "MERID",
+            "dataType": "string",
+            "sourceColumn": "MERID"
+          },
+          {
+            "name": "TERID",
+            "dataType": "string",
+            "sourceColumn": "TERID"
+          },
+          {
+            "name": "TSA_FLAG",
+            "dataType": "string",
+            "sourceColumn": "TSA_FLAG"
+          },
+          {
+            "name": "FLAG",
+            "dataType": "string",
+            "sourceColumn": "FLAG"
+          },
+          {
+            "type": "calculated",
+            "name": "DATE_ID",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(GOV[SETLDATE], \"YYYYMMDD\")"
+          },
+          {
+            "name": "AU_TSA_ID",
+            "dataType": "string",
+            "sourceColumn": "AU_TSA_ID"
+          },
+          {
+            "name": "SP_CODE",
+            "dataType": "string",
+            "sourceColumn": "SP_CODE"
+          },
+          {
+            "name": "INISTITBARCHNAMEARB",
+            "dataType": "string",
+            "sourceColumn": "INISTITBARCHNAMEARB"
+          },
+          {
+            "type": "calculated",
+            "name": "DATE_KEY_SETT",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(GOV[SETTELMENT_DATE], \"YYYYMMDD\")"
+          },
+          {
+            "name": "BUSINESS_FLAG",
+            "dataType": "string",
+            "sourceColumn": "BUSINESS_FLAG"
+          },
+          {
+            "name": "IS_INTEGRATED",
+            "dataType": "string",
+            "sourceColumn": "IS_INTEGRATED"
+          },
+          {
+            "name": "BUDGET_CATEGORY_CODE",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_CODE"
+          },
+          {
+            "name": "DELIVERY_CHANNEL_TYPE_ID",
+            "dataType": "double",
+            "sourceColumn": "DELIVERY_CHANNEL_TYPE_ID"
+          },
+          {
+            "name": "ISSUER_ID",
+            "dataType": "double",
+            "sourceColumn": "ISSUER_ID"
+          },
+          {
+            "name": "DELIVERY_CHANNEL_ID",
+            "dataType": "string",
+            "sourceColumn": "DELIVERY_CHANNEL_ID"
+          },
+          {
+            "name": "ROOT_ID",
+            "dataType": "string",
+            "sourceColumn": "ROOT_ID"
+          },
+          {
+            "type": "calculated",
+            "name": "CURRENCY_ID",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": "1"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    trx_count,",
+                "    amount,",
+                "    authamnt,",
+                "    interchangefees,",
+                "    setldate,",
+                "    settelment_date,",
+                "    sp_code,",
+                "    inistitbarchnamearb,",
+                "    fe_id,",
+                "    channel_id,",
+                "    merid,",
+                "    'MER-' || merid root_id,",
+                "    terid,",
+                "    tsa_flag,",
+                "    flag,",
+                "    coalesce((g.au_code), to_char(aud.au_code), to_char(auda.au_code), 'MUSEUM') au_code,",
+                "    coalesce(to_char(aud.au_tsa_id), to_char(auda.au_tsa_id),",
+                "             CASE",
+                "                 WHEN channel_id = 7",
+                "                      AND flag = 'GOV' THEN",
+                "                     'COMM'",
+                "                 WHEN channel_id = 7",
+                "                      AND flag <> 'GOV' THEN",
+                "                     'MUSEUM'",
+                "             END",
+                "    )                                                                            au_tsa_id,",
+                "    CASE",
+                "        WHEN substr(sp_code, 1, 2) IN ( '87', '94' ) THEN",
+                "            'GOV'",
+                "        WHEN substr(sp_code, 1, 2) IN ( '89', '92' ) THEN",
+                "            'ABE POST'",
+                "        WHEN substr(sp_code, 1, 2) IN ( '90', '91' ) THEN",
+                "            'INSURENCE'",
+                "        WHEN substr(sp_code, 1, 2) IN ( '84', '78' ) THEN",
+                "            'TPP'",
+                "        ELSE",
+                "            'COMM'",
+                "    END                                                                          business_flag,",
+                "    coalesce(to_char(is_integrated), 'COMM')                                     is_integrated,",
+                "    CASE",
+                "        WHEN is_integrated = 0",
+                "             AND budget_code IS NOT NULL THEN",
+                "            substr(budget_code, 3, instr(budget_code, '-', - 1, 1))",
+                "            || '0'",
+                "            || substr(budget_code, 1, instr(budget_code, '-', - 1, 1) - 1)",
+                "        WHEN is_integrated = 1",
+                "             AND budget_code = '1-2' THEN",
+                "            substr(budget_code, 3, instr(budget_code, '-', - 1, 1))",
+                "            || '0'",
+                "            || substr(budget_code, 1, instr(budget_code, '-', - 1, 1) - 1)",
+                "        WHEN budget_code IS NULL THEN",
+                "            'COMM'",
+                "        ELSE",
+                "            budget_code",
+                "    END                                                                          budget_category_code,",
+                "    CASE",
+                "        WHEN g.flag = 'GOV' THEN",
+                "            5 -- Accounting Unit",
+                "        ELSE",
+                "            6 -- Merchant",
+                "    END                                                                          delivery_channel_type_id,",
+                "    CASE",
+                "        WHEN g.flag = 'GOV' THEN",
+                "            'AU-'",
+                "            || coalesce(coalesce((g.au_code), to_char(aud.au_code), to_char(auda.au_code), 'MUSEUM'), br.accno, 'C00000000')",
+                "        ELSE",
+                "            'POS-' || g.merid",
+                "    END                                                                          delivery_channel_id,",
+                "    coalesce(g.issuer_id,0 ) issuer_id",
+                "FROM",
+                "    gov_txn_hist_agg               g",
+                "    LEFT JOIN oracle_user.lkp_accounting_units aud ON substr(aud.au_code, 1, 8) = substr(g.au_code, 2, 8)",
+                "                                                    AND aud.isactive = 0",
+                "                                                    AND substr(g.au_code, 1, 1) = 9",
+                "    LEFT JOIN oracle_user.lkp_accounting_units auda ON to_char(auda.au_code) = g.au_code",
+                "                                                     AND auda.isactive = 1",
+                "    LEFT JOIN sts_tblinistbranchs            br ON g.sp_code = br.inistitbarchcode",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "GOV_TRX_COUNT",
+            "expression": " SUM(GOV[TRX_COUNT])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "GOV_TRX_AMT",
+            "expression": " SUM(GOV[AMOUNT])",
+            "formatString": "#,0.00"
+          }
+        ]
+      },
+      {
+        "name": "CHEQUE",
+        "columns": [
+          {
+            "name": "TRX_COUNT",
+            "dataType": "double",
+            "sourceColumn": "TRX_COUNT"
+          },
+          {
+            "name": "AMOUNT",
+            "dataType": "double",
+            "sourceColumn": "AMOUNT"
+          },
+          {
+            "name": "RECEIVING_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "RECEIVING_DATE"
+          },
+          {
+            "name": "COLLECTION_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "COLLECTION_DATE"
+          },
+          {
+            "name": "SETTLEMENT_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "SETTLEMENT_DATE"
+          },
+          {
+            "name": "SP_ID",
+            "dataType": "double",
+            "sourceColumn": "SP_ID"
+          },
+          {
+            "name": "FE_ID",
+            "dataType": "double",
+            "sourceColumn": "FE_ID"
+          },
+          {
+            "name": "AU_TSA_ID",
+            "dataType": "string",
+            "sourceColumn": "AU_TSA_ID"
+          },
+          {
+            "name": "AU_CODE",
+            "dataType": "double",
+            "sourceColumn": "AU_CODE"
+          },
+          {
+            "name": "BUDGET_CATEGORY_CODE",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_CODE"
+          },
+          {
+            "name": "CHANNEL_ID",
+            "dataType": "double",
+            "sourceColumn": "CHANNEL_ID"
+          },
+          {
+            "name": "FE_FLAG",
+            "dataType": "string",
+            "sourceColumn": "FE_FLAG"
+          },
+          {
+            "name": "ACC_FLAG",
+            "dataType": "string",
+            "sourceColumn": "ACC_FLAG"
+          },
+          {
+            "type": "calculated",
+            "name": "DATE_ID",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(CHEQUE[COLLECTION_DATE], \"YYYYMMDD\")"
+          },
+          {
+            "type": "calculated",
+            "name": "DATE_KEY_SETT",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(CHEQUE[SETTLEMENT_DATE], \"YYYYMMDD\")"
+          },
+          {
+            "name": "DELIVERY_CHANNEL_TYPE_ID",
+            "dataType": "double",
+            "sourceColumn": "DELIVERY_CHANNEL_TYPE_ID"
+          },
+          {
+            "type": "calculated",
+            "name": "ISSUER_ID",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": " 0"
+          },
+          {
+            "name": "DELIVERY_CHANNEL_ID",
+            "dataType": "string",
+            "sourceColumn": "DELIVERY_CHANNEL_ID"
+          },
+          {
+            "name": "ROOT_ID",
+            "dataType": "string",
+            "sourceColumn": "ROOT_ID"
+          },
+          {
+            "name": "SERVICE_ENTITY_ID",
+            "dataType": "string",
+            "sourceColumn": "SERVICE_ENTITY_ID"
+          },
+          {
+            "type": "calculated",
+            "name": "CURRENCY_ID",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": "1"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    trx_count,",
+                "    amount,",
+                "    receiving_date,",
+                "    collection_date,",
+                "    settlement_date,",
+                "    sp_id,",
+                "    'EP-' || sp_id root_id,",
+                "    fe.u_id fe_id,",
+                "    coalesce(to_char(au_tsa_id), 'COMM') au_tsa_id,",
+                "    au_code,",
+                "    budget_category_code,",
+                "    channel_id,",
+                "    fe_flag,",
+                "    acc_flag,",
+                "    3  delivery_channel_type_id,",
+                "    'EP-' || coalesce(a.fe_id, 0) delivery_channel_id, --collection_bank_id",
+                "    'SP-' || sp_id service_entity_id",
+                "FROM",
+                "    cheque_txn_hist_agg a",
+                "LEFT Join con_fe_cheque_map      fe ON a.fe_id = fe.id",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "CH_TRX_COUNT",
+            "expression": " SUM(CHEQUE[TRX_COUNT])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "CH_TRX_AMT",
+            "expression": " SUM(CHEQUE[AMOUNT])",
+            "formatString": "#,0.00"
+          }
+        ]
+      },
+      {
+        "name": "DIM_DATE",
+        "columns": [
+          {
+            "name": "DATE_ID",
+            "dataType": "string",
+            "sourceColumn": "DATE_ID"
+          },
+          {
+            "name": "CALENDAR_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "CALENDAR_DATE"
+          },
+          {
+            "name": "CALENDAR_DATE_FORMATTED",
+            "dataType": "string",
+            "sourceColumn": "CALENDAR_DATE_FORMATTED"
+          },
+          {
+            "name": "YEAR",
+            "dataType": "string",
+            "sourceColumn": "YEAR"
+          },
+          {
+            "name": "QUARTER",
+            "dataType": "string",
+            "sourceColumn": "QUARTER"
+          },
+          {
+            "name": "MONTH",
+            "dataType": "double",
+            "sourceColumn": "MONTH"
+          },
+          {
+            "name": "MONTH_CH",
+            "dataType": "string",
+            "sourceColumn": "MONTH_CH",
+            "sortByColumn": "MONTH"
+          },
+          {
+            "name": "MONTH_NAME",
+            "dataType": "string",
+            "sourceColumn": "MONTH_NAME",
+            "sortByColumn": "MONTH"
+          },
+          {
+            "name": "MONTH_SHORT_NAME",
+            "dataType": "string",
+            "sourceColumn": "MONTH_SHORT_NAME",
+            "sortByColumn": "MONTH"
+          },
+          {
+            "name": "WEEK",
+            "dataType": "string",
+            "sourceColumn": "WEEK"
+          },
+          {
+            "name": "DAY",
+            "dataType": "string",
+            "sourceColumn": "DAY"
+          },
+          {
+            "name": "DAY_NAME",
+            "dataType": "string",
+            "sourceColumn": "DAY_NAME"
+          },
+          {
+            "name": "DAY_SHORT_NAME",
+            "dataType": "string",
+            "sourceColumn": "DAY_SHORT_NAME"
+          },
+          {
+            "name": "START_OF_MONTH",
+            "dataType": "dateTime",
+            "sourceColumn": "START_OF_MONTH"
+          },
+          {
+            "name": "END_OF_MONTH",
+            "dataType": "dateTime",
+            "sourceColumn": "END_OF_MONTH"
+          },
+          {
+            "name": "START_OF_QUARTER",
+            "dataType": "dateTime",
+            "sourceColumn": "START_OF_QUARTER"
+          },
+          {
+            "name": "END_OF_QUARTER",
+            "dataType": "dateTime",
+            "sourceColumn": "END_OF_QUARTER"
+          },
+          {
+            "name": "LAST_REFRESH",
+            "dataType": "dateTime",
+            "sourceColumn": "LAST_REFRESH",
+            "formatString": "MM/dd/yyyy h:mm:ss AM/PM",
+            "annotations": [
+              {
+                "name": "Format",
+                "value": "<Format Format=\"DateTimeCustom\"><DateTimes><DateTime LCID=\"1033\" Group=\"GeneralLongDateTime\" FormatString=\"MM/dd/yyyy h:mm:ss tt\" /></DateTimes></Format>"
+              }
+            ]
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT * FROM (    ",
+                "    SELECT",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'YYYYMMDD')     AS date_id,",
+                "        to_date(start_date, 'YYYY-MM-DD') + level - 1                          AS calendar_date,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'YYYY-MM-DD')   AS calendar_date_formatted,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'YYYY')         AS year,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'Q')            AS quarter,",
+                "        EXTRACT(MONTH FROM to_date(start_date, 'YYYY-MM-DD') + level - 1)      AS month,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'MM')           AS month_ch,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'MONTH')        AS month_name,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'MON')          AS month_short_name,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'IW')           AS week,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'DD')           AS day,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'DAY')          AS day_name,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'DY')           AS day_short_name,",
+                "        trunc(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'MM')             AS start_of_month,",
+                "        last_day(to_date(start_date, 'YYYY-MM-DD') + level - 1)                AS end_of_month,",
+                "        trunc(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'Q')              AS start_of_quarter,",
+                "        last_day(add_months(to_date(start_date, 'YYYY-MM-DD') + level - 1, 2)) AS end_of_quarter,",
+                "        systimestamp                                                           last_refresh",
+                "    FROM",
+                "        (",
+                "            SELECT",
+                "                '2009-01-01' AS start_date",
+                "            FROM",
+                "                dual",
+                "        )",
+                "    CONNECT BY",
+                "        level <= ( trunc(sysdate) - to_date(start_date, 'YYYY-MM-DD') + 1 ))",
+                "WHERE year <= to_char(SYSDATE, 'YYYY')",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "TXN_COUNT_",
+            "expression": " [EPay_TRX_COUNT] + GOV[GOV_TRX_COUNT] + CHEQUE[CH_TRX_COUNT] + 0",
+            "formatString": "#,0"
+          },
+          {
+            "name": "TXN_AMT_",
+            "expression": " [EP_TRX_AMT] + GOV[GOV_TRX_AMT] + CHEQUE[CH_TRX_AMT] + 0",
+            "formatString": "#,0.00"
+          }
+        ]
+      },
+      {
+        "name": "ACCOUNTING_UNITS",
+        "columns": [
+          {
+            "name": "AU_TSA_ID",
+            "dataType": "string",
+            "sourceColumn": "AU_TSA_ID"
+          },
+          {
+            "name": "FUNCTIONAL_CHILD",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_CHILD"
+          },
+          {
+            "name": "MINISTRY",
+            "dataType": "string",
+            "sourceColumn": "MINISTRY"
+          },
+          {
+            "name": "MINISTRY_CODE",
+            "dataType": "string",
+            "sourceColumn": "MINISTRY_CODE"
+          },
+          {
+            "name": "UNIT_CODE",
+            "dataType": "string",
+            "sourceColumn": "UNIT_CODE"
+          },
+          {
+            "name": "UNIT_NAME",
+            "dataType": "string",
+            "sourceColumn": "UNIT_NAME"
+          },
+          {
+            "name": "AREA_CODE",
+            "dataType": "string",
+            "sourceColumn": "AREA_CODE"
+          },
+          {
+            "name": "AREA_NAME",
+            "dataType": "string",
+            "sourceColumn": "AREA_NAME"
+          },
+          {
+            "name": "UNIT_TYPE",
+            "dataType": "string",
+            "sourceColumn": "UNIT_TYPE"
+          },
+          {
+            "name": "INSTITUTION_CODE",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTION_CODE"
+          },
+          {
+            "name": "INSTITUTION_NAME",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTION_NAME"
+          },
+          {
+            "name": "INSTITUTIONAL_SECTOR_CODE",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTIONAL_SECTOR_CODE"
+          },
+          {
+            "name": "INSTITUTIONAL_SECTOR_NAME",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTIONAL_SECTOR_NAME"
+          },
+          {
+            "name": "FUNCTIONAL_SECTOR_ID",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_SECTOR_ID"
+          },
+          {
+            "name": "FUNCTIONAL_SECTOR",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_SECTOR"
+          },
+          {
+            "name": "CLASSIFCATION",
+            "dataType": "string",
+            "sourceColumn": "CLASSIFCATION"
+          },
+          {
+            "type": "calculated",
+            "name": "UNIT_NAME_",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " IF(ACCOUNTING_UNITS[UNIT_NAME] = \"و.ح للإدارة العامة للجمارك بالإسكندرية\", \"الإيداع بالحساب الجاري الجمركي\" ,ACCOUNTING_UNITS[UNIT_NAME])"
+          },
+          {
+            "type": "calculated",
+            "name": "UNIT_CODE_NAME",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " ACCOUNTING_UNITS[UNIT_CODE] & \"-\" & ACCOUNTING_UNITS[UNIT_NAME]"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    to_char(au_tsa_id)                  au_tsa_id,",
+                "    coalesce(unit_code,",
+                "             to_char(au_code))          unit_code,",
+                "    coalesce(unit_name, au_name)        unit_name,",
+                "    coalesce(area_code,",
+                "             to_char(l3_code))          area_code,",
+                "    coalesce(area_name, l3_name)        area_name,",
+                "    coalesce(institution_code,",
+                "             to_char(l2_code))          institution_code,",
+                "    coalesce(institution_name, l2_name) institution_name,",
+                "    ministry_code,",
+                "    ministry,",
+                "    CASE",
+                "        WHEN substr(au_code, 1, 1) = 1 THEN",
+                "            '10000000'",
+                "        WHEN substr(au_code, 1, 1) = 2 THEN",
+                "            '20000000'",
+                "        WHEN substr(au_code, 1, 1) = 3 THEN",
+                "            '30000000'",
+                "        WHEN substr(au_code, 1, 1) = 4 THEN",
+                "            '40000000'",
+                "        ELSE",
+                "            institutional_sector_code",
+                "    END                                 institutional_sector_code,",
+                "    CASE",
+                "        WHEN substr(au_code, 1, 1) = 1 THEN",
+                "            'الجهاز الإدارى'",
+                "        WHEN substr(au_code, 1, 1) = 2 THEN",
+                "            'الإدارة المحلية'",
+                "        WHEN substr(au_code, 1, 1) = 3 THEN",
+                "            'الهيئات العامة الخدمية'",
+                "        WHEN substr(au_code, 1, 1) = 4 THEN",
+                "            'الهيئات الإقتصادية'",
+                "        ELSE",
+                "            institutional_sector_name",
+                "    END                                 institutional_sector_name,",
+                "    functional_sector_id,",
+                "    coalesce(functional_sector, 'أخرى') functional_sector,",
+                "    coalesce(functional_child, 'أخرى')  functional_child,",
+                "    CASE",
+                "        WHEN substr(au_code, 1, 1) IN ( 1, 2, 3 ) THEN",
+                "            n'هيئة موازنية'",
+                "        WHEN substr(au_code, 1, 1) = 4 THEN",
+                "            n'هيئة إقتصادية'",
+                "        ELSE",
+                "            unit_type",
+                "    END                                 unit_type,",
+                "    CASE",
+                "        WHEN area_code IN ( '10600700', '10601800', '10600900' ) THEN -- '10600500',",
+                "            n'مصلحة الضرائب المصرية'",
+                "        WHEN area_code IN ( '10600600' ) THEN",
+                "            n'مصلحة الجمارك المصرية'",
+                "        ELSE",
+                "            CASE",
+                "                    WHEN substr(au_code, 1, 1) IN ( 1, 2, 3 ) THEN",
+                "                        n'هيئة موازنية'",
+                "                    WHEN substr(au_code, 1, 1) = 4 THEN",
+                "                        n'هيئة إقتصادية'",
+                "                    ELSE",
+                "                        unit_type",
+                "            END",
+                "    END                                 classifcation",
+                "FROM",
+                "    gfmis_au_hierarchy_master mau",
+                "    RIGHT JOIN lkp_accounting_units      au ON substr(au.au_code, 1, 8) = mau.unit_code",
+                "--------------------------------------------------------------------------------",
+                "UNION ALL",
+                "--------------------------------------------------------------------------------",
+                "SELECT",
+                "    'COMM'   au_tsa_id,",
+                "    NULL     unit_code,",
+                "    'تجاري'  unit_name,",
+                "    NULL     area_code,",
+                "    'تجاري'  area_name,",
+                "    NULL     institution_code,",
+                "    'تجاري'  institution_name,",
+                "    NULL     ministry_code,",
+                "    'تجاري'  ministry,",
+                "    NULL     institutional_sector_code,",
+                "    'تجاري'  institutional_sector_name,",
+                "    NULL     functional_sector_id,",
+                "    'تجاري'  functional_sector,",
+                "    NULL     functional_child,",
+                "    n'أخرى'  unit_type,",
+                "    n'تجاري' classifcation",
+                "FROM",
+                "    dual",
+                "--------------------------------------------------------------------------------",
+                "UNION ALL",
+                "--------------------------------------------------------------------------------",
+                "SELECT",
+                "    'MUSEUM'                     au_tsa_id,",
+                "    NULL                         unit_code,",
+                "    'الترفيه و الثقافة و الدين'  unit_name,",
+                "    NULL                         area_code,",
+                "    'الترفيه و الثقافة و الدين'  area_name,",
+                "    NULL                         institution_code,",
+                "    'الترفيه و الثقافة و الدين'  institution_name,",
+                "    NULL                         ministry_code,",
+                "    'الترفيه و الثقافة و الدين'  ministry,",
+                "    NULL                         institutional_sector_code,",
+                "    'الترفيه و الثقافة و الدين'  institutional_sector_name,",
+                "    NULL                         functional_sector_id,",
+                "    'الترفيه و الثقافة و الدين'  functional_sector,",
+                "    NULL                         functional_child,",
+                "    n'أخرى'                      unit_type,",
+                "    n'الترفيه و الثقافة و الدين' classifcation",
+                "FROM",
+                "    dual",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "CHANNELS",
+        "columns": [
+          {
+            "name": "CHANNEL_ID",
+            "dataType": "double",
+            "sourceColumn": "CHANNEL_ID"
+          },
+          {
+            "name": "CHANNEL_ENG_NAME",
+            "dataType": "string",
+            "sourceColumn": "CHANNEL_ENG_NAME"
+          },
+          {
+            "name": "CHANNEL_ARB_NAME",
+            "dataType": "string",
+            "sourceColumn": "CHANNEL_ARB_NAME"
+          },
+          {
+            "name": "SOURCE",
+            "dataType": "string",
+            "sourceColumn": "SOURCE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    channel",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "SERVICE_PROVIDERS",
+        "columns": [
+          {
+            "name": "SP_ID",
+            "dataType": "string",
+            "sourceColumn": "SP_ID"
+          },
+          {
+            "name": "SERVICE_PROVIDER",
+            "dataType": "string",
+            "sourceColumn": "SERVICE_PROVIDER"
+          },
+          {
+            "name": "SERVICE_PROVIDER_AR",
+            "dataType": "string",
+            "sourceColumn": "SERVICE_PROVIDER_AR"
+          },
+          {
+            "name": "GROUP_NAME",
+            "dataType": "string",
+            "sourceColumn": "GROUP_NAME"
+          },
+          {
+            "name": "GROUP_NAME_AR",
+            "dataType": "string",
+            "sourceColumn": "GROUP_NAME_AR"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT distinct",
+                "    to_char(sp.sp_id)               sp_id,",
+                "    to_char(service_provider)    service_provider,",
+                "    to_char(service_provider_ar) service_provider_ar,",
+                "    group_name,",
+                "    group_name_ar",
+                "FROM",
+                "    lkp_service_provider       sp",
+                "    LEFT JOIN lkp_service_provider_group spg ON sp.sp_group_id = spg.id",
+                "",
+                "    ",
+                "-------------------------------------------------",
+                "UNION ALL",
+                "-------------------------------------------------",
+                "SELECT distinct",
+                "    to_char(a.inistitbarchcode),",
+                "    to_char(trim(a.inistitbarchname)),",
+                "    to_char(trim(a.inistitbarchnamearb)),",
+                "    CASE WHEN x.inistitbarchcode is not null THEN 'Customs Authority' ELSE  'STS' END,",
+                "    CASE WHEN x.inistitbarchcode is not null THEN 'مصلحة الجمارك المصرية' ELSE  'STS' END",
+                "    ",
+                "FROM",
+                "    sts_tblinistbranchs a left join (SELECT a.inistitbarchcode FROM sts_tblinistbranchs a inner join sts_tblinistitution b on a.inistitcode = b.inistitcode",
+                "    where b.id = 87)x on a.inistitbarchcode = x.inistitbarchcode",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>let",
+                  "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                  "",
+                  "SELECT distinct",
+                  "    to_char(sp.sp_id)               sp_id,",
+                  "    to_char(service_provider)    service_provider,",
+                  "    to_char(service_provider_ar) service_provider_ar,",
+                  "    group_name",
+                  "FROM",
+                  "    lkp_service_provider       sp",
+                  "    LEFT JOIN lkp_service_provider_group spg ON sp.sp_group_id = spg.id",
+                  "",
+                  "    ",
+                  "-------------------------------------------------",
+                  "UNION ALL",
+                  "-------------------------------------------------",
+                  "SELECT distinct",
+                  "    to_char(a.inistitbarchcode),",
+                  "    to_char(trim(a.inistitbarchname)),",
+                  "    to_char(trim(a.inistitbarchnamearb)),",
+                  "    CASE WHEN x.inistitbarchcode is not null THEN 'Customs Authority' ELSE  'STS' END",
+                  "FROM",
+                  "    sts_tblinistbranchs a left join (SELECT a.inistitbarchcode FROM sts_tblinistbranchs a inner join sts_tblinistitution b on a.inistitcode = b.inistitcode",
+                  "    where b.id = 87)x on a.inistitbarchcode = x.inistitbarchcode",
+                  "",
+                  "\")",
+                  "in",
+                  "    Source</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "FULLFILMENT_ENTITY",
+        "columns": [
+          {
+            "name": "ID",
+            "dataType": "double",
+            "sourceColumn": "ID"
+          },
+          {
+            "name": "NAME",
+            "dataType": "string",
+            "sourceColumn": "NAME"
+          },
+          {
+            "name": "TYPE",
+            "dataType": "string",
+            "sourceColumn": "TYPE"
+          },
+          {
+            "type": "calculated",
+            "name": "BANK_NAME",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " IF(FULLFILMENT_ENTITY[NAME] = \"بنك منظومة الحسابات الجمركية\", \"CAMS - اقرار جمركى منظومة الحسابات الجارية\", FULLFILMENT_ENTITY[NAME])"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    con_fe",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "lkp_tsa_budget_category",
+        "columns": [
+          {
+            "name": "BUDGET_CATEGORY_TYPE_NAME",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_TYPE_NAME"
+          },
+          {
+            "name": "BUDGET_CATEGORY_ID",
+            "dataType": "double",
+            "sourceColumn": "BUDGET_CATEGORY_ID"
+          },
+          {
+            "name": "BUDGET_CATEGORY_CODE",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_CODE"
+          },
+          {
+            "name": "BUDGET_CATEGORY_TYPE_ID",
+            "dataType": "double",
+            "sourceColumn": "BUDGET_CATEGORY_TYPE_ID"
+          },
+          {
+            "name": "BUDGET_CATEGORY_TYPE_CODE",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_TYPE_CODE"
+          },
+          {
+            "name": "BUDGET_CATEGORY_NAME",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_NAME"
+          },
+          {
+            "name": "SW_BUDGET_CODE",
+            "dataType": "string",
+            "sourceColumn": "SW_BUDGET_CODE"
+          },
+          {
+            "name": "ACCOUNT_TYPE_CODE",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_TYPE_CODE"
+          },
+          {
+            "name": "EPAY_BUDGET_CODE",
+            "dataType": "string",
+            "sourceColumn": "EPAY_BUDGET_CODE"
+          },
+          {
+            "name": "CCMS_BUDGET_CODE",
+            "dataType": "string",
+            "sourceColumn": "CCMS_BUDGET_CODE"
+          },
+          {
+            "name": "BUDGET_CATEGORY_CLASS",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_CLASS"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    budget_category_type_name,",
+                "    budget_category_id,",
+                "    budget_category_code,",
+                "    budget_category_type_id,",
+                "    budget_category_type_code,",
+                "    budget_category_name,",
+                "    to_number(budget_category_code)",
+                "    || '-'",
+                "    || budget_category_type_id                        AS sw_budget_code,",
+                "    CASE",
+                "        WHEN budget_category_type_id = 4 THEN",
+                "            '05'",
+                "        WHEN budget_category_type_id IN ( 1, 2 ) THEN",
+                "            '02'",
+                "        WHEN budget_category_type_id = 6 THEN",
+                "            '08'",
+                "    END                                               AS account_type_code,",
+                "    budget_category_type_id || budget_category_code   AS epay_budget_code,",
+                "    budget_category_code || budget_category_type_code AS ccms_budget_code,",
+                "    'كود مؤسسي' budget_category_class",
+                "FROM",
+                "    oracle_user.lkp_tsa_budget_category",
+                "-------------------------------------------------------------------------",
+                "UNION ALL",
+                "-------------------------------------------------------------------------",
+                "SELECT",
+                "    'حساب بنك مركزي' budget_category_type_name,",
+                "    NULL    budget_category_id,",
+                "    NULL    budget_category_code,",
+                "    NULL    budget_category_type_id,",
+                "    NULL    budget_category_type_code,",
+                "    'حساب بنك مركزي' budget_category_name,",
+                "    NULL    sw_budget_code,",
+                "    NULL    account_type_code,",
+                "    'COMM'  epay_budget_code,",
+                "    'COMM'  ccms_budget_code,",
+                "    'حساب بنك مركزي' budget_category_class",
+                "FROM",
+                "    dual",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DIM_DATE_SETT",
+        "columns": [
+          {
+            "name": "DATE_ID",
+            "dataType": "string",
+            "sourceColumn": "DATE_ID"
+          },
+          {
+            "name": "CALENDAR_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "CALENDAR_DATE"
+          },
+          {
+            "name": "CALENDAR_DATE_FORMATTED",
+            "dataType": "string",
+            "sourceColumn": "CALENDAR_DATE_FORMATTED"
+          },
+          {
+            "name": "YEAR",
+            "dataType": "string",
+            "sourceColumn": "YEAR"
+          },
+          {
+            "name": "QUARTER",
+            "dataType": "string",
+            "sourceColumn": "QUARTER"
+          },
+          {
+            "name": "MONTH",
+            "dataType": "double",
+            "sourceColumn": "MONTH"
+          },
+          {
+            "name": "MONTH_CH",
+            "dataType": "string",
+            "sourceColumn": "MONTH_CH",
+            "sortByColumn": "MONTH"
+          },
+          {
+            "name": "MONTH_NAME",
+            "dataType": "string",
+            "sourceColumn": "MONTH_NAME",
+            "sortByColumn": "MONTH"
+          },
+          {
+            "name": "MONTH_SHORT_NAME",
+            "dataType": "string",
+            "sourceColumn": "MONTH_SHORT_NAME",
+            "sortByColumn": "MONTH"
+          },
+          {
+            "name": "WEEK",
+            "dataType": "string",
+            "sourceColumn": "WEEK"
+          },
+          {
+            "name": "DAY",
+            "dataType": "string",
+            "sourceColumn": "DAY"
+          },
+          {
+            "name": "DAY_NAME",
+            "dataType": "string",
+            "sourceColumn": "DAY_NAME"
+          },
+          {
+            "name": "DAY_SHORT_NAME",
+            "dataType": "string",
+            "sourceColumn": "DAY_SHORT_NAME"
+          },
+          {
+            "name": "START_OF_MONTH",
+            "dataType": "dateTime",
+            "sourceColumn": "START_OF_MONTH"
+          },
+          {
+            "name": "END_OF_MONTH",
+            "dataType": "dateTime",
+            "sourceColumn": "END_OF_MONTH"
+          },
+          {
+            "name": "START_OF_QUARTER",
+            "dataType": "dateTime",
+            "sourceColumn": "START_OF_QUARTER"
+          },
+          {
+            "name": "END_OF_QUARTER",
+            "dataType": "dateTime",
+            "sourceColumn": "END_OF_QUARTER"
+          },
+          {
+            "name": "LAST_REFRESH",
+            "dataType": "dateTime",
+            "sourceColumn": "LAST_REFRESH"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT * FROM (    ",
+                "    SELECT",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'YYYYMMDD')     AS date_id,",
+                "        to_date(start_date, 'YYYY-MM-DD') + level - 1                          AS calendar_date,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'YYYY-MM-DD')   AS calendar_date_formatted,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'YYYY')         AS year,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'Q')            AS quarter,",
+                "        EXTRACT(MONTH FROM to_date(start_date, 'YYYY-MM-DD') + level - 1)      AS month,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'MM')           AS month_ch,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'MONTH')        AS month_name,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'MON')          AS month_short_name,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'IW')           AS week,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'DD')           AS day,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'DAY')          AS day_name,",
+                "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'DY')           AS day_short_name,",
+                "        trunc(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'MM')             AS start_of_month,",
+                "        last_day(to_date(start_date, 'YYYY-MM-DD') + level - 1)                AS end_of_month,",
+                "        trunc(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'Q')              AS start_of_quarter,",
+                "        last_day(add_months(to_date(start_date, 'YYYY-MM-DD') + level - 1, 2)) AS end_of_quarter,",
+                "        systimestamp                                                           last_refresh",
+                "    FROM",
+                "        (",
+                "            SELECT",
+                "                '2009-01-01' AS start_date",
+                "            FROM",
+                "                dual",
+                "        )",
+                "    CONNECT BY",
+                "        level <= ( trunc(sysdate) - to_date(start_date, 'YYYY-MM-DD') + 3 ))",
+                "WHERE year <= to_char(SYSDATE, 'YYYY')",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>let",
+                  "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                  "",
+                  "SELECT * FROM (    ",
+                  "    SELECT",
+                  "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'YYYYMMDD')     AS date_id,",
+                  "        to_date(start_date, 'YYYY-MM-DD') + level - 1                          AS calendar_date,",
+                  "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'YYYY-MM-DD')   AS calendar_date_formatted,",
+                  "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'YYYY')         AS year,",
+                  "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'Q')            AS quarter,",
+                  "        EXTRACT(MONTH FROM to_date(start_date, 'YYYY-MM-DD') + level - 1)      AS month,",
+                  "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'MM')           AS month_ch,",
+                  "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'MONTH')        AS month_name,",
+                  "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'MON')          AS month_short_name,",
+                  "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'IW')           AS week,",
+                  "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'DD')           AS day,",
+                  "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'DAY')          AS day_name,",
+                  "        to_char(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'DY')           AS day_short_name,",
+                  "        trunc(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'MM')             AS start_of_month,",
+                  "        last_day(to_date(start_date, 'YYYY-MM-DD') + level - 1)                AS end_of_month,",
+                  "        trunc(to_date(start_date, 'YYYY-MM-DD') + level - 1, 'Q')              AS start_of_quarter,",
+                  "        last_day(add_months(to_date(start_date, 'YYYY-MM-DD') + level - 1, 2)) AS end_of_quarter,",
+                  "        systimestamp                                                           last_refresh",
+                  "    FROM",
+                  "        (",
+                  "            SELECT",
+                  "                '2009-01-01' AS start_date",
+                  "            FROM",
+                  "                dual",
+                  "        )",
+                  "    CONNECT BY",
+                  "        level <= ( trunc(sysdate) - to_date(start_date, 'YYYY-MM-DD') + 3 ))",
+                  "WHERE year <= to_char(SYSDATE, 'YYYY')",
+                  "",
+                  "\")",
+                  "in",
+                  "    Source</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "datefiltertype",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "Type",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": false,
+            "sourceColumn": "[Type]"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated",
+              "expression": [
+                " DATATABLE(",
+                "    \"Type\", STRING,",
+                "    {",
+                "        {\"Business Date\"},",
+                "        {\"Settlement Date\"}",
+                "    }",
+                ")"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "SelectedDateKey",
+            "expression": [
+              "",
+              "VAR FilterType = SELECTEDVALUE(DateFilterType[Type])",
+              "RETURN",
+              "    SWITCH(",
+              "        TRUE(),",
+              "        FilterType = \"Business Date\", SELECTEDVALUE(DIM_DATE[CALENDAR_DATE_FORMATTED]),",
+              "        FilterType = \"Settlement Date\", SELECTEDVALUE(DIM_DATE_SETT[CALENDAR_DATE_FORMATTED]),",
+              "        BLANK()",
+              "    )"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "PARTNERS",
+        "columns": [
+          {
+            "name": "ID",
+            "dataType": "double",
+            "sourceColumn": "ID"
+          },
+          {
+            "name": "NAME",
+            "dataType": "string",
+            "sourceColumn": "NAME"
+          },
+          {
+            "name": "TYPE",
+            "dataType": "string",
+            "sourceColumn": "TYPE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    con_fe",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "EPAY_TRX_AGG",
+        "columns": [
+          {
+            "name": "SERVICE_ID",
+            "dataType": "int64",
+            "sourceColumn": "SERVICE_ID"
+          },
+          {
+            "name": "CHANNEL_ID",
+            "dataType": "double",
+            "sourceColumn": "CHANNEL_ID"
+          },
+          {
+            "name": "SP_ID",
+            "dataType": "int64",
+            "sourceColumn": "SP_ID"
+          },
+          {
+            "name": "FE_ID",
+            "dataType": "int64",
+            "sourceColumn": "FE_ID"
+          },
+          {
+            "name": "BUSINESS_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "BUSINESS_DATE"
+          },
+          {
+            "name": "SETTLEMENT_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "SETTLEMENT_DATE"
+          },
+          {
+            "name": "COLLECTION_NETWORK",
+            "dataType": "double",
+            "sourceColumn": "COLLECTION_NETWORK"
+          },
+          {
+            "name": "THIRD_PARTY_ENTITY",
+            "dataType": "double",
+            "sourceColumn": "THIRD_PARTY_ENTITY"
+          },
+          {
+            "name": "TXN_SETT_AMT_EGP",
+            "dataType": "double",
+            "sourceColumn": "TXN_SETT_AMT_EGP"
+          },
+          {
+            "name": "TRXCOUNT",
+            "dataType": "double",
+            "sourceColumn": "TRXCOUNT"
+          },
+          {
+            "name": "EFINANCE_SETT_COMM",
+            "dataType": "double",
+            "sourceColumn": "EFINANCE_SETT_COMM"
+          },
+          {
+            "name": "EFINANCE_REV",
+            "dataType": "double",
+            "sourceColumn": "EFINANCE_REV"
+          },
+          {
+            "name": "SP_SETT_COMM",
+            "dataType": "double",
+            "sourceColumn": "SP_SETT_COMM"
+          },
+          {
+            "name": "FE_SETT_COMM",
+            "dataType": "double",
+            "sourceColumn": "FE_SETT_COMM"
+          },
+          {
+            "name": "THIRD_PARTY_SETT_COMM",
+            "dataType": "double",
+            "sourceColumn": "THIRD_PARTY_SETT_COMM"
+          },
+          {
+            "name": "PGW_COMM",
+            "dataType": "double",
+            "sourceColumn": "PGW_COMM"
+          },
+          {
+            "name": "PGW_EF_COMM",
+            "dataType": "double",
+            "sourceColumn": "PGW_EF_COMM"
+          },
+          {
+            "name": "PGW_SP_COMM",
+            "dataType": "double",
+            "sourceColumn": "PGW_SP_COMM"
+          },
+          {
+            "name": "PGW_ACQRR_COMM",
+            "dataType": "double",
+            "sourceColumn": "PGW_ACQRR_COMM"
+          },
+          {
+            "name": "EPAY_BANK_CODE",
+            "dataType": "string",
+            "sourceColumn": "EPAY_BANK_CODE"
+          },
+          {
+            "name": "EPAY_BR_CODE",
+            "dataType": "string",
+            "sourceColumn": "EPAY_BR_CODE"
+          },
+          {
+            "name": "CPS_BANK_FEE_AMT",
+            "dataType": "double",
+            "sourceColumn": "CPS_BANK_FEE_AMT"
+          },
+          {
+            "name": "BILLER_ID",
+            "dataType": "double",
+            "sourceColumn": "BILLER_ID"
+          },
+          {
+            "name": "BILLING_ACCOUNT",
+            "dataType": "string",
+            "sourceColumn": "BILLING_ACCOUNT"
+          },
+          {
+            "name": "CP_AU_CODE",
+            "dataType": "string",
+            "sourceColumn": "CP_AU_CODE"
+          },
+          {
+            "name": "CP_AU_TSA_ID",
+            "dataType": "double",
+            "sourceColumn": "CP_AU_TSA_ID"
+          },
+          {
+            "name": "AMT_USD",
+            "dataType": "double",
+            "sourceColumn": "AMT_USD"
+          },
+          {
+            "name": "CUST_CURRENT_ACC_FLAG",
+            "dataType": "double",
+            "sourceColumn": "CUST_CURRENT_ACC_FLAG"
+          },
+          {
+            "name": "GOVORNORATE_ID",
+            "dataType": "double",
+            "sourceColumn": "GOVORNORATE_ID"
+          },
+          {
+            "name": "CPS_CUSTOMER_ID",
+            "dataType": "double",
+            "sourceColumn": "CPS_CUSTOMER_ID"
+          },
+          {
+            "type": "calculated",
+            "name": "DATE_KEY_SETT",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(EPAY_TRX_AGG[SETTLEMENT_DATE], \"YYYYMMDD\")"
+          },
+          {
+            "type": "calculated",
+            "name": "DATE_KEY_BUSS",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(EPAY_TRX_AGG[BUSINESS_DATE], \"YYYYMMDD\")"
+          },
+          {
+            "name": "FE_ID2",
+            "dataType": "double",
+            "sourceColumn": "FE_ID2"
+          },
+          {
+            "name": "COLL_BANK_ID",
+            "dataType": "double",
+            "sourceColumn": "COLL_BANK_ID"
+          },
+          {
+            "name": "TXN_TYPE",
+            "dataType": "int64",
+            "sourceColumn": "TXN_TYPE"
+          },
+          {
+            "name": "ROOT_ID",
+            "dataType": "string",
+            "sourceColumn": "ROOT_ID"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "WITH lpr AS (",
+                "    SELECT DISTINCT",
+                "        a.id,",
+                "        b.id   partner_id,",
+                "        a.name partner,",
+                "        CASE",
+                "            WHEN b.id = '38399' THEN",
+                "                b.id",
+                "            ELSE",
+                "                b2.id",
+                "        END    bank_id,",
+                "        CASE",
+                "            WHEN b.name = '38399' THEN",
+                "                b.name",
+                "            ELSE",
+                "                b2.name",
+                "        END    bank",
+                "    FROM",
+                "        con_fe              a",
+                "        LEFT JOIN con_fe_epay_map     b ON a.id = b.u_id",
+                "        LEFT JOIN account_offices_mst acof ON acof.entity_id = b.id",
+                "        LEFT JOIN account_offices_dtl acdtl ON acdtl.acc_off_id = acof.acc_off_id",
+                "        LEFT JOIN con_fe_epay_map     b2 ON b2.id = acdtl.rc_entity_pi_id",
+                "    WHERE",
+                "        lower(a.type) = 'partner'",
+                ")",
+                "SELECT",
+                "    a.*,",
+                "    'EP-' || a.sp_id as root_id,",
+                "    pr.u_id               fe_id,",
+                "    nvl(fe.u_id, pr.u_id) AS coll_bank_id",
+                "FROM",
+                "    epaysettm.epay_trx_agg a",
+                "    LEFT JOIN con_fe_epay_map        pr ON a.fe_id = pr.id",
+                "    LEFT JOIN lpr ON a.fe_id = lpr.partner_id",
+                "    LEFT JOIN con_fe_epay_map        fe ON lpr.bank_id = fe.id",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "EPay_TRX_COUNT",
+            "expression": " SUM(EPAY_TRX_AGG[TRXCOUNT])",
+            "formatString": "#,0"
+          }
+        ]
+      },
+      {
+        "name": "DELIVERY_CHANNEL_TYPE",
+        "columns": [
+          {
+            "name": "DELIVERY_CHANNEL_TYPE_ID",
+            "dataType": "double",
+            "sourceColumn": "DELIVERY_CHANNEL_TYPE_ID"
+          },
+          {
+            "name": "DELIVERY_CHANNEL_TYPE_EN",
+            "dataType": "string",
+            "sourceColumn": "DELIVERY_CHANNEL_TYPE_EN"
+          },
+          {
+            "name": "DELIVERY_CHANNEL_TYPE_AR",
+            "dataType": "string",
+            "sourceColumn": "DELIVERY_CHANNEL_TYPE_AR"
+          },
+          {
+            "name": "CHANNEL",
+            "dataType": "string",
+            "sourceColumn": "CHANNEL"
+          },
+          {
+            "name": "IS_SPECIAL",
+            "dataType": "double",
+            "sourceColumn": "IS_SPECIAL"
+          },
+          {
+            "name": "DESCRIPTION",
+            "dataType": "string",
+            "sourceColumn": "DESCRIPTION"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    LKP_DELIVERY_CHANNEL_TYPE",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_ENTITY",
+        "columns": [
+          {
+            "name": "ENT_ID",
+            "dataType": "double",
+            "sourceColumn": "ENT_ID"
+          },
+          {
+            "name": "LANG_ID",
+            "dataType": "double",
+            "sourceColumn": "LANG_ID"
+          },
+          {
+            "name": "ENT_NAME",
+            "dataType": "string",
+            "sourceColumn": "ENT_NAME"
+          },
+          {
+            "name": "ENT_ADDRESS1",
+            "dataType": "string",
+            "sourceColumn": "ENT_ADDRESS1"
+          },
+          {
+            "name": "ENT_ADDRESS2",
+            "dataType": "string",
+            "sourceColumn": "ENT_ADDRESS2"
+          },
+          {
+            "name": "CONTRACT_DESC",
+            "dataType": "string",
+            "sourceColumn": "CONTRACT_DESC"
+          },
+          {
+            "name": "PC_PERSON",
+            "dataType": "string",
+            "sourceColumn": "PC_PERSON"
+          },
+          {
+            "name": "SC_PERSON",
+            "dataType": "string",
+            "sourceColumn": "SC_PERSON"
+          },
+          {
+            "name": "CREATED_BY",
+            "dataType": "double",
+            "sourceColumn": "CREATED_BY"
+          },
+          {
+            "name": "CREATED_DT",
+            "dataType": "dateTime",
+            "sourceColumn": "CREATED_DT"
+          },
+          {
+            "name": "MODIFIED_BY",
+            "dataType": "double",
+            "sourceColumn": "MODIFIED_BY"
+          },
+          {
+            "name": "MODIFIED_DT",
+            "dataType": "dateTime",
+            "sourceColumn": "MODIFIED_DT"
+          },
+          {
+            "name": "DELETE_FLAG",
+            "dataType": "double",
+            "sourceColumn": "DELETE_FLAG"
+          },
+          {
+            "name": "ROW_VER_NO",
+            "dataType": "double",
+            "sourceColumn": "ROW_VER_NO"
+          },
+          {
+            "name": "CURRENT_LEVEL",
+            "dataType": "double",
+            "sourceColumn": "CURRENT_LEVEL"
+          },
+          {
+            "name": "ROOT_ID",
+            "dataType": "double",
+            "sourceColumn": "ROOT_ID"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    epay_entity_mst_lang",
+                "WHERE LANG_ID = 2",
+                "",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "SERVICES",
+        "columns": [
+          {
+            "name": "ENTITY_ID",
+            "dataType": "double",
+            "sourceColumn": "ENTITY_ID"
+          },
+          {
+            "name": "ENTITY_CODE",
+            "dataType": "string",
+            "sourceColumn": "ENTITY_CODE"
+          },
+          {
+            "name": "ENTITY_NAME",
+            "dataType": "string",
+            "sourceColumn": "ENTITY_NAME"
+          },
+          {
+            "name": "ENTITY_TYPE_ID",
+            "dataType": "double",
+            "sourceColumn": "ENTITY_TYPE_ID"
+          },
+          {
+            "name": "ENTITY_TYPE",
+            "dataType": "string",
+            "sourceColumn": "ENTITY_TYPE"
+          },
+          {
+            "name": "RC_ENTITY_PI_ID",
+            "dataType": "double",
+            "sourceColumn": "RC_ENTITY_PI_ID"
+          },
+          {
+            "name": "RC_ENTITY_PI_CODE",
+            "dataType": "string",
+            "sourceColumn": "RC_ENTITY_PI_CODE"
+          },
+          {
+            "name": "RC_ENTITY_PI_NAME",
+            "dataType": "string",
+            "sourceColumn": "RC_ENTITY_PI_NAME"
+          },
+          {
+            "name": "STM_ENTITY_PI_ID",
+            "dataType": "double",
+            "sourceColumn": "STM_ENTITY_PI_ID"
+          },
+          {
+            "name": "STM_ENTITY_PI_CODE",
+            "dataType": "string",
+            "sourceColumn": "STM_ENTITY_PI_CODE"
+          },
+          {
+            "name": "STM_ENTITY_PI_NAME",
+            "dataType": "string",
+            "sourceColumn": "STM_ENTITY_PI_NAME"
+          },
+          {
+            "name": "RC_ACC_NO",
+            "dataType": "string",
+            "sourceColumn": "RC_ACC_NO"
+          },
+          {
+            "name": "STM_ACC_NO",
+            "dataType": "string",
+            "sourceColumn": "STM_ACC_NO"
+          },
+          {
+            "name": "ACC_OFF_ID",
+            "dataType": "double",
+            "sourceColumn": "ACC_OFF_ID"
+          },
+          {
+            "name": "ACC_OFF_NAME",
+            "dataType": "string",
+            "sourceColumn": "ACC_OFF_NAME"
+          },
+          {
+            "name": "ACC_OFF_DTL_ID",
+            "dataType": "string",
+            "sourceColumn": "ACC_OFF_DTL_ID"
+          },
+          {
+            "name": "ACC_OFF_DTL_NAME",
+            "dataType": "string",
+            "sourceColumn": "ACC_OFF_DTL_NAME"
+          },
+          {
+            "name": "ACCOUNT_NUMBER",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NUMBER"
+          },
+          {
+            "name": "ACCOUNT_NAME",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NAME"
+          },
+          {
+            "name": "ACCOUNT_TYPE",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_TYPE"
+          },
+          {
+            "name": "IS_COMMERCIAL",
+            "dataType": "double",
+            "sourceColumn": "IS_COMMERCIAL"
+          },
+          {
+            "name": "UNIT_CODE",
+            "dataType": "string",
+            "sourceColumn": "UNIT_CODE"
+          },
+          {
+            "name": "IS_ACTIVE",
+            "dataType": "string",
+            "sourceColumn": "IS_ACTIVE"
+          },
+          {
+            "type": "calculated",
+            "name": "SERVICE_ID",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " SERVICES[ENTITY_ID] & \"-\" & SERVICES[ACC_OFF_DTL_ID]"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "WITH ent AS (",
+                "    SELECT",
+                "        en.ent_id,",
+                "        en.entity_type_id,",
+                "        en.ent_code,",
+                "        enl.ent_name",
+                "    FROM",
+                "        epay_entity_mst      en",
+                "        LEFT JOIN epay_entity_mst_lang enl ON en.ent_id = enl.ent_id",
+                "                                              AND enl.lang_id = 2",
+                ")",
+                "    SELECT",
+                "        *",
+                "    FROM",
+                "        (",
+                "            SELECT DISTINCT",
+                "                aom.entity_id,",
+                "                sp.ent_code                                                        entity_code,",
+                "                sp.ent_name                                                        entity_name,",
+                "                aom.entity_type_id,",
+                "                et.type_name                                                       entity_type,",
+                "                aod.rc_entity_pi_id,",
+                "                enlpi.ent_code                                                     rc_entity_pi_code,",
+                "                enlpi.ent_name                                                     rc_entity_pi_name,",
+                "                aod.stm_entity_pi_id,",
+                "                enlst.ent_code                                                     stm_entity_pi_code,",
+                "                enlst.ent_name                                                     stm_entity_pi_name,",
+                "                aod.rc_acc_no,",
+                "                aod.stm_acc_no,",
+                "                aod.acc_off_id,",
+                "                aoml.acc_off_name,",
+                "                aod.acc_off_dtl_code                                               acc_off_dtl_id,",
+                "                aodl.acc_off_dtl_name,",
+                "                coalesce(to_char(tsa.account_number), to_char(cbe.account_number)) account_number,",
+                "                coalesce(to_char(tsa.account_name), to_char(cbe.account_name))     account_name,",
+                "                coalesce(to_char(tsa.account_type), to_char(cbe.account_type))     account_type,",
+                "                CASE",
+                "                    WHEN coalesce(to_char(tsa.account_type), to_char(cbe.account_type)) IS NOT NULL THEN",
+                "                        0",
+                "                    ELSE",
+                "                        1",
+                "                END                                                                is_commercial,",
+                "                coalesce(to_char(tsa.unit_code), to_char(cbe.unit_code))           unit_code,",
+                "                coalesce(to_char(tsa.is_active), to_char(cbe.is_active))           is_active",
+                "            FROM",
+                "                account_offices_mst      aom",
+                "                LEFT JOIN account_offices_mst_lang aoml ON aoml.acc_off_id = aom.acc_off_id",
+                "                                                           AND aoml.lang_id = 2",
+                "                LEFT JOIN ent                      sp ON sp.ent_id = aom.entity_id",
+                "                LEFT JOIN entity_types_lang        et ON et.entity_type_id = aom.entity_type_id",
+                "                                                  AND et.lang_id = 2",
+                "                INNER JOIN account_offices_dtl      aod ON aod.acc_off_id = aom.acc_off_id",
+                "                LEFT JOIN account_offices_dtl_lang aodl ON aodl.acc_off_dtl_id = aod.acc_off_dtl_code",
+                "                                                           AND aodl.lang_id = 2",
+                "                LEFT JOIN ent                      enlpi ON enlpi.ent_id = aod.rc_entity_pi_id",
+                "                LEFT JOIN ent                      enlst ON enlst.ent_id = aod.stm_entity_pi_id",
+                "                LEFT JOIN mdm_lkp_tsa_accounts     tsa ON substr(tsa.account_number, 3) = substr(aod.rc_acc_no, 4)",
+                "                LEFT JOIN mdm_lkp_cbe_accounts     cbe ON cbe.account_number = aod.rc_acc_no",
+                "        )",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "CARD_ISSUERS_LKP",
+        "columns": [
+          {
+            "name": "ID",
+            "dataType": "double",
+            "sourceColumn": "ID"
+          },
+          {
+            "name": "NAME",
+            "dataType": "string",
+            "sourceColumn": "NAME"
+          },
+          {
+            "name": "TYPE",
+            "dataType": "string",
+            "sourceColumn": "TYPE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    con_fe",
+                "--==================================",
+                "UNION ALL",
+                "--==================================",
+                "SELECT",
+                "    0,",
+                "    'أخرى',",
+                "    'Other'",
+                "FROM",
+                "    dual",
+                "--==================================",
+                "UNION ALL",
+                "--==================================",
+                "SELECT",
+                "    9999,",
+                "    'E-Novate',",
+                "    'E-Novate'",
+                "FROM",
+                "    dual",
+                "",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "SETTLEMENT_ENTITY",
+        "columns": [
+          {
+            "name": "ENT_ID",
+            "dataType": "int64",
+            "sourceColumn": "ENT_ID"
+          },
+          {
+            "name": "ENT_NAME",
+            "dataType": "string",
+            "sourceColumn": "ENT_NAME"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    ent_id,",
+                "    ent_name",
+                "FROM",
+                "    epay_entity_mst_lang",
+                "WHERE",
+                "    lang_id = 2",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "SERVICE_ENTITY",
+        "columns": [
+          {
+            "name": "GROUP_ID",
+            "dataType": "double",
+            "sourceColumn": "GROUP_ID"
+          },
+          {
+            "name": "SERVICE_ENTITY_ID",
+            "dataType": "string",
+            "sourceColumn": "SERVICE_ENTITY_ID"
+          },
+          {
+            "name": "SERVICE_ENTITY_AR",
+            "dataType": "string",
+            "sourceColumn": "SERVICE_ENTITY_AR"
+          },
+          {
+            "name": "SERVICE_ENTITY_EN",
+            "dataType": "string",
+            "sourceColumn": "SERVICE_ENTITY_EN"
+          },
+          {
+            "name": "ORIGINAL_ID",
+            "dataType": "string",
+            "sourceColumn": "ORIGINAL_ID"
+          },
+          {
+            "name": "INTEGRATION_TYPE_ID",
+            "dataType": "double",
+            "sourceColumn": "INTEGRATION_TYPE_ID"
+          },
+          {
+            "name": "SOURCE",
+            "dataType": "string",
+            "sourceColumn": "SOURCE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    service_entity_id,",
+                "    original_id,",
+                "    service_entity_ar,",
+                "    service_entity_en,",
+                "    integration_type_id,",
+                "    group_id,",
+                "    source",
+                "FROM",
+                "    mdm_lkp_service_entity",
+                "--------------------------------------------------------------------------------",
+                "UNION ALL",
+                "--------------------------------------------------------------------------------",
+                "SELECT",
+                "    'CHEQUE',",
+                "    'CHEQUE',",
+                "    n'شيكات',",
+                "    n'Cheques',",
+                "    0,",
+                "    0,",
+                "    'CHEQUE'",
+                "FROM",
+                "    dual",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>let",
+                  "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                  "",
+                  "SELECT",
+                  "    mdm_id Service_entity_id,",
+                  "    biller_ar_name Service_entity_ar,",
+                  "    biller_en_name Service_entity_en,",
+                  "    group_id",
+                  "FROM",
+                  "    (",
+                  "        WITH ent AS (",
+                  "            SELECT",
+                  "                en.ent_id,",
+                  "                en.entity_type_id,",
+                  "                en.ent_code,",
+                  "                enl.ent_name",
+                  "            FROM",
+                  "                epay_entity_mst      en",
+                  "                LEFT JOIN epay_entity_mst_lang enl ON en.ent_id = enl.ent_id",
+                  "                                                      AND enl.lang_id = 2",
+                  "        ), service_without_biller AS (",
+                  "            SELECT",
+                  "                *",
+                  "            FROM",
+                  "                ent",
+                  "            WHERE",
+                  "                ent_id IN (",
+                  "                    SELECT DISTINCT",
+                  "                        entity_id",
+                  "                    FROM",
+                  "                        epay_reconciliation.entity_settlement_accs@epay2",
+                  "                    WHERE",
+                  "                        service_id <> 99",
+                  "                )",
+                  "        ), pfo AS (",
+                  "            SELECT DISTINCT",
+                  "                pb.biller_pfo_id,",
+                  "                biller_ar_name,",
+                  "                biller_en_name,",
+                  "                group_id",
+                  "            FROM",
+                  "                lkp_pfo_billers pb",
+                  "        ), mdm_init AS (",
+                  "            SELECT DISTINCT",
+                  "                'B-' || biller_pfo_id mdm_id,",
+                  "                biller_ar_name,",
+                  "                biller_en_name,",
+                  "                group_id",
+                  "            FROM",
+                  "                pfo",
+                  "--------------------------------------------------------------------------------",
+                  "            UNION ALL",
+                  "--------------------------------------------------------------------------------",
+                  "            SELECT DISTINCT",
+                  "                CASE",
+                  "                    WHEN biller_pfo_id IS NULL THEN",
+                  "                        'M-' || merid",
+                  "                    ELSE",
+                  "                        'B-' || biller_pfo_id",
+                  "                END mdm_id,",
+                  "                biller_ar_name,",
+                  "                biller_en_name,",
+                  "                group_id",
+                  "            FROM",
+                  "                pos_billers_stg",
+                  "        ), mdm_duplicates AS (",
+                  "            SELECT",
+                  "                mdm_id,",
+                  "                COUNT(mdm_id)",
+                  "            FROM",
+                  "                mdm_init",
+                  "            GROUP BY",
+                  "                mdm_id",
+                  "            HAVING",
+                  "                COUNT(mdm_id) > 1",
+                  "        ), mdm_duplicates_view AS (",
+                  "            SELECT ",
+                  "/*+ PARALLEL(16) */ DISTINCT",
+                  "                a.mdm_id,",
+                  "                a.group_id",
+                  "            FROM",
+                  "                mdm_init a",
+                  "                LEFT JOIN mdm_init b ON a.mdm_id = b.mdm_id",
+                  "            WHERE",
+                  "                a.mdm_id IN (",
+                  "                    SELECT",
+                  "                        mdm_id",
+                  "                    FROM",
+                  "                        mdm_duplicates",
+                  "                )",
+                  "            ORDER BY",
+                  "                1",
+                  "        ), mdm AS (",
+                  "            SELECT DISTINCT",
+                  "                mdm_id,",
+                  "                coalesce(to_char(TRIM(biller_ar_name)), to_char('أخرى'))  biller_ar_name,",
+                  "                coalesce(to_char(TRIM(biller_en_name)), to_char('Other')) biller_en_name,",
+                  "                coalesce(group_id, 0)                                     group_id",
+                  "            FROM",
+                  "                mdm_init",
+                  "        )",
+                  "        SELECT",
+                  "            to_char(mdm_id)         mdm_id,",
+                  "            to_char(biller_ar_name) biller_ar_name,",
+                  "            to_char(biller_en_name) biller_en_name,",
+                  "            group_id",
+                  "        FROM",
+                  "            mdm",
+                  "--------------------------------------------------------------------------------",
+                  "        UNION ALL",
+                  "--------------------------------------------------------------------------------",
+                  "        SELECT",
+                  "            'CHEQUE'  mdm_id,",
+                  "            'شيكات'   biller_ar_name,",
+                  "            'Cheques' biller_en_name,",
+                  "            0         group_id",
+                  "        FROM",
+                  "            dual",
+                  "--------------------------------------------------------------------------------",
+                  "        UNION ALL",
+                  "--------------------------------------------------------------------------------",
+                  "        SELECT DISTINCT",
+                  "            MAX(",
+                  "                CASE",
+                  "                    WHEN entity_type_id = 1 THEN",
+                  "                        'SP-'",
+                  "                    WHEN entity_type_id = 2 THEN",
+                  "                        'FE-'",
+                  "                    WHEN entity_type_id = 3 THEN",
+                  "                        'PO-'",
+                  "                END",
+                  "                || ent_id)",
+                  "            OVER(PARTITION BY ent_id)           mdm_id,",
+                  "            coalesce(to_char(ent_name), 'أخرى') mdm_ar_name,",
+                  "            coalesce(to_char(ent_name), 'أخرى') mdm_en_name,",
+                  "            CASE",
+                  "                WHEN sb.ent_id = 58   THEN",
+                  "                    60",
+                  "                WHEN sb.ent_id = 60   THEN",
+                  "                    1",
+                  "                WHEN sb.ent_id = 3690 THEN",
+                  "                    5",
+                  "                ELSE",
+                  "                    0",
+                  "            END",
+                  "        FROM",
+                  "            ent sb",
+                  "--------------------------------------------------------------------------------",
+                  "        UNION ALL",
+                  "--------------------------------------------------------------------------------",
+                  "        SELECT",
+                  "            'B-'            mdm_id,",
+                  "            'أخرى'          biller_ar_name,",
+                  "            'Other Billers' biller_en_name,",
+                  "            0               group_id",
+                  "        FROM",
+                  "            dual",
+                  "    )",
+                  "",
+                  "\")",
+                  "in",
+                  "    Source</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "DELIVERY_CHANNEL",
+        "columns": [
+          {
+            "name": "ENT_ID",
+            "dataType": "string",
+            "sourceColumn": "ENT_ID"
+          },
+          {
+            "name": "ENT_CODE",
+            "dataType": "string",
+            "sourceColumn": "ENT_CODE"
+          },
+          {
+            "name": "ENT_NAME_AR",
+            "dataType": "string",
+            "sourceColumn": "ENT_NAME_AR"
+          },
+          {
+            "name": "ENT_NAME_EN",
+            "dataType": "string",
+            "sourceColumn": "ENT_NAME_EN"
+          },
+          {
+            "name": "ROOT_ID",
+            "dataType": "string",
+            "sourceColumn": "ROOT_ID"
+          },
+          {
+            "name": "ROOT_CODE",
+            "dataType": "string",
+            "sourceColumn": "ROOT_CODE"
+          },
+          {
+            "name": "ROOT_NAME_AR",
+            "dataType": "string",
+            "sourceColumn": "ROOT_NAME_AR"
+          },
+          {
+            "name": "ROOT_NAME_EN",
+            "dataType": "string",
+            "sourceColumn": "ROOT_NAME_EN"
+          },
+          {
+            "name": "FULL_PATH_AR",
+            "dataType": "string",
+            "sourceColumn": "FULL_PATH_AR"
+          },
+          {
+            "name": "FULL_PATH_EN",
+            "dataType": "string",
+            "sourceColumn": "FULL_PATH_EN"
+          },
+          {
+            "name": "LVL",
+            "dataType": "double",
+            "sourceColumn": "LVL"
+          },
+          {
+            "name": "SOURCE",
+            "dataType": "string",
+            "sourceColumn": "SOURCE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    LKP_DELIVERY_CHANNEL",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_ENTITIES_ROOT",
+        "columns": [
+          {
+            "name": "ENT_ID",
+            "dataType": "string",
+            "sourceColumn": "ENT_ID"
+          },
+          {
+            "name": "ENT_CODE",
+            "dataType": "string",
+            "sourceColumn": "ENT_CODE"
+          },
+          {
+            "name": "ENT_NAME_AR",
+            "dataType": "string",
+            "sourceColumn": "ENT_NAME_AR"
+          },
+          {
+            "name": "ENT_NAME_EN",
+            "dataType": "string",
+            "sourceColumn": "ENT_NAME_EN"
+          },
+          {
+            "name": "ROOT_ID",
+            "dataType": "string",
+            "sourceColumn": "ROOT_ID"
+          },
+          {
+            "name": "ROOT_CODE",
+            "dataType": "string",
+            "sourceColumn": "ROOT_CODE"
+          },
+          {
+            "name": "ROOT_NAME_AR",
+            "dataType": "string",
+            "sourceColumn": "ROOT_NAME_AR"
+          },
+          {
+            "name": "ROOT_NAME_EN",
+            "dataType": "string",
+            "sourceColumn": "ROOT_NAME_EN"
+          },
+          {
+            "name": "FULL_PATH_AR",
+            "dataType": "string",
+            "sourceColumn": "FULL_PATH_AR"
+          },
+          {
+            "name": "FULL_PATH_EN",
+            "dataType": "string",
+            "sourceColumn": "FULL_PATH_EN"
+          },
+          {
+            "name": "LVL",
+            "dataType": "double",
+            "sourceColumn": "LVL"
+          },
+          {
+            "name": "SOURCE",
+            "dataType": "string",
+            "sourceColumn": "SOURCE"
+          },
+          {
+            "type": "calculated",
+            "name": "IS_ACTIVE",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": " IF(OR(LKP_ENTITIES_ROOT[ENT_ID] IN VALUES(EPAY[ROOT_ID]), LKP_ENTITIES_ROOT[ENT_ID] IN VALUES(GOV[ROOT_ID])),1,0)"
+          },
+          {
+            "type": "calculated",
+            "name": "ROOT_FULL",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " LKP_ENTITIES_ROOT[ROOT_ID] & \"-\" & LKP_ENTITIES_ROOT[ROOT_NAME_AR]"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    LKP_DELIVERY_CHANNEL",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_ENTITIES_GROUP",
+        "columns": [
+          {
+            "name": "ENTITY_ID",
+            "dataType": "string",
+            "sourceColumn": "ENTITY_ID"
+          },
+          {
+            "name": "CONSOLIDATED_LVL",
+            "dataType": "double",
+            "sourceColumn": "CONSOLIDATED_LVL"
+          },
+          {
+            "name": "CONSOLIDATED_NAME",
+            "dataType": "string",
+            "sourceColumn": "CONSOLIDATED_NAME"
+          },
+          {
+            "name": "AREA_CODE",
+            "dataType": "string",
+            "sourceColumn": "AREA_CODE"
+          },
+          {
+            "name": "AREA_NAME",
+            "dataType": "string",
+            "sourceColumn": "AREA_NAME"
+          },
+          {
+            "name": "MINISTRY",
+            "dataType": "string",
+            "sourceColumn": "MINISTRY"
+          },
+          {
+            "name": "INSTITUTIONAL_SECTOR",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTIONAL_SECTOR"
+          },
+          {
+            "name": "FUNCTIONAL_SECTOR",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_SECTOR"
+          },
+          {
+            "name": "SERVICE",
+            "dataType": "string",
+            "sourceColumn": "SERVICE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "",
+                "select * from MDM_LKP_SERVICE_PROVIDER",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_CURRENCY",
+        "columns": [
+          {
+            "name": "CURRENCY_ID",
+            "dataType": "int64",
+            "sourceColumn": "CURRENCY_ID"
+          },
+          {
+            "name": "CURRENCY_CODE",
+            "dataType": "string",
+            "sourceColumn": "CURRENCY_CODE"
+          },
+          {
+            "name": "CURRENCY_EN",
+            "dataType": "string",
+            "sourceColumn": "CURRENCY_EN"
+          },
+          {
+            "name": "CURRENCY_AR",
+            "dataType": "string",
+            "sourceColumn": "CURRENCY_AR"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "SELECT",
+                "    currency_id,",
+                "    currency_code,",
+                "    currency_en,",
+                "    currency_ar",
+                "FROM",
+                "    mdm_lkp_currency",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_SERVICE_HIERARCHY",
+        "columns": [
+          {
+            "name": "SERVICE_CODE",
+            "dataType": "string",
+            "sourceColumn": "SERVICE_CODE"
+          },
+          {
+            "name": "UNIFIED_NAME",
+            "dataType": "string",
+            "sourceColumn": "UNIFIED_NAME"
+          },
+          {
+            "name": "UNIFIED_NAME_EN",
+            "dataType": "string",
+            "sourceColumn": "UNIFIED_NAME_EN"
+          },
+          {
+            "name": "SERVICE_TYPE_ID",
+            "dataType": "int64",
+            "sourceColumn": "SERVICE_TYPE_ID"
+          },
+          {
+            "name": "SP_NAME_AR",
+            "dataType": "string",
+            "sourceColumn": "SP_NAME_AR"
+          },
+          {
+            "name": "SP_NAME_EN",
+            "dataType": "string",
+            "sourceColumn": "SP_NAME_EN"
+          },
+          {
+            "name": "SERVICE_NAME_AR",
+            "dataType": "string",
+            "sourceColumn": "SERVICE_NAME_AR"
+          },
+          {
+            "name": "SERVICE_NAME_EN",
+            "dataType": "string",
+            "sourceColumn": "SERVICE_NAME_EN"
+          },
+          {
+            "name": "SP_ID",
+            "dataType": "string",
+            "sourceColumn": "SP_ID"
+          },
+          {
+            "name": "UNIT_CODE",
+            "dataType": "string",
+            "sourceColumn": "UNIT_CODE"
+          },
+          {
+            "name": "MINISTRY_CODE",
+            "dataType": "string",
+            "sourceColumn": "MINISTRY_CODE"
+          },
+          {
+            "name": "GOVERNORATE_ID",
+            "dataType": "int64",
+            "sourceColumn": "GOVERNORATE_ID"
+          },
+          {
+            "name": "SECTOR_ID",
+            "dataType": "int64",
+            "sourceColumn": "SECTOR_ID"
+          },
+          {
+            "name": "BUDGET_CATEGORY_ID",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_ID"
+          },
+          {
+            "name": "CURRENCY_ID",
+            "dataType": "int64",
+            "sourceColumn": "CURRENCY_ID"
+          },
+          {
+            "name": "IS_EFINANCE_SERVICE",
+            "dataType": "int64",
+            "sourceColumn": "IS_EFINANCE_SERVICE"
+          },
+          {
+            "name": "IS_MODIFIED",
+            "dataType": "int64",
+            "sourceColumn": "IS_MODIFIED"
+          },
+          {
+            "name": "ACCOUNT_NUMBER",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NUMBER"
+          },
+          {
+            "name": "ACCOUNT_TYPE",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_TYPE"
+          },
+          {
+            "name": "SETTLEMENT_ENTITY_ID",
+            "dataType": "string",
+            "sourceColumn": "SETTLEMENT_ENTITY_ID"
+          },
+          {
+            "name": "SETTLEMENT_BANK_ID",
+            "dataType": "int64",
+            "sourceColumn": "SETTLEMENT_BANK_ID"
+          },
+          {
+            "name": "SOURCE_SYSTEM",
+            "dataType": "string",
+            "sourceColumn": "SOURCE_SYSTEM"
+          },
+          {
+            "name": "UPDATED_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "UPDATED_DATE"
+          },
+          {
+            "name": "IS_EFINANCE_FEES",
+            "dataType": "int64",
+            "sourceColumn": "IS_EFINANCE_FEES"
+          },
+          {
+            "name": "IS_VIRTUAL_SP",
+            "dataType": "int64",
+            "sourceColumn": "IS_VIRTUAL_SP"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "",
+                "select * from MDM_LKP_SERVICE_HIERARCHY",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_SECTORS",
+        "columns": [
+          {
+            "name": "CATEGORY_ID",
+            "dataType": "double",
+            "sourceColumn": "CATEGORY_ID"
+          },
+          {
+            "name": "CATEGORY_NAME_AR",
+            "dataType": "string",
+            "sourceColumn": "CATEGORY_NAME_AR"
+          },
+          {
+            "name": "SUB_SECTOR_NAME_AR",
+            "dataType": "string",
+            "sourceColumn": "SUB_SECTOR_NAME_AR"
+          },
+          {
+            "name": "SECTOR_NAME_AR",
+            "dataType": "string",
+            "sourceColumn": "SECTOR_NAME_AR"
+          },
+          {
+            "name": "CATEGORY_NAME_EN",
+            "dataType": "string",
+            "sourceColumn": "CATEGORY_NAME_EN"
+          },
+          {
+            "name": "SUB_SECTOR_NAME_EN",
+            "dataType": "string",
+            "sourceColumn": "SUB_SECTOR_NAME_EN"
+          },
+          {
+            "name": "SECTOR_NAME_EN",
+            "dataType": "string",
+            "sourceColumn": "SECTOR_NAME_EN"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "",
+                "select * from MDM_LKP_SECTORS",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_MINISTRIES",
+        "columns": [
+          {
+            "name": "MINISTRY_CODE",
+            "dataType": "string",
+            "sourceColumn": "MINISTRY_CODE"
+          },
+          {
+            "name": "MINISTRY",
+            "dataType": "string",
+            "sourceColumn": "MINISTRY"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT DISTINCT",
+                "    ministry_code,",
+                "    ministry",
+                "FROM",
+                "    mdm_lkp_accounting_units",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_SETTLEMENT_BANK",
+        "columns": [
+          {
+            "name": "ID",
+            "dataType": "double",
+            "sourceColumn": "ID"
+          },
+          {
+            "name": "NAME",
+            "dataType": "string",
+            "sourceColumn": "NAME"
+          },
+          {
+            "name": "TYPE",
+            "dataType": "string",
+            "sourceColumn": "TYPE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    con_fe",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_ACCOUNTING_UNITS",
+        "columns": [
+          {
+            "name": "UNIT_CODE",
+            "dataType": "string",
+            "sourceColumn": "UNIT_CODE"
+          },
+          {
+            "name": "UNIT_NAME",
+            "dataType": "string",
+            "sourceColumn": "UNIT_NAME"
+          },
+          {
+            "name": "AREA_CODE",
+            "dataType": "string",
+            "sourceColumn": "AREA_CODE"
+          },
+          {
+            "name": "AREA_NAME",
+            "dataType": "string",
+            "sourceColumn": "AREA_NAME"
+          },
+          {
+            "name": "INSTITUTION_CODE",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTION_CODE"
+          },
+          {
+            "name": "INSTITUTION_NAME",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTION_NAME"
+          },
+          {
+            "name": "MINISTRY_CODE",
+            "dataType": "string",
+            "sourceColumn": "MINISTRY_CODE"
+          },
+          {
+            "name": "MINISTRY",
+            "dataType": "string",
+            "sourceColumn": "MINISTRY"
+          },
+          {
+            "name": "INSTITUTIONAL_SECTOR_CODE",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTIONAL_SECTOR_CODE"
+          },
+          {
+            "name": "INSTITUTIONAL_SECTOR_NAME",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTIONAL_SECTOR_NAME"
+          },
+          {
+            "name": "FUNCTIONAL_SECTOR_ID",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_SECTOR_ID"
+          },
+          {
+            "name": "FUNCTIONAL_SECTOR",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_SECTOR"
+          },
+          {
+            "name": "FUNCTIONAL_CHILD_ID",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_CHILD_ID"
+          },
+          {
+            "name": "FUNCTIONAL_CHILD",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_CHILD"
+          },
+          {
+            "name": "UNIT_TYPE",
+            "dataType": "string",
+            "sourceColumn": "UNIT_TYPE"
+          },
+          {
+            "name": "GOVERNORATE_ID",
+            "dataType": "double",
+            "sourceColumn": "GOVERNORATE_ID"
+          },
+          {
+            "name": "IS_ACTIVE",
+            "dataType": "double",
+            "sourceColumn": "IS_ACTIVE"
+          },
+          {
+            "name": "UNIT_TSA_ID",
+            "dataType": "string",
+            "sourceColumn": "UNIT_TSA_ID"
+          },
+          {
+            "name": "UNIT_GPS_ID",
+            "dataType": "string",
+            "sourceColumn": "UNIT_GPS_ID"
+          },
+          {
+            "name": "EFFECTIVE_DATE_FROM",
+            "dataType": "dateTime",
+            "sourceColumn": "EFFECTIVE_DATE_FROM"
+          },
+          {
+            "name": "EFFECTIVE_DATE_TO",
+            "dataType": "dateTime",
+            "sourceColumn": "EFFECTIVE_DATE_TO"
+          },
+          {
+            "name": "SOURCE",
+            "dataType": "string",
+            "sourceColumn": "SOURCE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    unit_code,",
+                "    unit_name,",
+                "    area_code,",
+                "    area_name,",
+                "    institution_code,",
+                "    institution_name,",
+                "    ministry_code,",
+                "    ministry,",
+                "    institutional_sector_code,",
+                "    institutional_sector_name,",
+                "    functional_sector_id,",
+                "    functional_sector,",
+                "    functional_child_id,",
+                "    functional_child,",
+                "    unit_type,",
+                "    governorate_id,",
+                "    is_active,",
+                "    unit_tsa_id,",
+                "    unit_gps_id,",
+                "    effective_date_from,",
+                "    effective_date_to,",
+                "    source",
+                "FROM",
+                "    mdm_lkp_accounting_units",
+                "--------------------------------------------------------------------------------",
+                "UNION ALL",
+                "--------------------------------------------------------------------------------",
+                "SELECT",
+                "    '00000000'  unit_code,",
+                "    'حساب تجاري' unit_name,",
+                "    '00000000'  area_code,",
+                "    'حساب تجاري' area_name,",
+                "    '00000000'  institution_code,",
+                "    'حساب تجاري' institution_name,",
+                "    'C0000'      ministry_code,",
+                "    'حساب تجاري' ministry,",
+                "    '00000000'  institutional_sector_code,",
+                "    'حساب تجاري' institutional_sector_name,",
+                "    '00000'     functional_sector_id,",
+                "    'حساب تجاري' functional_sector,",
+                "    '00000'     functional_child_id,",
+                "    'حساب تجاري' functional_child,",
+                "    'حساب تجاري' unit_type,",
+                "    0            governorate_id,",
+                "    1            is_active,",
+                "    NULL         unit_tsa_id,",
+                "    NULL         unit_gps_id,",
+                "    sysdate      effective_date_from,",
+                "    sysdate      effective_date_to,",
+                "    'COMM'       source",
+                "FROM",
+                "    dual",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "cbd4898e-100c-4a2b-8c8d-e3ee3412fb3e",
+        "fromTable": "EPAY",
+        "fromColumn": "DATE_ID",
+        "toTable": "DIM_DATE",
+        "toColumn": "DATE_ID"
+      },
+      {
+        "name": "871ff6cb-0123-4f37-9729-29b0cc21ce79",
+        "fromTable": "GOV",
+        "fromColumn": "DATE_ID",
+        "toTable": "DIM_DATE",
+        "toColumn": "DATE_ID"
+      },
+      {
+        "name": "eef724e7-05e6-4ca6-bf05-e56ed73a3128",
+        "fromTable": "CHEQUE",
+        "fromColumn": "DATE_ID",
+        "toTable": "DIM_DATE",
+        "toColumn": "DATE_ID"
+      },
+      {
+        "name": "d0651502-c4e6-4a2e-a3a2-b136b3eeddb1",
+        "fromTable": "CHEQUE",
+        "fromColumn": "AU_TSA_ID",
+        "toTable": "ACCOUNTING_UNITS",
+        "toColumn": "AU_TSA_ID"
+      },
+      {
+        "name": "06767b62-db87-4d89-afd1-0ac7ba982ec0",
+        "fromTable": "GOV",
+        "fromColumn": "AU_TSA_ID",
+        "toTable": "ACCOUNTING_UNITS",
+        "toColumn": "AU_TSA_ID"
+      },
+      {
+        "name": "fb3970e9-db86-46ee-a0ee-9dc9666a3992",
+        "fromTable": "CHEQUE",
+        "fromColumn": "FE_ID",
+        "toTable": "FULLFILMENT_ENTITY",
+        "toColumn": "ID"
+      },
+      {
+        "name": "f1397730-9e34-4073-851a-54e1e992b083",
+        "fromTable": "CHEQUE",
+        "fromColumn": "SP_ID",
+        "toTable": "SERVICE_PROVIDERS",
+        "toColumn": "SP_ID"
+      },
+      {
+        "name": "8273f9a2-1667-424d-b521-74185cdef6c7",
+        "fromTable": "CHEQUE",
+        "fromColumn": "CHANNEL_ID",
+        "toTable": "CHANNELS",
+        "toColumn": "CHANNEL_ID"
+      },
+      {
+        "name": "ade8ea81-3942-4926-8d41-f3767c6ccd28",
+        "fromTable": "GOV",
+        "fromColumn": "CHANNEL_ID",
+        "toTable": "CHANNELS",
+        "toColumn": "CHANNEL_ID"
+      },
+      {
+        "name": "bbc52214-a84b-4c55-97f9-276a4c0541a8",
+        "fromTable": "EPAY",
+        "fromColumn": "SP_ID",
+        "toTable": "SERVICE_PROVIDERS",
+        "toColumn": "SP_ID"
+      },
+      {
+        "name": "8004ecc2-8adf-4f8d-9f4e-128acc721cd0",
+        "fromTable": "EPAY",
+        "fromColumn": "CHANNEL_ID",
+        "toTable": "CHANNELS",
+        "toColumn": "CHANNEL_ID"
+      },
+      {
+        "name": "682c8ee5-7007-4bc9-8a0f-b5dd5b6bef42",
+        "fromTable": "GOV",
+        "fromColumn": "FE_ID",
+        "toTable": "FULLFILMENT_ENTITY",
+        "toColumn": "ID"
+      },
+      {
+        "name": "0b16522e-dcde-4f6d-9e61-a395c9cf1e9c",
+        "fromTable": "EPAY",
+        "fromColumn": "EPAY_BUDGET_CODE",
+        "toTable": "lkp_tsa_budget_category",
+        "toColumn": "EPAY_BUDGET_CODE"
+      },
+      {
+        "name": "a7aaeed6-02b5-41d8-a5ad-c0889109d188",
+        "fromTable": "CHEQUE",
+        "fromColumn": "BUDGET_CATEGORY_CODE",
+        "toTable": "lkp_tsa_budget_category",
+        "toColumn": "CCMS_BUDGET_CODE"
+      },
+      {
+        "name": "89f916b9-acfb-4b2b-89bf-70cc3280960e",
+        "fromTable": "CHEQUE",
+        "fromColumn": "DATE_KEY_SETT",
+        "toTable": "DIM_DATE_SETT",
+        "toColumn": "DATE_ID"
+      },
+      {
+        "name": "07432243-29c5-49e8-b769-d6223d4ed16d",
+        "fromTable": "GOV",
+        "fromColumn": "DATE_KEY_SETT",
+        "toTable": "DIM_DATE_SETT",
+        "toColumn": "DATE_ID"
+      },
+      {
+        "name": "c6672d38-46bd-463a-b6bb-0435368b7c51",
+        "fromTable": "EPAY",
+        "fromColumn": "FE_ID",
+        "toTable": "PARTNERS",
+        "toColumn": "ID"
+      },
+      {
+        "name": "c23ba428-d83d-451f-b85d-f69e6e94bc93",
+        "fromTable": "EPAY",
+        "fromColumn": "COLL_BANK_ID",
+        "toTable": "FULLFILMENT_ENTITY",
+        "toColumn": "ID"
+      },
+      {
+        "name": "b8cc2dd9-8b68-4cfe-954e-4fbb9c823d9c",
+        "fromTable": "GOV",
+        "fromColumn": "FE_ID",
+        "toTable": "PARTNERS",
+        "toColumn": "ID"
+      },
+      {
+        "name": "329852ba-1d22-4cfb-ad5b-3a7870c3a134",
+        "fromTable": "CHEQUE",
+        "fromColumn": "FE_ID",
+        "toTable": "PARTNERS",
+        "toColumn": "ID"
+      },
+      {
+        "name": "f9e15e00-0d45-4ab4-acdc-9c9e885e39b6",
+        "fromTable": "GOV",
+        "fromColumn": "BUDGET_CATEGORY_CODE",
+        "toTable": "lkp_tsa_budget_category",
+        "toColumn": "EPAY_BUDGET_CODE"
+      },
+      {
+        "name": "8cd3c4e3-697a-42c7-9007-92bfaf93a89d",
+        "fromTable": "EPAY",
+        "fromColumn": "DATE_KEY_SETT",
+        "toTable": "DIM_DATE_SETT",
+        "toColumn": "DATE_ID"
+      },
+      {
+        "name": "d1447068-6b11-41fb-9bad-fcdd5f8453bd",
+        "fromTable": "EPAY",
+        "fromColumn": "AU_TSA_ID",
+        "toTable": "ACCOUNTING_UNITS",
+        "toColumn": "AU_TSA_ID"
+      },
+      {
+        "name": "a5dafee3-df8c-49f3-92c3-4a4c6ce1fd25",
+        "fromTable": "GOV",
+        "fromColumn": "SP_CODE",
+        "toTable": "SERVICE_PROVIDERS",
+        "toColumn": "SP_ID"
+      },
+      {
+        "name": "8cf427f7-2f0a-4cf9-a0e8-9241c0779f78",
+        "fromTable": "EPAY_TRX_AGG",
+        "fromColumn": "CHANNEL_ID",
+        "toTable": "CHANNELS",
+        "toColumn": "CHANNEL_ID"
+      },
+      {
+        "name": "bc8a9636-07db-4253-9588-0ef029169719",
+        "fromTable": "EPAY_TRX_AGG",
+        "fromColumn": "DATE_KEY_BUSS",
+        "toTable": "DIM_DATE",
+        "toColumn": "DATE_ID"
+      },
+      {
+        "name": "5aa0b057-a700-4c97-b24b-1199a2ac76cf",
+        "fromTable": "EPAY_TRX_AGG",
+        "fromColumn": "DATE_KEY_SETT",
+        "toTable": "DIM_DATE_SETT",
+        "toColumn": "DATE_ID"
+      },
+      {
+        "name": "0b89f399-f55b-4c28-ac91-9fb0ef9875b8",
+        "fromTable": "EPAY_TRX_AGG",
+        "fromColumn": "SP_ID",
+        "toTable": "SERVICE_PROVIDERS",
+        "toColumn": "SP_ID"
+      },
+      {
+        "name": "253df9bb-d029-4b42-90a4-f25bd198dcff",
+        "fromTable": "EPAY_TRX_AGG",
+        "fromColumn": "FE_ID2",
+        "toTable": "PARTNERS",
+        "toColumn": "ID"
+      },
+      {
+        "name": "89110fd0-4efd-41fe-8ba9-8dcd9485878b",
+        "fromTable": "EPAY_TRX_AGG",
+        "fromColumn": "COLL_BANK_ID",
+        "toTable": "FULLFILMENT_ENTITY",
+        "toColumn": "ID"
+      },
+      {
+        "name": "af2644b1-8d30-4249-b732-11dfbaa6622e",
+        "fromTable": "EPAY",
+        "fromColumn": "DELIVERY_CHANNEL_TYPE_ID",
+        "toTable": "DELIVERY_CHANNEL_TYPE",
+        "toColumn": "DELIVERY_CHANNEL_TYPE_ID"
+      },
+      {
+        "name": "3205fc7f-c20d-4499-bb5b-2756dd9b8658",
+        "fromTable": "EPAY_TRX_AGG",
+        "fromColumn": "FE_ID",
+        "toTable": "LKP_ENTITY",
+        "toColumn": "ENT_ID"
+      },
+      {
+        "name": "a242a5f2-f0d8-4ac2-b9ee-26b59aa6fda1",
+        "fromTable": "CHEQUE",
+        "fromColumn": "FE_ID",
+        "toTable": "LKP_ENTITY",
+        "toColumn": "ENT_ID"
+      },
+      {
+        "name": "e01da960-0553-4800-a2ed-37d69e8633bf",
+        "fromTable": "GOV",
+        "fromColumn": "FE_ID",
+        "toTable": "LKP_ENTITY",
+        "toColumn": "ENT_ID"
+      },
+      {
+        "name": "d97d3b38-d4dd-40c1-89ab-1f4a9f9b8124",
+        "fromTable": "EPAY",
+        "fromColumn": "FE_ENT_ID",
+        "toTable": "LKP_ENTITY",
+        "toColumn": "ENT_ID"
+      },
+      {
+        "name": "bf6e5435-84bb-4210-acff-92a210fab3a7",
+        "fromTable": "CHEQUE",
+        "fromColumn": "DELIVERY_CHANNEL_TYPE_ID",
+        "toTable": "DELIVERY_CHANNEL_TYPE",
+        "toColumn": "DELIVERY_CHANNEL_TYPE_ID"
+      },
+      {
+        "name": "214d84c0-c009-449b-aeb4-b9337be3f654",
+        "fromTable": "GOV",
+        "fromColumn": "DELIVERY_CHANNEL_TYPE_ID",
+        "toTable": "DELIVERY_CHANNEL_TYPE",
+        "toColumn": "DELIVERY_CHANNEL_TYPE_ID"
+      },
+      {
+        "name": "878ab14c-e86d-4ea8-88d6-2bec2022cf0c",
+        "fromTable": "GOV",
+        "fromColumn": "ISSUER_ID",
+        "toTable": "CARD_ISSUERS_LKP",
+        "toColumn": "ID"
+      },
+      {
+        "name": "6dd5797f-2623-4e26-b9b5-1c3b3001d9ec",
+        "fromTable": "EPAY",
+        "fromColumn": "ISSUER_ID",
+        "toTable": "CARD_ISSUERS_LKP",
+        "toColumn": "ID"
+      },
+      {
+        "name": "835c52d6-9336-4b20-a4e5-ae610ca6223b",
+        "fromTable": "CHEQUE",
+        "fromColumn": "ISSUER_ID",
+        "toTable": "CARD_ISSUERS_LKP",
+        "toColumn": "ID"
+      },
+      {
+        "name": "6e1180e5-292d-472b-b7c8-874311a0736d",
+        "fromTable": "EPAY",
+        "fromColumn": "SETTLEMENT_ENTITY_ID",
+        "toTable": "SETTLEMENT_ENTITY",
+        "toColumn": "ENT_ID"
+      },
+      {
+        "name": "60d8bc10-e74d-4439-89a0-a1a06338d1ab",
+        "fromTable": "EPAY",
+        "fromColumn": "SERVICE_ENTITY_ID",
+        "toTable": "SERVICE_ENTITY",
+        "toColumn": "SERVICE_ENTITY_ID"
+      },
+      {
+        "name": "90108322-d272-4617-8f14-0394af137a8f",
+        "fromTable": "EPAY",
+        "fromColumn": "DELIVERY_CHANNEL_ID",
+        "toTable": "DELIVERY_CHANNEL",
+        "toColumn": "ENT_ID"
+      },
+      {
+        "name": "b3f1c3e1-777f-463a-bdb5-0e84f910abaf",
+        "fromTable": "GOV",
+        "fromColumn": "DELIVERY_CHANNEL_ID",
+        "toTable": "DELIVERY_CHANNEL",
+        "toColumn": "ENT_ID"
+      },
+      {
+        "name": "65fbb37f-d131-4535-829e-a418e590bac5",
+        "fromTable": "CHEQUE",
+        "fromColumn": "DELIVERY_CHANNEL_ID",
+        "toTable": "DELIVERY_CHANNEL",
+        "toColumn": "ENT_ID"
+      },
+      {
+        "name": "2520b85c-d594-4469-9cd6-9b4c8f62678d",
+        "fromTable": "GOV",
+        "fromColumn": "ROOT_ID",
+        "toTable": "LKP_ENTITIES_ROOT",
+        "toColumn": "ENT_ID"
+      },
+      {
+        "name": "22ad5bc9-06bc-42b6-a09b-5bfb3b470fd0",
+        "fromTable": "CHEQUE",
+        "fromColumn": "ROOT_ID",
+        "toTable": "LKP_ENTITIES_ROOT",
+        "toColumn": "ENT_ID"
+      },
+      {
+        "name": "0867840c-b2e3-465e-94e2-2d4b695b9fae",
+        "fromTable": "EPAY_TRX_AGG",
+        "fromColumn": "ROOT_ID",
+        "toTable": "LKP_ENTITIES_ROOT",
+        "toColumn": "ENT_ID"
+      },
+      {
+        "name": "8a287fa7-0074-4062-ab43-b0edab1ddaf9",
+        "fromTable": "GOV",
+        "fromColumn": "ROOT_ID",
+        "toTable": "SERVICE_ENTITY",
+        "toColumn": "SERVICE_ENTITY_ID"
+      },
+      {
+        "name": "2223e2bf-5e83-47d6-9bf8-3acc0d04a05a",
+        "fromTable": "CHEQUE",
+        "fromColumn": "SERVICE_ENTITY_ID",
+        "toTable": "SERVICE_ENTITY",
+        "toColumn": "SERVICE_ENTITY_ID"
+      },
+      {
+        "name": "d7c73599-97a7-46d7-99dc-d6b65430191f",
+        "fromTable": "EPAY",
+        "fromColumn": "ACC_OFF_DTL_ID",
+        "toTable": "SERVICES",
+        "toColumn": "ACC_OFF_DTL_ID",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "039ffbce-dc64-4733-a94c-b88a4df9ee86",
+        "fromTable": "GOV",
+        "fromColumn": "ROOT_ID",
+        "toTable": "LKP_ENTITIES_GROUP",
+        "toColumn": "ENTITY_ID"
+      },
+      {
+        "name": "16d60f44-ae04-4d14-b809-8c15aef23a3f",
+        "fromTable": "CHEQUE",
+        "fromColumn": "ROOT_ID",
+        "toTable": "LKP_ENTITIES_GROUP",
+        "toColumn": "ENTITY_ID"
+      },
+      {
+        "name": "d65ce68b-7f51-4186-91b3-7216a801f92e",
+        "fromTable": "EPAY_TRX_AGG",
+        "fromColumn": "ROOT_ID",
+        "toTable": "LKP_ENTITIES_GROUP",
+        "toColumn": "ENTITY_ID"
+      },
+      {
+        "name": "fbc86eaa-3a7f-4c3f-92b6-74d7cd2f0e31",
+        "fromTable": "EPAY",
+        "fromColumn": "ROOT_ID",
+        "toTable": "LKP_ENTITIES_ROOT",
+        "toColumn": "ENT_ID",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "837c1e26-d803-428c-a3a4-48a9df809a19",
+        "fromTable": "EPAY",
+        "fromColumn": "CURRENCY",
+        "toTable": "LKP_CURRENCY",
+        "toColumn": "CURRENCY_ID"
+      },
+      {
+        "name": "49a29377-d8e0-48f9-9be9-13decf9d7a0f",
+        "fromTable": "GOV",
+        "fromColumn": "CURRENCY_ID",
+        "toTable": "LKP_CURRENCY",
+        "toColumn": "CURRENCY_ID"
+      },
+      {
+        "name": "7f9dfeac-a0e2-41b3-81d1-0e4bcca4f9e1",
+        "fromTable": "CHEQUE",
+        "fromColumn": "CURRENCY_ID",
+        "toTable": "LKP_CURRENCY",
+        "toColumn": "CURRENCY_ID"
+      },
+      {
+        "name": "5636aa57-3754-42ce-8da6-10ff8154efb5",
+        "fromTable": "LKP_SERVICE_HIERARCHY",
+        "fromColumn": "SECTOR_ID",
+        "toTable": "LKP_SECTORS",
+        "toColumn": "CATEGORY_ID"
+      },
+      {
+        "name": "81c6c1c3-2114-44ef-ae6a-62390abc1e75",
+        "fromTable": "EPAY",
+        "fromColumn": "SP_MAIN_ID",
+        "toTable": "LKP_SERVICE_HIERARCHY",
+        "toColumn": "SERVICE_CODE"
+      },
+      {
+        "name": "e19ee3ab-4c64-4690-ae71-e5792c8c2934",
+        "fromTable": "GOV",
+        "fromColumn": "ROOT_ID",
+        "toTable": "LKP_SERVICE_HIERARCHY",
+        "toColumn": "SERVICE_CODE"
+      },
+      {
+        "name": "8a719854-1034-4916-a469-14a97b24b2d4",
+        "fromTable": "LKP_SERVICE_HIERARCHY",
+        "fromColumn": "MINISTRY_CODE",
+        "toTable": "LKP_MINISTRIES",
+        "toColumn": "MINISTRY_CODE"
+      },
+      {
+        "name": "3baccecd-4835-4329-be23-bb9e58c56df0",
+        "fromTable": "EPAY",
+        "fromColumn": "SP_MAIN_OLD_ID",
+        "toTable": "LKP_ENTITIES_GROUP",
+        "toColumn": "ENTITY_ID"
+      },
+      {
+        "name": "af1c84d1-a722-4efe-949d-30b10482ed3a",
+        "fromTable": "LKP_SERVICE_HIERARCHY",
+        "fromColumn": "SETTLEMENT_BANK_ID",
+        "toTable": "LKP_SETTLEMENT_BANK",
+        "toColumn": "ID"
+      },
+      {
+        "name": "a13eadb7-a79e-4618-99c0-7f9fb806eddb",
+        "fromTable": "LKP_SERVICE_HIERARCHY",
+        "fromColumn": "UNIT_CODE",
+        "toTable": "LKP_ACCOUNTING_UNITS",
+        "toColumn": "UNIT_CODE"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "ClientCompatibilityLevel",
+        "value": "600"
+      }
+    ]
+  },
+  "id": "SemanticModel"
+}

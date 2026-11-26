@@ -1,0 +1,1516 @@
+{
+  "name": "SemanticModel",
+  "compatibilityLevel": 1500,
+  "model": {
+    "culture": "en-US",
+    "dataSources": [
+      {
+        "type": "structured",
+        "name": "Oracle/oracle-host:1521/oracle_service",
+        "connectionDetails": {
+          "protocol": "oracle",
+          "address": {
+            "server": "oracle-host:1521/oracle_service"
+          },
+          "authentication": null,
+          "query": null
+        },
+        "options": {
+          "hierarchicalNavigation": true
+        },
+        "credential": {
+          "AuthenticationKind": "UsernamePassword",
+          "kind": "Oracle",
+          "path": "oracle-host:1521/oracle_service",
+          "Username": "oracle_user"
+        }
+      }
+    ],
+    "tables": [
+      {
+        "name": "TRX_INVOICES",
+        "columns": [
+          {
+            "name": "INVOICE_COUNT",
+            "dataType": "double",
+            "sourceColumn": "INVOICE_COUNT"
+          },
+          {
+            "name": "COLLECTED_AMOUNT",
+            "dataType": "double",
+            "sourceColumn": "COLLECTED_AMOUNT"
+          },
+          {
+            "name": "DUE_AMOUNT",
+            "dataType": "double",
+            "sourceColumn": "DUE_AMOUNT"
+          },
+          {
+            "name": "ACCRUED_AMOUNT",
+            "dataType": "double",
+            "sourceColumn": "ACCRUED_AMOUNT"
+          },
+          {
+            "name": "TRX_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "TRX_DATE"
+          },
+          {
+            "name": "INVOICE_TYPE",
+            "dataType": "string",
+            "sourceColumn": "INVOICE_TYPE"
+          },
+          {
+            "name": "CUSTOMER_ID",
+            "dataType": "string",
+            "sourceColumn": "CUSTOMER_ID"
+          },
+          {
+            "name": "CONTRACT_ID",
+            "dataType": "string",
+            "sourceColumn": "CONTRACT_ID"
+          },
+          {
+            "name": "CONTRACT_NUMBER",
+            "dataType": "string",
+            "sourceColumn": "CONTRACT_NUMBER"
+          },
+          {
+            "name": "PROJECT_ID",
+            "dataType": "string",
+            "sourceColumn": "PROJECT_ID"
+          },
+          {
+            "name": "PROJECT_NUMBER",
+            "dataType": "string",
+            "sourceColumn": "PROJECT_NUMBER"
+          },
+          {
+            "name": "ACCOUNT_ID",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_ID"
+          },
+          {
+            "name": "ACCOUNT_NUMBER",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NUMBER"
+          },
+          {
+            "name": "TASK_ID",
+            "dataType": "string",
+            "sourceColumn": "TASK_ID"
+          },
+          {
+            "name": "TASK_NUMBER",
+            "dataType": "string",
+            "sourceColumn": "TASK_NUMBER"
+          },
+          {
+            "name": "LOB_CODE",
+            "dataType": "string",
+            "sourceColumn": "LOB_CODE"
+          },
+          {
+            "name": "BUSINESS_UNIT_ID",
+            "dataType": "string",
+            "sourceColumn": "BUSINESS_UNIT_ID"
+          },
+          {
+            "type": "calculated",
+            "name": "DATE_KEY",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(TRX_INVOICES[TRX_DATE], \"YYYYMMDD\")"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    COUNT(invoice_number)                            invoice_count,",
+                "    coalesce(SUM(invoice_amount), 0)                 collected_amount,",
+                "    coalesce(SUM(revenue_amount), 0)                 due_amount,",
+                "    coalesce(LEAD(SUM(invoice_amount))",
+                "             OVER(PARTITION BY coalesce(invoice_type, 'STANDARD'), prj.customer_id, inv.contract_id, inv.contract_number, inv.project_id,",
+                "     inv.project_number, prj.account_id, prj.account_number, task_id, task_number,",
+                "     inv.lob_code, prj.business_unit_id",
+                "                  ORDER BY",
+                "                      trunc(coalesce(invoice_date, revenue_date), 'Q')",
+                "    ), 0) - SUM(revenue_amount)                      accrued_amount,",
+                "    trunc(coalesce(invoice_date, revenue_date), 'Q') trx_date,",
+                "    coalesce(invoice_type, 'STANDARD')               invoice_type,",
+                "    prj.customer_id,",
+                "    inv.contract_id,",
+                "    inv.contract_number,",
+                "    inv.project_id,",
+                "    inv.project_number,",
+                "    prj.account_id,",
+                "    prj.account_number,",
+                "    task_id,",
+                "    task_number,",
+                "    inv.lob_code,",
+                "    prj.business_unit_id",
+                "FROM",
+                "    erp_contract_invoice_collection inv",
+                "    LEFT JOIN erp_project_contract_map        prj ON prj.contract_id = inv.contract_id",
+                "                                              AND prj.project_id = inv.project_id",
+                "                                              AND prj.lob_code = inv.lob_code",
+                "WHERE",
+                "--            inv.project_name LIKE '%6.1. Hyperion%' AND",
+                "        coalesce(invoice_date, revenue_date) >= '01-JAN-2024'",
+                "    AND coalesce(invoice_date, revenue_date) <= '31-OCT-2026'",
+                "    and invoice_type <> 'CANCEL'",
+                "GROUP BY",
+                "    trunc(coalesce(invoice_date, revenue_date), 'Q'),",
+                "    coalesce(invoice_type, 'STANDARD'),",
+                "    prj.customer_id,",
+                "    inv.contract_id,",
+                "    inv.contract_number,",
+                "    inv.project_id,",
+                "    inv.project_number,",
+                "    prj.account_id,",
+                "    prj.account_number,",
+                "    task_id,",
+                "    task_number,",
+                "    inv.lob_code,",
+                "    prj.business_unit_id",
+                "ORDER BY",
+                "    trx_date",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_CONTRACTS",
+        "columns": [
+          {
+            "name": "CONTRACT_ID",
+            "dataType": "string",
+            "sourceColumn": "CONTRACT_ID"
+          },
+          {
+            "name": "CONTRACT_NUMBER",
+            "dataType": "int64",
+            "sourceColumn": "CONTRACT_NUMBER"
+          },
+          {
+            "name": "CONTRACT_NAME",
+            "dataType": "string",
+            "sourceColumn": "CONTRACT_NAME"
+          },
+          {
+            "name": "CONTRACT_STATUS",
+            "dataType": "string",
+            "sourceColumn": "CONTRACT_STATUS"
+          },
+          {
+            "name": "CONTRACT_AMOUNT",
+            "dataType": "double",
+            "sourceColumn": "CONTRACT_AMOUNT"
+          },
+          {
+            "name": "CONTRACT_CURRENCY",
+            "dataType": "string",
+            "sourceColumn": "CONTRACT_CURRENCY"
+          },
+          {
+            "name": "CONTRACT_START_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "CONTRACT_START_DATE"
+          },
+          {
+            "name": "CONTRACT_END_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "CONTRACT_END_DATE"
+          },
+          {
+            "name": "HAS_INVOICE",
+            "dataType": "int64",
+            "sourceColumn": "HAS_INVOICE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    erp_lkp_contracts",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_CUSTOMERS",
+        "columns": [
+          {
+            "name": "CUSTOMER_ID",
+            "dataType": "string",
+            "sourceColumn": "CUSTOMER_ID"
+          },
+          {
+            "name": "CUSTOMER_NAME",
+            "dataType": "string",
+            "sourceColumn": "CUSTOMER_NAME"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    erp_lkp_customers",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_PROJECTS",
+        "columns": [
+          {
+            "name": "PROJECT_ID",
+            "dataType": "string",
+            "sourceColumn": "PROJECT_ID"
+          },
+          {
+            "name": "PROJECT_NUMBER",
+            "dataType": "int64",
+            "sourceColumn": "PROJECT_NUMBER"
+          },
+          {
+            "name": "PROJECT_NAME",
+            "dataType": "string",
+            "sourceColumn": "PROJECT_NAME"
+          },
+          {
+            "name": "PROJECT_STATUS",
+            "dataType": "string",
+            "sourceColumn": "PROJECT_STATUS"
+          },
+          {
+            "name": "PROJECT_START_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "PROJECT_START_DATE"
+          },
+          {
+            "name": "PROJECT_END_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "PROJECT_END_DATE"
+          },
+          {
+            "name": "PROJECT_TYPE",
+            "dataType": "string",
+            "sourceColumn": "PROJECT_TYPE"
+          },
+          {
+            "name": "PROJECT_MANAGER_EMAIL",
+            "dataType": "string",
+            "sourceColumn": "PROJECT_MANAGER_EMAIL"
+          },
+          {
+            "name": "IS_DIRECT_COLLECTION",
+            "dataType": "int64",
+            "sourceColumn": "IS_DIRECT_COLLECTION"
+          },
+          {
+            "name": "IS_INVOICE_COLLECTION",
+            "dataType": "int64",
+            "sourceColumn": "IS_INVOICE_COLLECTION"
+          },
+          {
+            "name": "HAS_INVOICE",
+            "dataType": "int64",
+            "sourceColumn": "HAS_INVOICE"
+          },
+          {
+            "name": "COMPANY_CODE",
+            "dataType": "string",
+            "sourceColumn": "COMPANY_CODE"
+          },
+          {
+            "name": "COMPANY_NAME",
+            "dataType": "string",
+            "sourceColumn": "COMPANY_NAME"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    erp_lkp_projects",
+                "",
+                "\"),",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(Source,{{\"PROJECT_ID\", type text}})",
+                "in",
+                "    #\"Changed Type\""
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_LOB",
+        "columns": [
+          {
+            "name": "LOB_ID",
+            "dataType": "string",
+            "sourceColumn": "LOB_ID"
+          },
+          {
+            "name": "LOB",
+            "dataType": "string",
+            "sourceColumn": "LOB"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    erp_lkp_lob",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_PROJECT_TASKS",
+        "columns": [
+          {
+            "name": "TASK_ID",
+            "dataType": "string",
+            "sourceColumn": "TASK_ID"
+          },
+          {
+            "name": "TASK_NUMBER",
+            "dataType": "string",
+            "sourceColumn": "TASK_NUMBER"
+          },
+          {
+            "name": "PROJECT_ID",
+            "dataType": "string",
+            "sourceColumn": "PROJECT_ID"
+          },
+          {
+            "name": "PROJECT_NUMBER",
+            "dataType": "double",
+            "sourceColumn": "PROJECT_NUMBER"
+          },
+          {
+            "name": "TASK_NAME",
+            "dataType": "string",
+            "sourceColumn": "TASK_NAME"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    erp_lkp_project_task_map",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_ACCOUNTS",
+        "columns": [
+          {
+            "name": "ACCOUNT_ID",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_ID"
+          },
+          {
+            "name": "ACCOUNT_NUMBER",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NUMBER"
+          },
+          {
+            "name": "ACCOUNT_NAME",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NAME"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    erp_lkp_project_accounts",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DIM_DATE",
+        "dataCategory": "Time",
+        "columns": [
+          {
+            "name": "calendar_date",
+            "dataType": "dateTime",
+            "isKey": true,
+            "sourceColumn": "calendar_date"
+          },
+          {
+            "name": "date_key",
+            "dataType": "string",
+            "sourceColumn": "date_key"
+          },
+          {
+            "name": "calendar_date_formatted",
+            "dataType": "string",
+            "sourceColumn": "calendar_date_formatted"
+          },
+          {
+            "name": "year",
+            "dataType": "string",
+            "sourceColumn": "year"
+          },
+          {
+            "name": "quarter",
+            "dataType": "string",
+            "sourceColumn": "quarter"
+          },
+          {
+            "name": "quarter_name",
+            "dataType": "string",
+            "sourceColumn": "quarter_name"
+          },
+          {
+            "name": "month",
+            "dataType": "int64",
+            "sourceColumn": "month"
+          },
+          {
+            "name": "month_ch",
+            "dataType": "string",
+            "sourceColumn": "month_ch"
+          },
+          {
+            "name": "month_name",
+            "dataType": "string",
+            "sourceColumn": "month_name"
+          },
+          {
+            "name": "month_short_name",
+            "dataType": "string",
+            "sourceColumn": "month_short_name"
+          },
+          {
+            "name": "month_year",
+            "dataType": "string",
+            "sourceColumn": "month_year"
+          },
+          {
+            "name": "week",
+            "dataType": "string",
+            "sourceColumn": "week"
+          },
+          {
+            "name": "day",
+            "dataType": "string",
+            "sourceColumn": "day"
+          },
+          {
+            "name": "day_name",
+            "dataType": "string",
+            "sourceColumn": "day_name"
+          },
+          {
+            "name": "day_short_name",
+            "dataType": "string",
+            "sourceColumn": "day_short_name"
+          },
+          {
+            "name": "start_of_month",
+            "dataType": "dateTime",
+            "sourceColumn": "start_of_month"
+          },
+          {
+            "name": "end_of_month",
+            "dataType": "dateTime",
+            "sourceColumn": "end_of_month"
+          },
+          {
+            "name": "start_of_quarter",
+            "dataType": "dateTime",
+            "sourceColumn": "start_of_quarter"
+          },
+          {
+            "name": "end_of_quarter",
+            "dataType": "dateTime",
+            "sourceColumn": "end_of_quarter"
+          },
+          {
+            "name": "fiscal_year",
+            "dataType": "int64",
+            "sourceColumn": "fiscal_year"
+          },
+          {
+            "name": "fiscal_year_range",
+            "dataType": "string",
+            "sourceColumn": "fiscal_year_range"
+          },
+          {
+            "name": "fiscal_month",
+            "dataType": "int64",
+            "sourceColumn": "fiscal_month"
+          },
+          {
+            "name": "last_refresh",
+            "dataType": "dateTime",
+            "sourceColumn": "last_refresh"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #date(2024, 1, 1),",
+                "    Today = Date.From(DateTime.LocalNow()),",
+                "    DateList = List.Dates(Source, Duration.Days(Today - Source) + 1, #duration(1,0,0,0)),",
+                "    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {\"calendar_date\"}),",
+                "",
+                "    // Format and enrich columns",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(DateTable,{{\"calendar_date\", type date}}),",
+                "    #\"Added date_key\" = Table.AddColumn(#\"Changed Type\", \"date_key\", each Date.ToText([calendar_date], \"yyyyMMdd\"), type text),",
+                "    #\"Added calendar_date_formatted\" = Table.AddColumn(#\"Added date_key\", \"calendar_date_formatted\", each Date.ToText([calendar_date], \"yyyy-MM-dd\"), type text),",
+                "    #\"Added year\" = Table.AddColumn(#\"Added calendar_date_formatted\", \"year\", each Date.ToText([calendar_date], \"yyyy\"), type text),",
+                "    #\"Added quarter\" = Table.AddColumn(#\"Added year\", \"quarter\", each Text.From(Date.QuarterOfYear([calendar_date])), type text),",
+                "    #\"Added quarter_name\" = Table.AddColumn(#\"Added quarter\", \"quarter_name\", each \"Q\" & Text.From(Date.QuarterOfYear([calendar_date])), type text),",
+                "    #\"Added month\" = Table.AddColumn(#\"Added quarter_name\", \"month\", each Date.Month([calendar_date]), Int64.Type),",
+                "    #\"Added month_ch\" = Table.AddColumn(#\"Added month\", \"month_ch\", each Date.ToText([calendar_date], \"MM\"), type text),",
+                "    #\"Added month_name\" = Table.AddColumn(#\"Added month_ch\", \"month_name\", each Text.Upper(Date.ToText([calendar_date], \"MMMM\")), type text),",
+                "    #\"Added month_short_name\" = Table.AddColumn(#\"Added month_name\", \"month_short_name\", each Text.Upper(Date.ToText([calendar_date], \"MMM\")), type text),",
+                "    #\"Added month_year\" = Table.AddColumn(#\"Added month_short_name\", \"month_year\", each Text.Upper(Date.ToText([calendar_date], \"MMM\")) & \"-\" & Date.ToText([calendar_date], \"yyyy\"), type text),",
+                "    #\"Added week\" = Table.AddColumn(#\"Added month_year\", \"week\", each Date.ToText([calendar_date], \"ww\"), type text),",
+                "    #\"Added day\" = Table.AddColumn(#\"Added week\", \"day\", each Date.ToText([calendar_date], \"dd\"), type text),",
+                "    #\"Added day_name\" = Table.AddColumn(#\"Added day\", \"day_name\", each Text.Upper(Date.ToText([calendar_date], \"dddd\")), type text),",
+                "    #\"Added day_short_name\" = Table.AddColumn(#\"Added day_name\", \"day_short_name\", each Text.Upper(Date.ToText([calendar_date], \"ddd\")), type text),",
+                "    #\"Added start_of_month\" = Table.AddColumn(#\"Added day_short_name\", \"start_of_month\", each Date.StartOfMonth([calendar_date]), type date),",
+                "    #\"Added end_of_month\" = Table.AddColumn(#\"Added start_of_month\", \"end_of_month\", each Date.EndOfMonth([calendar_date]), type date),",
+                "    #\"Added start_of_quarter\" = Table.AddColumn(#\"Added end_of_month\", \"start_of_quarter\", each Date.StartOfQuarter([calendar_date]), type date),",
+                "    #\"Added end_of_quarter\" = Table.AddColumn(#\"Added start_of_quarter\", \"end_of_quarter\", each Date.EndOfQuarter([calendar_date]), type date),",
+                "",
+                "    // Fiscal logic",
+                "    #\"Added fiscal_year\" = Table.AddColumn(#\"Added end_of_quarter\", \"fiscal_year\", each if Date.Month([calendar_date]) >= 7 then Date.Year([calendar_date]) + 1 else Date.Year([calendar_date]), Int64.Type),",
+                "    #\"Added fiscal_year_range\" = Table.AddColumn(#\"Added fiscal_year\", \"fiscal_year_range\", each if Date.Month([calendar_date]) >= 7 then Text.From(Date.Year([calendar_date])) & \"-\" & Text.From(Date.Year([calendar_date]) + 1) else Text.From(Date.Year([calendar_date]) - 1) & \"-\" & Text.From(Date.Year([calendar_date])), type text),",
+                "    #\"Added fiscal_month\" = Table.AddColumn(#\"Added fiscal_year_range\", \"fiscal_month\", each if Date.Month([calendar_date]) >= 7 then Date.Month([calendar_date]) - 6 else Date.Month([calendar_date]) + 6, Int64.Type),",
+                "",
+                "    // Last refresh timestamp",
+                "    #\"Added last_refresh\" = Table.AddColumn(#\"Added fiscal_month\", \"last_refresh\", each DateTime.LocalNow(), type datetime)",
+                "in",
+                "    #\"Added last_refresh\""
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_SALES_ACTIVITY",
+        "columns": [
+          {
+            "name": "ACTIVITY_ID",
+            "dataType": "string",
+            "sourceColumn": "ACTIVITY_ID"
+          },
+          {
+            "name": "ACTIVITY_NAME",
+            "dataType": "string",
+            "sourceColumn": "ACTIVITY_NAME"
+          },
+          {
+            "name": "ACTIVITY_TYPE",
+            "dataType": "string",
+            "sourceColumn": "ACTIVITY_TYPE"
+          },
+          {
+            "name": "ACTIVITY_STATUS",
+            "dataType": "string",
+            "sourceColumn": "ACTIVITY_STATUS"
+          },
+          {
+            "name": "CREATED_AT",
+            "dataType": "dateTime",
+            "sourceColumn": "CREATED_AT"
+          },
+          {
+            "name": "LAST_UPDATE",
+            "dataType": "dateTime",
+            "sourceColumn": "LAST_UPDATE"
+          },
+          {
+            "name": "CONTRACT_VALUE",
+            "dataType": "double",
+            "sourceColumn": "CONTRACT_VALUE"
+          },
+          {
+            "name": "ACCOUNT_ID",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_ID"
+          },
+          {
+            "name": "ACCOUNT_NAME",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NAME"
+          },
+          {
+            "name": "TERRITORY",
+            "dataType": "string",
+            "sourceColumn": "TERRITORY"
+          },
+          {
+            "name": "ACCOUNT_MANAGER",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_MANAGER"
+          },
+          {
+            "name": "HAS_FINANCIAL_PROPOSAL",
+            "dataType": "string",
+            "sourceColumn": "HAS_FINANCIAL_PROPOSAL"
+          },
+          {
+            "name": "HAS_TECHNICAL_PROPOSAL",
+            "dataType": "string",
+            "sourceColumn": "HAS_TECHNICAL_PROPOSAL"
+          },
+          {
+            "name": "DUE_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "DUE_DATE"
+          },
+          {
+            "name": "PRIORITY",
+            "dataType": "string",
+            "sourceColumn": "PRIORITY"
+          },
+          {
+            "name": "CLOSER_Q",
+            "dataType": "string",
+            "sourceColumn": "CLOSER_Q"
+          },
+          {
+            "name": "YEAR",
+            "dataType": "string",
+            "sourceColumn": "YEAR"
+          },
+          {
+            "name": "PRODUCT_TYPE",
+            "dataType": "string",
+            "sourceColumn": "PRODUCT_TYPE"
+          },
+          {
+            "name": "BUSINESS_OWNER",
+            "dataType": "string",
+            "sourceColumn": "BUSINESS_OWNER"
+          },
+          {
+            "name": "TECHNICAL_OWNER",
+            "dataType": "string",
+            "sourceColumn": "TECHNICAL_OWNER"
+          },
+          {
+            "name": "PROJECT_ID",
+            "dataType": "string",
+            "sourceColumn": "PROJECT_ID"
+          },
+          {
+            "name": "PROJECT_NUMBER",
+            "dataType": "double",
+            "sourceColumn": "PROJECT_NUMBER"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    act.id                   activity_id,",
+                "    name                 activity_name,",
+                "    activitytype         activity_type,",
+                "    status               activity_status,",
+                "    trunc(act.created)       created_at,",
+                "    lastupdate           last_update,",
+                "    finalcontractedvalue contract_value,",
+                "    act.accountid            account_id,",
+                "    acc.title account_name,",
+                "    acc.territory,",
+                "    act.account_manager,",
+                "    financialproposal    has_financial_proposal,",
+                "    technicalproposal    has_technical_proposal,",
+                "    expectedduedate      due_date,",
+                "    priority,",
+                "    closer_q,",
+                "    year,",
+                "    product_type,",
+                "    business_owner,",
+                "    technical_owner,",
+                "    prj.project_id,",
+                "    prj.project_number",
+                "FROM",
+                "    business_mangment_lkp__activity  act",
+                "    LEFT JOIN business_mangment_lkp_account acc ON act.accountid = acc.id",
+                "    LEFT JOIN erp_app_lkp_project_activity_map prj ON act.id = prj.activity_id",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "TRX_ERP_TRIAL_BALANCE",
+        "columns": [
+          {
+            "name": "SYSTEM_ID",
+            "dataType": "double",
+            "sourceColumn": "SYSTEM_ID"
+          },
+          {
+            "name": "ACCOUNT_TYPE_ID",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_TYPE_ID"
+          },
+          {
+            "name": "COMPANY_ID",
+            "dataType": "string",
+            "sourceColumn": "COMPANY_ID"
+          },
+          {
+            "name": "DEPARTMENT_ID",
+            "dataType": "string",
+            "sourceColumn": "DEPARTMENT_ID"
+          },
+          {
+            "name": "ACCOUNT",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT"
+          },
+          {
+            "name": "INTERCOMPANY_ID",
+            "dataType": "string",
+            "sourceColumn": "INTERCOMPANY_ID"
+          },
+          {
+            "name": "LOCATION_ID",
+            "dataType": "string",
+            "sourceColumn": "LOCATION_ID"
+          },
+          {
+            "name": "PRODUCT_ID",
+            "dataType": "string",
+            "sourceColumn": "PRODUCT_ID"
+          },
+          {
+            "name": "PROGRAM_ID",
+            "dataType": "string",
+            "sourceColumn": "PROGRAM_ID"
+          },
+          {
+            "name": "PROJECT_ID",
+            "dataType": "string",
+            "sourceColumn": "PROJECT_ID"
+          },
+          {
+            "name": "LOB_ID",
+            "dataType": "string",
+            "sourceColumn": "LOB_ID"
+          },
+          {
+            "name": "SERVICE_ID",
+            "dataType": "string",
+            "sourceColumn": "SERVICE_ID"
+          },
+          {
+            "name": "LEDGER_NAME",
+            "dataType": "string",
+            "sourceColumn": "LEDGER_NAME"
+          },
+          {
+            "name": "PERIOD_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "PERIOD_DATE"
+          },
+          {
+            "name": "BALANCE",
+            "dataType": "double",
+            "sourceColumn": "BALANCE"
+          },
+          {
+            "name": "CLOSING_BALANCE",
+            "dataType": "double",
+            "sourceColumn": "CLOSING_BALANCE"
+          },
+          {
+            "name": "UPDATE_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "UPDATE_DATE"
+          },
+          {
+            "type": "calculated",
+            "name": "DATE_KEY",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(TRX_ERP_TRIAL_BALANCE[PERIOD_DATE], \"YYYYMMDD\")"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT ",
+                "    * ",
+                "FROM ",
+                "    oracle_user.erp_trial_balance",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "ERP_LKP_ACCOUNT_TYPE",
+        "columns": [
+          {
+            "name": "ACCOUNT_TYPE_ID",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_TYPE_ID"
+          },
+          {
+            "name": "ACCOUT_TYPE",
+            "dataType": "string",
+            "sourceColumn": "ACCOUT_TYPE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"   ",
+                "",
+                "-- ACCOUNT_TYPE",
+                "SELECT DISTINCT",
+                "    account_type account_type_id,",
+                "    CASE",
+                "        WHEN account_type = 'A' THEN",
+                "            'Assets'",
+                "        WHEN account_type = 'D' THEN",
+                "            'D'",
+                "        WHEN account_type = 'E' THEN",
+                "            'Expenses'",
+                "        WHEN account_type = 'L' THEN",
+                "            'Liability'",
+                "        WHEN account_type = 'O' THEN",
+                "            'Operating Expenses & Profits'",
+                "        WHEN account_type = 'R' THEN",
+                "            'Revenue'",
+                "        ELSE",
+                "            'Unknown'",
+                "    END          accout_type",
+                "FROM",
+                "    erp_api_code_combination",
+                "ORDER BY",
+                "    1",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "ERP_LKP_COMPANY",
+        "columns": [
+          {
+            "name": "COMPANY_ID",
+            "dataType": "string",
+            "sourceColumn": "COMPANY_ID"
+          },
+          {
+            "name": "COMPANY",
+            "dataType": "string",
+            "sourceColumn": "COMPANY"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"   ",
+                "",
+                "-- COMPANY",
+                "SELECT DISTINCT",
+                "    company      company_id,",
+                "    company_desc company",
+                "FROM",
+                "    erp_api_code_combination",
+                "ORDER BY",
+                "    1",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "ERP_LKP_DEPARTMENT",
+        "columns": [
+          {
+            "name": "DEPARTMENT_ID",
+            "dataType": "string",
+            "sourceColumn": "DEPARTMENT_ID"
+          },
+          {
+            "name": "DEPARTMENT",
+            "dataType": "string",
+            "sourceColumn": "DEPARTMENT"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"   ",
+                "",
+                "-- DEPARTMENT",
+                "SELECT DISTINCT",
+                "    department      department_id,",
+                "    department_desc department",
+                "FROM",
+                "    erp_api_code_combination",
+                "ORDER BY",
+                "    1    ",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "ERP_LKP_INTERCOMPANY",
+        "columns": [
+          {
+            "name": "INTERCOMPANY_ID",
+            "dataType": "string",
+            "sourceColumn": "INTERCOMPANY_ID"
+          },
+          {
+            "name": "INTERCOMPANY",
+            "dataType": "string",
+            "sourceColumn": "INTERCOMPANY"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"   ",
+                "",
+                "-- INTERCOMPANY",
+                "SELECT DISTINCT",
+                "    intercompany      intercompany_id,",
+                "    intercompany_desc intercompany",
+                "FROM",
+                "    erp_api_code_combination",
+                "ORDER BY",
+                "    1",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "ERP_LKP_PRODUCT",
+        "columns": [
+          {
+            "name": "PRODUCT_ID",
+            "dataType": "string",
+            "sourceColumn": "PRODUCT_ID"
+          },
+          {
+            "name": "PRODUCT",
+            "dataType": "string",
+            "sourceColumn": "PRODUCT"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"   ",
+                "",
+                "-- PRODUCT",
+                "SELECT DISTINCT",
+                "    product      product_id,",
+                "    product_desc product",
+                "FROM",
+                "    erp_api_code_combination",
+                "ORDER BY",
+                "    1",
+                " ",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "ERP_LKP_PROGRAM",
+        "columns": [
+          {
+            "name": "PROGRAM_ID",
+            "dataType": "string",
+            "sourceColumn": "PROGRAM_ID"
+          },
+          {
+            "name": "PROGRAM",
+            "dataType": "string",
+            "sourceColumn": "PROGRAM"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"   ",
+                "",
+                "-- PROGRAM",
+                "SELECT DISTINCT",
+                "    program      program_id,",
+                "    program_desc program",
+                "FROM",
+                "    erp_api_code_combination",
+                "ORDER BY",
+                "    1",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_TB_CHART_OF_ACCOUNTS",
+        "columns": [
+          {
+            "name": "ACCOUNT_VALUE",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_VALUE"
+          },
+          {
+            "name": "ACCOUNT_DESCRIPTION_EN",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_DESCRIPTION_EN"
+          },
+          {
+            "name": "ACCOUNT_DESCRIPTION_AR",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_DESCRIPTION_AR"
+          },
+          {
+            "name": "ACCOUNT_ID_1",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_ID_1"
+          },
+          {
+            "name": "ACCOUNT_NAME_EN_1",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NAME_EN_1"
+          },
+          {
+            "name": "ACCOUNT_NAME_AR_1",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NAME_AR_1"
+          },
+          {
+            "name": "ACCOUNT_ID_2",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_ID_2"
+          },
+          {
+            "name": "ACCOUNT_NAME_EN_2",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NAME_EN_2"
+          },
+          {
+            "name": "ACCOUNT_NAME_AR_2",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NAME_AR_2"
+          },
+          {
+            "name": "ACCOUNT_ID_3",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_ID_3"
+          },
+          {
+            "name": "ACCOUNT_NAME_EN_3",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NAME_EN_3"
+          },
+          {
+            "name": "ACCOUNT_NAME_AR_3",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NAME_AR_3"
+          },
+          {
+            "name": "ACCOUNT_ID_4",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_ID_4"
+          },
+          {
+            "name": "ACCOUNT_NAME_EN_4",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NAME_EN_4"
+          },
+          {
+            "name": "ACCOUNT_NAME_AR_4",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NAME_AR_4"
+          },
+          {
+            "name": "ACCOUNT_ID_5",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_ID_5"
+          },
+          {
+            "name": "ACCOUNT_NAME_EN_5",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NAME_EN_5"
+          },
+          {
+            "name": "ACCOUNT_NAME_AR_5",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NAME_AR_5"
+          },
+          {
+            "name": "ACCOUNT_ID_6",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_ID_6"
+          },
+          {
+            "name": "ACCOUNT_NAME_EN_6",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NAME_EN_6"
+          },
+          {
+            "name": "ACCOUNT_NAME_AR_6",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_NAME_AR_6"
+          },
+          {
+            "name": "CREATION_DATE",
+            "dataType": "string",
+            "sourceColumn": "CREATION_DATE"
+          },
+          {
+            "name": "INSERTION_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "INSERTION_DATE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"   ",
+                "",
+                "SELECT ",
+                "    *",
+                "FROM",
+                "    erp_lkp_tb_chart_of_accounts",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "74c02ba9-bf39-4c86-a33e-658d6fcfdb46",
+        "fromTable": "TRX_INVOICES",
+        "fromColumn": "ACCOUNT_ID",
+        "toTable": "LKP_ACCOUNTS",
+        "toColumn": "ACCOUNT_ID"
+      },
+      {
+        "name": "ec19ba6c-3840-4d51-8e59-936ba9b7756a",
+        "fromTable": "TRX_INVOICES",
+        "fromColumn": "LOB_CODE",
+        "toTable": "LKP_LOB",
+        "toColumn": "LOB_ID"
+      },
+      {
+        "name": "3bddba5f-c782-40d7-a9cf-a4c94f0c17a7",
+        "fromTable": "TRX_INVOICES",
+        "fromColumn": "CUSTOMER_ID",
+        "toTable": "LKP_CUSTOMERS",
+        "toColumn": "CUSTOMER_ID"
+      },
+      {
+        "name": "9f48b2e7-7882-42af-a33e-7da5f2d9af98",
+        "fromTable": "TRX_INVOICES",
+        "fromColumn": "CONTRACT_ID",
+        "toTable": "LKP_CONTRACTS",
+        "toColumn": "CONTRACT_ID"
+      },
+      {
+        "name": "26df06af-ffcc-4cd7-a4f1-53475531799a",
+        "fromTable": "TRX_INVOICES",
+        "fromColumn": "TASK_ID",
+        "toTable": "LKP_PROJECT_TASKS",
+        "toColumn": "TASK_ID"
+      },
+      {
+        "name": "2461563c-cc3f-498e-b83b-d42e56e84c4a",
+        "fromTable": "TRX_INVOICES",
+        "fromColumn": "DATE_KEY",
+        "toTable": "DIM_DATE",
+        "toColumn": "date_key"
+      },
+      {
+        "name": "4682c8be-327f-4bab-aac7-d8853f75778b",
+        "fromTable": "LKP_SALES_ACTIVITY",
+        "fromColumn": "PROJECT_NUMBER",
+        "toTable": "LKP_PROJECTS",
+        "toColumn": "PROJECT_NUMBER"
+      },
+      {
+        "name": "5ae28892-55ea-4998-8b72-24d0d3fb687b",
+        "fromTable": "TRX_INVOICES",
+        "fromColumn": "PROJECT_NUMBER",
+        "toTable": "LKP_PROJECTS",
+        "toColumn": "PROJECT_NUMBER"
+      },
+      {
+        "name": "cc183754-9d88-4d3f-a46c-434abf8b3ffd",
+        "fromTable": "TRX_ERP_TRIAL_BALANCE",
+        "fromColumn": "PROJECT_ID",
+        "toTable": "LKP_PROJECTS",
+        "toColumn": "PROJECT_NUMBER"
+      },
+      {
+        "name": "cb95f9e5-84b1-46fe-82de-f40d30c4a36f",
+        "fromTable": "TRX_ERP_TRIAL_BALANCE",
+        "fromColumn": "INTERCOMPANY_ID",
+        "toTable": "ERP_LKP_INTERCOMPANY",
+        "toColumn": "INTERCOMPANY_ID"
+      },
+      {
+        "name": "e1f11f80-ea98-49e8-8965-cfa708e599d5",
+        "fromTable": "TRX_ERP_TRIAL_BALANCE",
+        "fromColumn": "DEPARTMENT_ID",
+        "toTable": "ERP_LKP_DEPARTMENT",
+        "toColumn": "DEPARTMENT_ID"
+      },
+      {
+        "name": "ef52d294-6659-4e9e-9193-13b7af9f72a0",
+        "fromTable": "TRX_ERP_TRIAL_BALANCE",
+        "fromColumn": "COMPANY_ID",
+        "toTable": "ERP_LKP_COMPANY",
+        "toColumn": "COMPANY_ID"
+      },
+      {
+        "name": "4fab7d19-c0ef-4a75-87c3-f6b4657a9d84",
+        "fromTable": "TRX_ERP_TRIAL_BALANCE",
+        "fromColumn": "PRODUCT_ID",
+        "toTable": "ERP_LKP_PRODUCT",
+        "toColumn": "PRODUCT_ID"
+      },
+      {
+        "name": "ed5cf650-9151-4f10-baaf-8416c69af92d",
+        "fromTable": "TRX_ERP_TRIAL_BALANCE",
+        "fromColumn": "PROGRAM_ID",
+        "toTable": "ERP_LKP_PROGRAM",
+        "toColumn": "PROGRAM_ID"
+      },
+      {
+        "name": "50922569-5081-4376-a650-ba7993fe7f3d",
+        "fromTable": "TRX_ERP_TRIAL_BALANCE",
+        "fromColumn": "ACCOUNT_TYPE_ID",
+        "toTable": "ERP_LKP_ACCOUNT_TYPE",
+        "toColumn": "ACCOUNT_TYPE_ID"
+      },
+      {
+        "name": "7d2bac20-7450-4385-a02a-bc578facedc1",
+        "fromTable": "TRX_ERP_TRIAL_BALANCE",
+        "fromColumn": "ACCOUNT",
+        "toTable": "LKP_TB_CHART_OF_ACCOUNTS",
+        "toColumn": "ACCOUNT_VALUE"
+      },
+      {
+        "name": "48aa4dd9-61d7-4f03-beb7-969621ff7b37",
+        "fromTable": "TRX_ERP_TRIAL_BALANCE",
+        "fromColumn": "DATE_KEY",
+        "toTable": "DIM_DATE",
+        "toColumn": "date_key"
+      },
+      {
+        "name": "d05fa0c2-f548-48cd-bb9c-4d7bcf9b52b0",
+        "fromTable": "TRX_ERP_TRIAL_BALANCE",
+        "fromColumn": "LOB_ID",
+        "toTable": "LKP_LOB",
+        "toColumn": "LOB_ID"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "ClientCompatibilityLevel",
+        "value": "600"
+      }
+    ]
+  },
+  "id": "SemanticModel"
+}

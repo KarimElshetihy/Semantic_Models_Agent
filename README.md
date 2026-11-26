@@ -1,0 +1,11 @@
+What is this project about?
+- I want to build an AI Agent that will e able to build SSAS Models from scratch
+- I will provide some example on how it will do the work and how it will build the models
+- I prefer to make it human in the loop agent so every step can be reviewed
+- The model will build or Edit the Model.bim files and other supporting files for tabular models on the SSAS database.
+- It will also write DAX queries to build measures and column or tables that will  help get the best model
+- It should focus on the performance of the model, simplicity, size, centralization in case the model is complex, and clarity.
+- It will help creating SQL Agent jobs to refresh the required tabular models on the SSAS DB.
+- In case of issues it will review the existing model logic and structure, queries, measures , relationships and more to fix the issues.
+- It will write sql queries and validate the result of existing models against the Database to make sure the model is giving the correct results.
+- It will also write SQL queries to build the Tbales required in the Model.
