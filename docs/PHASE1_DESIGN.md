@@ -150,6 +150,7 @@ Mocked tests are labeled as mocked. The live test contacts the configured endpoi
 | Plain http to a network host requires an explicit switch, default off (design choice, to confirm) | Agent, 27 Nov 2026 |
 | Policy allows reading the root `.env` file only (exact file, never written) | Agent, 27 Nov 2026; policy change, to confirm |
 | Fixed choices in code use enums | User, 27 Nov 2026 |
+| Runtime uses the standard library only; pytest 8.4.2 is the only test dependency, pinned in `requirements.txt`; project venv in `.venv` (git-ignored) | Agent, 27 Nov 2026; to confirm |
 | Approved changes written to workspace only; no policy change | User, 27 Nov 2026 |
 | Dependencies: report "not checked" in Phase 1; full graph in Phase 2 | User, 27 Nov 2026 |
 | Knowledge source: a `knowledge/` folder in the repo, filled by the user | User, 27 Nov 2026 |
