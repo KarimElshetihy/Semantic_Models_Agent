@@ -1,6 +1,6 @@
 # Phase 1 Design (Draft)
 
-**Status:** DRAFT. Steps 1–4 and the LLM client layer (section 3a) are implemented and tested. Steps 5–10 wait for the decisions in section 4.
+**Status:** DRAFT. Steps 1–7 and the LLM client layer (section 3a) are implemented and tested. Steps 8–10 are not written yet.
 **Scope:** Phase 1 (AI Engineering Assistant, MVP) from `requirements.md` section 12, plus the features it lists in sections 15 to 20.
 **Offline by default:** tests make no LLM calls (the one live test runs only when its environment variables are set), no SSAS connection, no Oracle connection, no writes to `example_models/` or `tests/fixtures/`.
 **Spec file:** `requirements.md` is unchanged and is the reference for comparison. Known differences are listed in section 5.
@@ -35,8 +35,8 @@ Each step has its own tests. A step is done only when its tests pass and the ful
 | 4 | Version comparison with breaking-change classification (ENG-06): semantic diff, a category for each change, and the text diff in one comparison. Staging writes the categories to `diff.json` and `run.json`. | none (rule from section 3 used as proposed) | **DONE:** code in `src/ssas_agent/diff/classify.py` and `compare.py`, 31 tests in `tests/unit/test_breaking_changes.py`, staging updated (24 tests). Full suite: 383 PASS, 1 skipped (symlink). |
 | 3a | LLM client layer (section 3a): one client interface, OpenAI-compatible implementation with endpoint policy (local, network https, or network http behind a switch), `.env` reader, redirect refusal, bounded reply and timeout, structured reply check, mock client for tests. | none (server location still open, decision 1a) | **DONE:** code in `src/ssas_agent/llm/`, 92 unit tests, 9 policy tests, plus 1 live test (NOT_RUN unless settings are complete). Full suite: 484 PASS, 2 skipped (live test, symlink). |
 | 5 | Knowledge retrieval with provenance: index a `knowledge/` folder of approved standards and examples, return matches with source file and hash. Retrieved text is data, never instructions. (CORE-10, FR-11) | decision 4 (answered: `knowledge/` folder; sample files until your files arrive) | **DONE:** code in `src/ssas_agent/knowledge/`, 21 tests in `tests/unit/test_knowledge.py` (1 symlink test skipped on this machine). Full suite: 507 PASS, 2 skipped. Keyword retrieval only; no embeddings yet. |
-| 6 | Requirements assistant: turn a request into a written specification with explicit "missing definitions" list. (BIZ-01 phase 1 part) | decision 1 | not started |
-| 7 | DAX and SQL generation through a provider-independent interface. Candidates pass through static checks and approval before any write. (CORE-04, CORE-05, FR-04, FR-05) | decision 1, decision 2 | not started |
+| 6 | Requirements assistant: a fixed template of the eight section 4 fields (business objectives, KPIs, data sources, table grain, keys, refresh, security, target SSAS version). Your entries and the model's drafts fill it; model drafts are kept only if every word is in the request. Writes artifacts/{run_id}/spec.md with the sources and a missing-definitions list. (BIZ-01 phase 1 part) | decision 1 (LLM connected) | **DONE:** code in src/ssas_agent/requirements/, 15 tests in tests/unit/test_requirements_assistant.py (mocked model). Full suite: 522 PASS, 2 skipped. A live check with the test model showed weak drafts (for example, keys placed under the wrong field); human review is required. |
+| 7 | DAX and SQL generation through a provider-independent interface. DAX: the model proposes one new measure (JSON with table, name, expression); it is checked by the static checks (new errors only, and a measure the scanner cannot read is refused), then staged for approval. SQL: text-only rule checks on an Oracle statement; the result is an artifact, never written to a project. (CORE-04, CORE-05, FR-04, FR-05) | decision 1, decision 2 | **DONE:** code in `src/ssas_agent/generation/`, 36 tests (14 in `tests/unit/test_generation_dax.py`, 22 in `tests/unit/test_generation_sql.py`), mocked model. Full suite: 558 PASS, 2 skipped. Live check with the test model: SQL draft passed the checks; the DAX draft was not valid JSON in 3 attempts, so nothing was staged. A larger model is needed for DAX drafts. |
 | 8 | New model creation from a supplied schema spec. (CORE-01, AC-01) | decision 5 | not started |
 | 9 | Approved local application to the destination chosen in decision 2. (FR-10, AC-06, AC-07) | decision 2 | not started |
 | 10 | Phase 1 demonstration: a new sample model and a safe edit to an existing model, with a report. Exit gate. | steps 1–9 | not started |
@@ -78,7 +78,7 @@ Each step has its own tests. A step is done only when its tests pass and the ful
 **Endpoint location (decided 27 Nov 2026, location still unknown):** the agent accepts three cases, and the choice is made by configuration, not code:
 - `local`: loopback (`localhost`, `127.x.x.x`, `::1`) over http or https. Allowed by default.
 - `network_https`: a host listed in `SSAS_AGENT_LLM_ALLOWED_HOSTS`, over https. Preferred for a network server.
-- `network_http`: a listed host over plain http. Allowed only when `SSAS_AGENT_LLM_ALLOW_INSECURE_HTTP=true`. This switch is a design choice of mine (default off), because prompts carry model metadata. Confirm or change it.
+- `network_http`: a listed host over plain http. Allowed only when `SSAS_AGENT_LLM_ALLOW_INSECURE_HTTP=true`. This switch is a design choice of mine (default off), because prompts carry model metadata. Kept by user decision, 27 Nov 2026.
 
 **Settings sources (decided 27 Nov 2026):** real environment variables, then the project's `.env` file, then defaults. `.env` is read only through the path policy. The policy allows reading exactly one root file, `.env` (`READABLE_FILES`), and never writing it. `.env.example` is committed with placeholders; `.env` is git-ignored. Malformed `.env` lines are refused with a line number and key name, never the value.
 
@@ -127,12 +127,15 @@ These affect the steps listed above. Recommendations are marked.
 | `tests/unit/test_llm_config.py` (22 tests) | Required and optional settings, defaults, blank values, API key hidden from `repr`, number and on/off switch ranges | PASS |
 | `tests/unit/test_llm_env_file.py` (23 tests) | `.env` format (comments, `export`, quotes, inline comments, BOM, CRLF), line-numbered errors that never show values, duplicate keys, reads through the policy, environment overrides file | PASS |
 | `tests/unit/test_knowledge.py` (21 tests, 1 skipped) | Indexing with SHA-256 hashes, skip reasons (type, size, encoding, outside policy), deterministic ranking, provenance, reference blocks that mark retrieved text as data and cannot be closed early by planted markers; real sample folder | PASS |
+| `tests/unit/test_requirements_assistant.py` (15 tests, MOCKED MODEL) | Eight-field template, your entries over drafts, grounding rule (all words from the request), model failure recorded as a note, Markdown table and missing list, write only to artifacts | PASS |
 | `tests/unit/test_policy_settings_file.py` (9 tests) | Only the root `.env` is readable; never writable; lookalike names and other root files stay denied | PASS |
 | `tests/unit/test_llm_endpoint.py` (16 tests) | Loopback allowed; network host refused unless allowlisted; https allowed; plain http refused unless the switch is on; credentials, schemes and missing host refused | PASS |
 | `tests/unit/test_llm_openai_client.py` (16 tests, MOCKED SERVER) | Request shape, bearer header, reply parsing, HTTP errors, timeout, unreachable endpoint, redirect refused, oversized reply, proxy ignored. Uses a local fake server, not a model. | PASS |
 | `tests/unit/test_llm_structured_output.py` (15 tests, MOCKED CLIENT) | One JSON object only, fenced block, typed fields, boolean is not an integer, refused reply recorded without its text | PASS |
 | `tests/integration/test_llm_live.py` (2 tests, LIVE) | One plain prompt, and one structured reply (up to 3 attempts), to the configured endpoint. Runs when settings are complete (environment or `.env`); NOT_RUN otherwise. | PASS on 27 Nov 2026 against local Ollama, model `qwen2.5:0.5b` (connectivity test only) |
-| Steps 5–10 | Not written yet | NOT_RUN |
+| `tests/unit/test_generation_dax.py` (14 tests, MOCKED MODEL) | Staging a new measure on a copy of RETA, candidate and review files written, prompt context, unknown column refused (SC-020), unreadable DAX not checked, duplicate name, unknown table, blank fields, bad replies retried up to 3 attempts, unreachable model not retried | PASS |
+| `tests/unit/test_generation_sql.py` (22 tests) | Clean and refused statements, literals and comments not scanned, one statement only, balanced parentheses, unclosed literal or comment, warnings, not-checked notes, artifact-only recording, event without statement text | PASS |
+| Steps 8–10 | Not written yet | NOT_RUN |
 
 Mocked tests are labeled as mocked. The live test contacts the configured endpoint only when its environment variables are set. No Phase 1 test contacts SSAS or Oracle.
 
@@ -147,14 +150,16 @@ Mocked tests are labeled as mocked. The live test contacts the configured endpoi
 | LLM is local, behind an OpenAI-compatible API; model not chosen; structure first, try many models later | User, 27 Nov 2026 |
 | LLM endpoint location not decided: build with localhost on the allowlist, add others later | User, 27 Nov 2026 |
 | Endpoint location unknown: support local, network https, or network http; the choice is configuration | User, 27 Nov 2026 |
+| Live tests fail (not skip) when settings exist but the server is unreachable (kept as current behaviour) | User confirmed 27 Nov 2026 |
 | Settings from a `.env` file (reader needed, with `.env.example`); environment variables override the file | User, 27 Nov 2026 |
-| Plain http to a network host requires an explicit switch, default off (design choice, to confirm) | Agent, 27 Nov 2026 |
-| Policy allows reading the root `.env` file only (exact file, never written) | Agent, 27 Nov 2026; policy change, to confirm |
+| Plain http to a network host requires an explicit switch, default off | Agent proposed; user confirmed 27 Nov 2026 |
+| Policy allows reading the root `.env` file only (exact file, never written) | Agent proposed; user confirmed 27 Nov 2026 |
 | Fixed choices in code use enums | User, 27 Nov 2026 |
-| Knowledge folder starts with two SAMPLE files marked NOT APPROVED; the user replaces them with approved standards. Retrieval is keyword-based and deterministic | User, 27 Nov 2026 (sample now); retrieval method Agent, to confirm |
-| Policy allows reading the `knowledge/` folder (read only) | Agent, 27 Nov 2026; policy change, to confirm |
-| Local test server: Ollama on this machine with the small model `qwen2.5:0.5b`, for connectivity tests only; the final model is still not chosen | User, 27 Nov 2026 (install approved); model choice Agent, to confirm |
-| Runtime uses the standard library only; pytest 8.4.2 is the only test dependency, pinned in `requirements.txt`; project venv in `.venv` (git-ignored) | Agent, 27 Nov 2026; to confirm |
+| Knowledge folder starts with two SAMPLE files marked NOT APPROVED; the user replaces them with approved standards. Retrieval is keyword-based and deterministic | User, 27 Nov 2026 (sample now); keyword retrieval confirmed 27 Nov 2026 |
+| Policy allows reading the `knowledge/` folder (read only) | Agent proposed; user confirmed 27 Nov 2026 |
+| Requirements: a fixed template first; the user or the model fills it; a model draft is kept only if all its words come from the request; output in artifacts/ | User, 27 Nov 2026 (template, artifacts); word rule Agent proposed, to confirm |
+| Local test server: Ollama on this machine with the small model `qwen2.5:0.5b`, for connectivity tests only; the final model is still not chosen | User, 27 Nov 2026 (install and test model approved); final model not chosen |
+| Runtime uses the standard library only; pytest 8.4.2 is the only test dependency, pinned in `requirements.txt`; project venv in `.venv` (git-ignored) | Agent proposed; user confirmed 27 Nov 2026 |
 | Approved changes written to workspace only; no policy change | User, 27 Nov 2026 |
 | Dependencies: report "not checked" in Phase 1; full graph in Phase 2 | User, 27 Nov 2026 |
 | Knowledge source: a `knowledge/` folder in the repo, filled by the user | User, 27 Nov 2026 |
@@ -162,3 +167,8 @@ Mocked tests are labeled as mocked. The live test contacts the configured endpoi
 | New model input: a JSON spec file written by the user | User, 27 Nov 2026 |
 | SQL checks are text-only; sqlglot not approved | User, 27 Nov 2026 |
 | Generated and edited projects look like the example projects | User, 27 Nov 2026 |
+| Step 7 DAX: the model proposes one new measure only (no edit of existing measures); the candidate is staged for approval | User, 27 Nov 2026 |
+| Step 7 SQL: text-only checks; the candidate is an artifact, never written to a project | User, 27 Nov 2026 |
+| Step 7 demo model: RETA_MODEL (copied to a temporary folder in tests) | User, 27 Nov 2026 |
+| Step 7 DAX drafts: up to 3 attempts when the reply is not valid JSON; the model's own errors are never applied | Agent proposed, 27 Nov 2026 (to confirm) |
+| The word rule (every word from the request) applies to requirements drafts only, not to DAX or SQL | Agent proposed, 27 Nov 2026 (to confirm) |
