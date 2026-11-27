@@ -13,6 +13,13 @@ class ChatRole(StrEnum):
     ASSISTANT = "assistant"
 
 
+class ReplyFormat(StrEnum):
+    """TEXT is free text. JSON_OBJECT asks the server to return one JSON object only."""
+
+    TEXT = "text"
+    JSON_OBJECT = "json_object"
+
+
 @dataclass(frozen=True)
 class ChatMessage:
     role: ChatRole

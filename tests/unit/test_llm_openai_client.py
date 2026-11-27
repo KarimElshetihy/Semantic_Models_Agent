@@ -14,7 +14,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
 
-from ssas_agent.llm import ChatMessage, ChatRole, EndpointNotAllowedError, LlmError, LlmSettings
+from ssas_agent.llm import ChatMessage, ChatRole, EndpointNotAllowedError, LlmError, LlmSettings, ReplyFormat
 from ssas_agent.llm.config import LOOPBACK_HOSTS, MAX_RESPONSE_BYTES
 from ssas_agent.llm.openai_compatible import OpenAICompatibleClient
 
@@ -105,6 +105,20 @@ def test_request_carries_model_messages_temperature_and_no_streaming(fake_server
         "temperature": 0.3,
         "stream": False,
     }
+
+
+def test_json_object_reply_format_asks_the_server_for_one_json_object(fake_server, base_url):
+    OpenAICompatibleClient(make_settings(base_url)).complete(MESSAGES, ReplyFormat.JSON_OBJECT)
+
+    payload = json.loads(fake_server.received[0]["body"])
+    assert payload["response_format"] == {"type": "json_object"}
+
+
+def test_text_reply_format_sends_no_response_format(fake_server, base_url):
+    OpenAICompatibleClient(make_settings(base_url)).complete(MESSAGES)
+
+    payload = json.loads(fake_server.received[0]["body"])
+    assert "response_format" not in payload
 
 
 def test_model_name_is_used_when_the_server_does_not_report_one(fake_server, base_url):

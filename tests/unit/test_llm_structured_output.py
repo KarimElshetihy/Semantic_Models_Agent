@@ -5,7 +5,7 @@ import json
 import pytest
 
 from ssas_agent.audit import RunRecorder
-from ssas_agent.llm import ChatMessage, ChatRole, LlmError, ScriptedLlmClient, StructuredOutputError
+from ssas_agent.llm import ChatMessage, ChatRole, LlmError, ReplyFormat, ScriptedLlmClient, StructuredOutputError
 from ssas_agent.llm.structured import StructuredEvent, ask_structured, check_fields, parse_object
 from ssas_agent.policy import PathPolicy
 
@@ -67,6 +67,14 @@ def test_ask_structured_returns_checked_fields_and_sends_the_messages():
 
     assert fields == {"name": "Sales", "count": 2}
     assert client.calls == [tuple(MESSAGES)]
+
+
+def test_ask_structured_asks_the_server_for_a_json_object_reply():
+    client = ScriptedLlmClient(['{"name": "Sales", "count": 2}'])
+
+    ask_structured(client, MESSAGES, SCHEMA)
+
+    assert client.reply_formats == [ReplyFormat.JSON_OBJECT]
 
 
 def test_refused_reply_is_recorded_without_the_reply_text(tmp_path):

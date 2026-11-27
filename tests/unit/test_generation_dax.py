@@ -109,6 +109,32 @@ def test_unknown_table_is_refused(project):
         propose_from_reply(project, reply(table="NoSuchTable"))
 
 
+def test_measure_name_with_square_brackets_is_refused_and_nothing_is_written(project):
+    before = written_paths(project)
+
+    with pytest.raises(CandidateRefusedError, match="must not contain '\\[' or '\\]'"):
+        propose_from_reply(project, reply(measure_name="Total [Amount]"))
+
+    assert written_paths(project) == before
+
+
+def test_expression_starting_with_equals_is_refused_and_nothing_is_written(project):
+    before = written_paths(project)
+
+    with pytest.raises(CandidateRefusedError, match="must not start with '='"):
+        propose_from_reply(project, reply(expression="=SUM(TRX[AMOUNT])"))
+
+    assert written_paths(project) == before
+
+
+def test_measure_name_with_a_dot_is_allowed_as_production_names_use_dots(project):
+    staged = propose_from_reply(project, reply(measure_name="01.Total Amount"))
+
+    candidate = BimDocument.from_bytes(staged.candidate_path.read_bytes()).data
+    trx = next(table for table in candidate["model"]["tables"] if table["name"] == "TRX")
+    assert any(measure["name"] == "01.Total Amount" for measure in trx["measures"])
+
+
 @pytest.mark.parametrize("field", ["table", "measure_name", "expression"])
 def test_blank_field_in_the_draft_is_refused(project, field):
     with pytest.raises(CandidateRefusedError, match="the draft has no"):

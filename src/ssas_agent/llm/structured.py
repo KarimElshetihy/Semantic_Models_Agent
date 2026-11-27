@@ -16,7 +16,7 @@ from typing import Any
 from ssas_agent.audit import RunRecorder
 from ssas_agent.llm.client import LlmClient
 from ssas_agent.llm.errors import LlmError
-from ssas_agent.llm.messages import ChatMessage
+from ssas_agent.llm.messages import ChatMessage, ReplyFormat
 
 _SINGLE_FENCE = re.compile(r"\A```(?:(?i:json))?[ \t]*\r?\n(.*?)\r?\n?```\Z", re.DOTALL)
 
@@ -61,7 +61,7 @@ def ask_structured(
     recorder: RunRecorder | None = None,
 ) -> dict[str, Any]:
     """Send the messages and return the checked fields. Raises StructuredOutputError for a bad reply."""
-    result = client.complete(messages)
+    result = client.complete(messages, ReplyFormat.JSON_OBJECT)
     try:
         return check_fields(parse_object(result.text), schema)
     except StructuredOutputError as error:

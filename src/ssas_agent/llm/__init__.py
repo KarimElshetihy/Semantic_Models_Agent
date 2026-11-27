@@ -5,7 +5,7 @@ from ssas_agent.llm.config import LlmSetting, LlmSettings, SwitchValue, load_pro
 from ssas_agent.llm.endpoint import EndpointDecision, EndpointKind, UrlScheme, check_endpoint
 from ssas_agent.llm.env_file import ENV_FILE_NAME, parse_env_text, read_env_file
 from ssas_agent.llm.errors import EndpointNotAllowedError, EnvFileError, LlmConfigError, LlmError
-from ssas_agent.llm.messages import ChatMessage, ChatRole, CompletionResult
+from ssas_agent.llm.messages import ChatMessage, ChatRole, CompletionResult, ReplyFormat
 from ssas_agent.llm.openai_compatible import OpenAICompatibleClient
 from ssas_agent.llm.scripted import ScriptedLlmClient
 from ssas_agent.llm.structured import StructuredEvent, StructuredOutputError, ask_structured, check_fields, parse_object
@@ -25,6 +25,7 @@ __all__ = [
     "LlmSetting",
     "LlmSettings",
     "OpenAICompatibleClient",
+    "ReplyFormat",
     "ScriptedLlmClient",
     "StructuredEvent",
     "StructuredOutputError",

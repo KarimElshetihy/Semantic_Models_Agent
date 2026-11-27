@@ -31,6 +31,7 @@ DRAFT_INSTRUCTIONS = (
 )
 DRAFT_SCHEMA: dict[str, type] = {"table": str, "measure_name": str, "expression": str}
 MAX_DRAFT_ATTEMPTS = 3
+FORBIDDEN_NAME_CHARACTERS = ("[", "]")
 
 
 @dataclass(frozen=True)
@@ -66,6 +67,9 @@ def propose_measure(
     proposal: MeasureProposal,
 ) -> StagedChange:
     """Check the candidate in memory, then stage it. Raises CandidateRefusedError if the checks fail."""
+    form_reasons = _form_reasons(proposal)
+    if form_reasons:
+        raise CandidateRefusedError(tuple(form_reasons))
     base_document = _read_base(policy, source_model)
     edit = _edit_for(proposal)
     candidate = _apply_or_refuse(edit, base_document)
@@ -96,6 +100,19 @@ def _checked_proposal(fields: dict[str, Any]) -> MeasureProposal:
     if missing:
         raise CandidateRefusedError((f"the draft has no {', '.join(missing)}",))
     return proposal
+
+
+def _form_reasons(proposal: MeasureProposal) -> list[str]:
+    """Refuse shapes that no production measure in the example models has.
+
+    Dots and '#' are allowed: production names use them (for example '01.RABT_ASLY').
+    """
+    reasons: list[str] = []
+    if any(character in proposal.measure_name for character in FORBIDDEN_NAME_CHARACTERS):
+        reasons.append("measure name must not contain '[' or ']'")
+    if proposal.expression.lstrip().startswith("="):
+        reasons.append("expression must not start with '=' (write the DAX formula only)")
+    return reasons
 
 
 def _read_base(policy: PathPolicy, source_model: Path) -> BimDocument:

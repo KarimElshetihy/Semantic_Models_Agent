@@ -19,7 +19,7 @@ from urllib.error import HTTPError, URLError
 from ssas_agent.llm.config import MAX_RESPONSE_BYTES, LlmSettings
 from ssas_agent.llm.endpoint import check_endpoint
 from ssas_agent.llm.errors import LlmError
-from ssas_agent.llm.messages import ChatMessage, CompletionResult
+from ssas_agent.llm.messages import ChatMessage, CompletionResult, ReplyFormat
 
 CHAT_PATH = "/chat/completions"
 
@@ -44,8 +44,12 @@ class OpenAICompatibleClient:
         self._url = settings.base_url.rstrip("/") + CHAT_PATH
         self._opener = opener or urllib.request.build_opener(_NoEnvironmentProxy(), _RefuseRedirects)
 
-    def complete(self, messages: Sequence[ChatMessage]) -> CompletionResult:
-        body = json.dumps(self._payload(messages), ensure_ascii=False).encode("utf-8")
+    def complete(
+        self,
+        messages: Sequence[ChatMessage],
+        reply_format: ReplyFormat = ReplyFormat.TEXT,
+    ) -> CompletionResult:
+        body = json.dumps(self._payload(messages, reply_format), ensure_ascii=False).encode("utf-8")
         started = time.monotonic()
         raw = self._post(body)
         elapsed = time.monotonic() - started
@@ -59,13 +63,16 @@ class OpenAICompatibleClient:
             elapsed_seconds=round(elapsed, 3),
         )
 
-    def _payload(self, messages: Sequence[ChatMessage]) -> dict[str, Any]:
-        return {
+    def _payload(self, messages: Sequence[ChatMessage], reply_format: ReplyFormat) -> dict[str, Any]:
+        payload: dict[str, Any] = {
             "model": self._settings.model,
             "messages": [{"role": message.role.value, "content": message.content} for message in messages],
             "temperature": self._settings.temperature,
             "stream": False,
         }
+        if reply_format is ReplyFormat.JSON_OBJECT:
+            payload["response_format"] = {"type": ReplyFormat.JSON_OBJECT.value}
+        return payload
 
     def _headers(self) -> dict[str, str]:
         headers = {"Content-Type": "application/json", "Accept": "application/json"}

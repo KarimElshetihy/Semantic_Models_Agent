@@ -9,7 +9,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from ssas_agent.llm.errors import LlmError
-from ssas_agent.llm.messages import ChatMessage, CompletionResult
+from ssas_agent.llm.messages import ChatMessage, CompletionResult, ReplyFormat
 
 SCRIPTED_HOST = "mock"
 
@@ -19,9 +19,15 @@ class ScriptedLlmClient:
         self._replies = list(replies)
         self._model = model
         self.calls: list[tuple[ChatMessage, ...]] = []
+        self.reply_formats: list[ReplyFormat] = []
 
-    def complete(self, messages: Sequence[ChatMessage]) -> CompletionResult:
+    def complete(
+        self,
+        messages: Sequence[ChatMessage],
+        reply_format: ReplyFormat = ReplyFormat.TEXT,
+    ) -> CompletionResult:
         self.calls.append(tuple(messages))
+        self.reply_formats.append(reply_format)
         if not self._replies:
             raise LlmError("scripted client has no reply left")
         text = self._replies.pop(0)
