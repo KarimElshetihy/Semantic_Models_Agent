@@ -130,7 +130,7 @@ These affect the steps listed above. Recommendations are marked.
 | `tests/unit/test_llm_endpoint.py` (16 tests) | Loopback allowed; network host refused unless allowlisted; https allowed; plain http refused unless the switch is on; credentials, schemes and missing host refused | PASS |
 | `tests/unit/test_llm_openai_client.py` (16 tests, MOCKED SERVER) | Request shape, bearer header, reply parsing, HTTP errors, timeout, unreachable endpoint, redirect refused, oversized reply, proxy ignored. Uses a local fake server, not a model. | PASS |
 | `tests/unit/test_llm_structured_output.py` (15 tests, MOCKED CLIENT) | One JSON object only, fenced block, typed fields, boolean is not an integer, refused reply recorded without its text | PASS |
-| `tests/integration/test_llm_live.py` (1 test, LIVE) | One prompt to the configured endpoint; runs only when `SSAS_AGENT_LLM_BASE_URL` and `SSAS_AGENT_LLM_MODEL` are set | NOT_RUN |
+| `tests/integration/test_llm_live.py` (2 tests, LIVE) | One plain prompt, and one structured reply (up to 3 attempts), to the configured endpoint. Runs when settings are complete (environment or `.env`); NOT_RUN otherwise. | PASS on 27 Nov 2026 against local Ollama, model `qwen2.5:0.5b` (connectivity test only) |
 | Steps 5–10 | Not written yet | NOT_RUN |
 
 Mocked tests are labeled as mocked. The live test contacts the configured endpoint only when its environment variables are set. No Phase 1 test contacts SSAS or Oracle.
@@ -150,6 +150,7 @@ Mocked tests are labeled as mocked. The live test contacts the configured endpoi
 | Plain http to a network host requires an explicit switch, default off (design choice, to confirm) | Agent, 27 Nov 2026 |
 | Policy allows reading the root `.env` file only (exact file, never written) | Agent, 27 Nov 2026; policy change, to confirm |
 | Fixed choices in code use enums | User, 27 Nov 2026 |
+| Local test server: Ollama on this machine with the small model `qwen2.5:0.5b`, for connectivity tests only; the final model is still not chosen | User, 27 Nov 2026 (install approved); model choice Agent, to confirm |
 | Runtime uses the standard library only; pytest 8.4.2 is the only test dependency, pinned in `requirements.txt`; project venv in `.venv` (git-ignored) | Agent, 27 Nov 2026; to confirm |
 | Approved changes written to workspace only; no policy change | User, 27 Nov 2026 |
 | Dependencies: report "not checked" in Phase 1; full graph in Phase 2 | User, 27 Nov 2026 |
