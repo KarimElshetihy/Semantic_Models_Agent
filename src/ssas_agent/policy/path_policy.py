@@ -14,6 +14,8 @@ from typing import Any
 PROTECTED_FOLDERS = ("example_models", "tests/fixtures")
 READABLE_FOLDERS = ("example_models", "tests/fixtures", "workspaces", "artifacts")
 WRITABLE_FOLDERS = ("workspaces", "artifacts")
+# Exact files at the project root that may be read (never written). Only the local settings file.
+READABLE_FILES = (".env",)
 
 
 class Operation(Enum):
@@ -65,10 +67,15 @@ class PathPolicy:
         return PolicyDecision(True, f"write allowed in '{folder}'", resolved)
 
     def _decide_read(self, resolved: Path) -> PolicyDecision:
+        if self._is_readable_file(resolved):
+            return PolicyDecision(True, "read allowed for a project settings file", resolved)
         folder = self._matching_folder(resolved, READABLE_FOLDERS)
         if folder is None:
             return self._deny("read is outside the allowed folders", resolved)
         return PolicyDecision(True, f"read allowed in '{folder}'", resolved)
+
+    def _is_readable_file(self, resolved: Path) -> bool:
+        return any(resolved == self._root / file_name for file_name in READABLE_FILES)
 
     def _matching_folder(self, resolved: Path, folder_names: tuple[str, ...]) -> str | None:
         for folder_name in folder_names:

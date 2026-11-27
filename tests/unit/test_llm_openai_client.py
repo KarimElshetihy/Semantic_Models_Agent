@@ -14,12 +14,12 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
 
-from ssas_agent.llm import ChatMessage, EndpointNotAllowedError, LlmError, LlmSettings
+from ssas_agent.llm import ChatMessage, ChatRole, EndpointNotAllowedError, LlmError, LlmSettings
 from ssas_agent.llm.config import LOOPBACK_HOSTS, MAX_RESPONSE_BYTES
 from ssas_agent.llm.openai_compatible import OpenAICompatibleClient
 
 MODEL_NAME = "test-model"
-MESSAGES = [ChatMessage("system", "be brief"), ChatMessage("user", "hi")]
+MESSAGES = [ChatMessage(ChatRole.SYSTEM, "be brief"), ChatMessage(ChatRole.USER, "hi")]
 
 
 def make_reply(text: str, served_model: str = "served-name") -> bytes:
@@ -76,6 +76,7 @@ def make_settings(base_url, **overrides) -> LlmSettings:
         allowed_hosts=LOOPBACK_HOSTS,
         timeout_seconds=5.0,
         temperature=0.0,
+        allow_insecure_http=False,
         api_key=None,
     )
     return replace(settings, **overrides)

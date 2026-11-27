@@ -2,6 +2,7 @@
 
 from ssas_agent.policy.path_policy import (
     PROTECTED_FOLDERS,
+    READABLE_FILES,
     READABLE_FOLDERS,
     WRITABLE_FOLDERS,
     Operation,
@@ -12,6 +13,7 @@ from ssas_agent.policy.path_policy import (
 
 __all__ = [
     "PROTECTED_FOLDERS",
+    "READABLE_FILES",
     "READABLE_FOLDERS",
     "WRITABLE_FOLDERS",
     "Operation",

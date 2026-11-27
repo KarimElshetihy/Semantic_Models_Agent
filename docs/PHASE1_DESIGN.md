@@ -33,7 +33,7 @@ Each step has its own tests. A step is done only when its tests pass and the ful
 | 2 | Static checks on a Model.bim: names, duplicates, relationships, DAX references, empty expressions. Each finding has evidence and a suggested fix. Unreadable DAX is listed as not checked, never passed. (AC-03, CORE-03, FR-02) | none | **DONE:** code in `src/ssas_agent/validation/`, 61 tests (19 in `test_dax_scanner.py`, 42 in `test_static_checks.py`). Full suite: 328 PASS, 1 skipped (symlink). |
 | 3 | Staging: copy the base model into `workspaces/{run_id}/Model.bim`, write the candidate to `workspaces/{run_id}/candidate.bim`, write `diff.json`, `diff.txt`, `run.json` and `events.jsonl` to `artifacts/{run_id}/`, then submit the proposal (stops at PROPOSED). Raw models never go into `artifacts/`, because the recorder redacts text and would not redact a model copy. (CORE-12, FR-12) | none | **DONE:** code in `src/ssas_agent/staging/`, 22 tests when built, 24 now with the category tests in `tests/unit/test_staging.py`. |
 | 4 | Version comparison with breaking-change classification (ENG-06): semantic diff, a category for each change, and the text diff in one comparison. Staging writes the categories to `diff.json` and `run.json`. | none (rule from section 3 used as proposed) | **DONE:** code in `src/ssas_agent/diff/classify.py` and `compare.py`, 31 tests in `tests/unit/test_breaking_changes.py`, staging updated (24 tests). Full suite: 383 PASS, 1 skipped (symlink). |
-| 3a | LLM client layer (section 3a): one client interface, OpenAI-compatible implementation with endpoint policy, redirect refusal, bounded reply and timeout, structured reply check, mock client for tests. | none (endpoint localhost only, decision 1a open) | **DONE:** code in `src/ssas_agent/llm/`, 61 unit tests plus 1 live test (NOT_RUN unless env variables are set). Full suite: 444 PASS, 2 skipped (live test, symlink). |
+| 3a | LLM client layer (section 3a): one client interface, OpenAI-compatible implementation with endpoint policy (local, network https, or network http behind a switch), `.env` reader, redirect refusal, bounded reply and timeout, structured reply check, mock client for tests. | none (server location still open, decision 1a) | **DONE:** code in `src/ssas_agent/llm/`, 92 unit tests, 9 policy tests, plus 1 live test (NOT_RUN unless settings are complete). Full suite: 484 PASS, 2 skipped (live test, symlink). |
 | 5 | Knowledge retrieval with provenance: index a `knowledge/` folder of approved standards and examples, return matches with source file and hash. Retrieved text is data, never instructions. (CORE-10, FR-11) | decision 4 | not started |
 | 6 | Requirements assistant: turn a request into a written specification with explicit "missing definitions" list. (BIZ-01 phase 1 part) | decision 1 | not started |
 | 7 | DAX and SQL generation through a provider-independent interface. Candidates pass through static checks and approval before any write. (CORE-04, CORE-05, FR-04, FR-05) | decision 1, decision 2 | not started |
@@ -73,7 +73,14 @@ Each step has its own tests. A step is done only when its tests pass and the ful
 
 ## 3a. LLM layer (client built; decided 27 Nov 2026)
 
-**Client layer status:** implemented in `src/ssas_agent/llm/`: settings (`config.py`), endpoint policy (`endpoint.py`), the client interface (`client.py`), the OpenAI-compatible client (`openai_compatible.py`), the structured reply check (`structured.py`), and the scripted mock client for tests (`scripted.py`). Safety measures in the client: the endpoint is checked when the client is created; redirects are refused; environment proxy variables are ignored (a proxy would receive prompts outside the endpoint policy); the reply size is capped at 1 MB; requests have a timeout; the API key is sent only as a bearer header and is hidden from `repr` and from error messages.
+**Client layer status:** implemented in `src/ssas_agent/llm/`: settings (`config.py`), the `.env` reader (`env_file.py`), endpoint policy (`endpoint.py`), the client interface (`client.py`), the OpenAI-compatible client (`openai_compatible.py`), the structured reply check (`structured.py`), and the scripted mock client for tests (`scripted.py`). Fixed choices are enums: `ChatRole`, `UrlScheme`, `EndpointKind`, `LlmSetting` (setting names), `SwitchValue`, `StructuredEvent`. Safety measures in the client: the endpoint is checked when the client is created; redirects are refused; environment proxy variables are ignored (a proxy would receive prompts outside the endpoint policy); the reply size is capped at 1 MB; requests have a timeout; the API key is sent only as a bearer header and is hidden from `repr` and from error messages.
+
+**Endpoint location (decided 27 Nov 2026, location still unknown):** the agent accepts three cases, and the choice is made by configuration, not code:
+- `local`: loopback (`localhost`, `127.x.x.x`, `::1`) over http or https. Allowed by default.
+- `network_https`: a host listed in `SSAS_AGENT_LLM_ALLOWED_HOSTS`, over https. Preferred for a network server.
+- `network_http`: a listed host over plain http. Allowed only when `SSAS_AGENT_LLM_ALLOW_INSECURE_HTTP=true`. This switch is a design choice of mine (default off), because prompts carry model metadata. Confirm or change it.
+
+**Settings sources (decided 27 Nov 2026):** real environment variables, then the project's `.env` file, then defaults. `.env` is read only through the path policy. The policy allows reading exactly one root file, `.env` (`READABLE_FILES`), and never writing it. `.env.example` is committed with placeholders; `.env` is git-ignored. Malformed `.env` lines are refused with a line number and key name, never the value.
 
 The agent is LLM-driven. The LLM proposes plans, DAX, SQL and candidate edits. Deterministic code validates, enforces policy and applies changes only through approval.
 
@@ -90,7 +97,7 @@ The agent is LLM-driven. The LLM proposes plans, DAX, SQL and candidate edits. D
 These affect the steps listed above. Recommendations are marked.
 
 1. **LLM provider.** *Answered:* a local LLM behind an OpenAI-compatible API (section 3a). Still open:
-   - 1a. Where the endpoint runs: on this machine (localhost only), or on a server in your network (then its address is added to the allowlist)?
+   - 1a. *Partly answered 27 Nov 2026:* the location is not known yet; the code supports local, network https, and network http (see section 3a). Still open: the server address and its scheme, once your colleague confirms them. They go in `.env`, not in code.
    - 1b. The model itself is not needed now. It is chosen later through configuration.
 2. **Where approved changes are written.** Options:
    - a. Workspace only. You copy the approved file into your Visual Studio project yourself. *(Recommended: no policy change.)*
@@ -117,8 +124,10 @@ These affect the steps listed above. Recommendations are marked.
 | `tests/unit/test_static_checks.py` (42 tests) | Each rule with a planted defect; clean model; case-insensitive names; the four fixtures (HISTORICAL shows the known `Add Column2` finding only) | PASS |
 | `tests/unit/test_staging.py` (24 tests) | Staging writes, hash binding, review files, refused inputs write nothing, approve, apply and verify after staging, tampered candidate refused, categories in review files | PASS |
 | `tests/unit/test_breaking_changes.py` (31 tests) | Each category rule on synthetic changes; real edits to a fixture (expression, added measure, rename, data type, removed relationship, description); payload holds no expression text | PASS |
-| `tests/unit/test_llm_config.py` (16 tests) | Required and optional settings, defaults, blank values, API key hidden from `repr`, number ranges | PASS |
-| `tests/unit/test_llm_endpoint.py` (14 tests) | Loopback allowed; remote refused unless allowlisted and https; credentials, schemes and missing host refused | PASS |
+| `tests/unit/test_llm_config.py` (22 tests) | Required and optional settings, defaults, blank values, API key hidden from `repr`, number and on/off switch ranges | PASS |
+| `tests/unit/test_llm_env_file.py` (23 tests) | `.env` format (comments, `export`, quotes, inline comments, BOM, CRLF), line-numbered errors that never show values, duplicate keys, reads through the policy, environment overrides file | PASS |
+| `tests/unit/test_policy_settings_file.py` (9 tests) | Only the root `.env` is readable; never writable; lookalike names and other root files stay denied | PASS |
+| `tests/unit/test_llm_endpoint.py` (16 tests) | Loopback allowed; network host refused unless allowlisted; https allowed; plain http refused unless the switch is on; credentials, schemes and missing host refused | PASS |
 | `tests/unit/test_llm_openai_client.py` (16 tests, MOCKED SERVER) | Request shape, bearer header, reply parsing, HTTP errors, timeout, unreachable endpoint, redirect refused, oversized reply, proxy ignored. Uses a local fake server, not a model. | PASS |
 | `tests/unit/test_llm_structured_output.py` (15 tests, MOCKED CLIENT) | One JSON object only, fenced block, typed fields, boolean is not an integer, refused reply recorded without its text | PASS |
 | `tests/integration/test_llm_live.py` (1 test, LIVE) | One prompt to the configured endpoint; runs only when `SSAS_AGENT_LLM_BASE_URL` and `SSAS_AGENT_LLM_MODEL` are set | NOT_RUN |
@@ -136,6 +145,11 @@ Mocked tests are labeled as mocked. The live test contacts the configured endpoi
 | Fixture content review in progress | User, 26 Nov 2026 |
 | LLM is local, behind an OpenAI-compatible API; model not chosen; structure first, try many models later | User, 27 Nov 2026 |
 | LLM endpoint location not decided: build with localhost on the allowlist, add others later | User, 27 Nov 2026 |
+| Endpoint location unknown: support local, network https, or network http; the choice is configuration | User, 27 Nov 2026 |
+| Settings from a `.env` file (reader needed, with `.env.example`); environment variables override the file | User, 27 Nov 2026 |
+| Plain http to a network host requires an explicit switch, default off (design choice, to confirm) | Agent, 27 Nov 2026 |
+| Policy allows reading the root `.env` file only (exact file, never written) | Agent, 27 Nov 2026; policy change, to confirm |
+| Fixed choices in code use enums | User, 27 Nov 2026 |
 | Approved changes written to workspace only; no policy change | User, 27 Nov 2026 |
 | Dependencies: report "not checked" in Phase 1; full graph in Phase 2 | User, 27 Nov 2026 |
 | Knowledge source: a `knowledge/` folder in the repo, filled by the user | User, 27 Nov 2026 |

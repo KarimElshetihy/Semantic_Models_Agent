@@ -5,12 +5,12 @@ import json
 import pytest
 
 from ssas_agent.audit import RunRecorder
-from ssas_agent.llm import ChatMessage, LlmError, ScriptedLlmClient, StructuredOutputError
+from ssas_agent.llm import ChatMessage, ChatRole, LlmError, ScriptedLlmClient, StructuredOutputError
+from ssas_agent.llm.structured import StructuredEvent, ask_structured, check_fields, parse_object
 from ssas_agent.policy import PathPolicy
-from ssas_agent.llm.structured import REFUSED_EVENT, ask_structured, check_fields, parse_object
 
 SCHEMA = {"name": str, "count": int}
-MESSAGES = [ChatMessage("user", "give me a name and a count")]
+MESSAGES = [ChatMessage(ChatRole.USER, "give me a name and a count")]
 SECRET_REPLY = "SECRET_REPLY_TEXT"
 
 
@@ -78,7 +78,7 @@ def test_refused_reply_is_recorded_without_the_reply_text(tmp_path):
 
     events_text = (tmp_path / "artifacts" / "run-refused" / "events.jsonl").read_text(encoding="utf-8")
     events = [json.loads(line) for line in events_text.splitlines()]
-    refused = [event for event in events if event.get("event") == REFUSED_EVENT]
+    refused = [event for event in events if event.get("event") == StructuredEvent.REPLY_REFUSED]
     assert len(refused) == 1
     assert "missing field 'count'" in refused[0]["reason"]
     assert SECRET_REPLY not in events_text

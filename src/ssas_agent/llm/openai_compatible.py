@@ -38,7 +38,8 @@ class _RefuseRedirects(urllib.request.HTTPRedirectHandler):
 
 class OpenAICompatibleClient:
     def __init__(self, settings: LlmSettings, opener: urllib.request.OpenerDirector | None = None) -> None:
-        self._host = check_endpoint(settings.base_url, settings.allowed_hosts)
+        decision = check_endpoint(settings.base_url, settings.allowed_hosts, settings.allow_insecure_http)
+        self._host = decision.host
         self._settings = settings
         self._url = settings.base_url.rstrip("/") + CHAT_PATH
         self._opener = opener or urllib.request.build_opener(_NoEnvironmentProxy(), _RefuseRedirects)
@@ -61,7 +62,7 @@ class OpenAICompatibleClient:
     def _payload(self, messages: Sequence[ChatMessage]) -> dict[str, Any]:
         return {
             "model": self._settings.model,
-            "messages": [{"role": message.role, "content": message.content} for message in messages],
+            "messages": [{"role": message.role.value, "content": message.content} for message in messages],
             "temperature": self._settings.temperature,
             "stream": False,
         }

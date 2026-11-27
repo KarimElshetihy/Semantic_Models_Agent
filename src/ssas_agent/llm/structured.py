@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import re
 from collections.abc import Mapping, Sequence
+from enum import StrEnum
 from typing import Any
 
 from ssas_agent.audit import RunRecorder
@@ -17,8 +18,11 @@ from ssas_agent.llm.client import LlmClient
 from ssas_agent.llm.errors import LlmError
 from ssas_agent.llm.messages import ChatMessage
 
-REFUSED_EVENT = "llm_reply_refused"
 _SINGLE_FENCE = re.compile(r"\A```(?:(?i:json))?[ \t]*\r?\n(.*?)\r?\n?```\Z", re.DOTALL)
+
+
+class StructuredEvent(StrEnum):
+    REPLY_REFUSED = "llm_reply_refused"
 
 
 class StructuredOutputError(LlmError):
@@ -63,7 +67,7 @@ def ask_structured(
     except StructuredOutputError as error:
         if recorder is not None:
             recorder.append_event(
-                REFUSED_EVENT,
+                StructuredEvent.REPLY_REFUSED,
                 {"reason": str(error), "model": result.model, "response_characters": result.response_characters},
             )
         raise
