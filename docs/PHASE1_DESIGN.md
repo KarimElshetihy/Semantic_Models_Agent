@@ -1,8 +1,8 @@
 # Phase 1 Design (Draft)
 
-**Status:** DRAFT. Step 1 is implemented and tested. The other steps wait for the decisions in section 4.
+**Status:** DRAFT. Steps 1–4 and the LLM client layer (section 3a) are implemented and tested. Steps 5–10 wait for the decisions in section 4.
 **Scope:** Phase 1 (AI Engineering Assistant, MVP) from `requirements.md` section 12, plus the features it lists in sections 15 to 20.
-**Offline only:** no LLM calls, no SSAS connection, no Oracle connection, no writes to `example_models/` or `tests/fixtures/`.
+**Offline by default:** tests make no LLM calls (the one live test runs only when its environment variables are set), no SSAS connection, no Oracle connection, no writes to `example_models/` or `tests/fixtures/`.
 **Spec file:** `requirements.md` is unchanged and is the reference for comparison. Known differences are listed in section 5.
 
 ## 1. Goal and exit gate
@@ -33,6 +33,7 @@ Each step has its own tests. A step is done only when its tests pass and the ful
 | 2 | Static checks on a Model.bim: names, duplicates, relationships, DAX references, empty expressions. Each finding has evidence and a suggested fix. Unreadable DAX is listed as not checked, never passed. (AC-03, CORE-03, FR-02) | none | **DONE:** code in `src/ssas_agent/validation/`, 61 tests (19 in `test_dax_scanner.py`, 42 in `test_static_checks.py`). Full suite: 328 PASS, 1 skipped (symlink). |
 | 3 | Staging: copy the base model into `workspaces/{run_id}/Model.bim`, write the candidate to `workspaces/{run_id}/candidate.bim`, write `diff.json`, `diff.txt`, `run.json` and `events.jsonl` to `artifacts/{run_id}/`, then submit the proposal (stops at PROPOSED). Raw models never go into `artifacts/`, because the recorder redacts text and would not redact a model copy. (CORE-12, FR-12) | none | **DONE:** code in `src/ssas_agent/staging/`, 22 tests when built, 24 now with the category tests in `tests/unit/test_staging.py`. |
 | 4 | Version comparison with breaking-change classification (ENG-06): semantic diff, a category for each change, and the text diff in one comparison. Staging writes the categories to `diff.json` and `run.json`. | none (rule from section 3 used as proposed) | **DONE:** code in `src/ssas_agent/diff/classify.py` and `compare.py`, 31 tests in `tests/unit/test_breaking_changes.py`, staging updated (24 tests). Full suite: 383 PASS, 1 skipped (symlink). |
+| 3a | LLM client layer (section 3a): one client interface, OpenAI-compatible implementation with endpoint policy, redirect refusal, bounded reply and timeout, structured reply check, mock client for tests. | none (endpoint localhost only, decision 1a open) | **DONE:** code in `src/ssas_agent/llm/`, 61 unit tests plus 1 live test (NOT_RUN unless env variables are set). Full suite: 444 PASS, 2 skipped (live test, symlink). |
 | 5 | Knowledge retrieval with provenance: index a `knowledge/` folder of approved standards and examples, return matches with source file and hash. Retrieved text is data, never instructions. (CORE-10, FR-11) | decision 4 | not started |
 | 6 | Requirements assistant: turn a request into a written specification with explicit "missing definitions" list. (BIZ-01 phase 1 part) | decision 1 | not started |
 | 7 | DAX and SQL generation through a provider-independent interface. Candidates pass through static checks and approval before any write. (CORE-04, CORE-05, FR-04, FR-05) | decision 1, decision 2 | not started |
@@ -70,7 +71,9 @@ Each step has its own tests. A step is done only when its tests pass and the ful
   Rules: names are compared ignoring case, as DAX and SSAS do. Unreadable DAX (unterminated strings or comments, unbalanced brackets, escaped `]]`) is listed under "not checked". Partitions (Power Query) and role filter expressions are listed under "not checked" in every report where they exist. Rule IDs are stable; a rule change gets a new ID.
 - **Edit storage (step 1, done):** an expression keeps its original form. A string stays a string, and a list of lines stays a list. A new multi-line expression is stored as a list, as Visual Studio does.
 
-## 3a. LLM layer (planned structure, decided 27 Nov 2026)
+## 3a. LLM layer (client built; decided 27 Nov 2026)
+
+**Client layer status:** implemented in `src/ssas_agent/llm/`: settings (`config.py`), endpoint policy (`endpoint.py`), the client interface (`client.py`), the OpenAI-compatible client (`openai_compatible.py`), the structured reply check (`structured.py`), and the scripted mock client for tests (`scripted.py`). Safety measures in the client: the endpoint is checked when the client is created; redirects are refused; environment proxy variables are ignored (a proxy would receive prompts outside the endpoint policy); the reply size is capped at 1 MB; requests have a timeout; the API key is sent only as a bearer header and is hidden from `repr` and from error messages.
 
 The agent is LLM-driven. The LLM proposes plans, DAX, SQL and candidate edits. Deterministic code validates, enforces policy and applies changes only through approval.
 
@@ -114,9 +117,14 @@ These affect the steps listed above. Recommendations are marked.
 | `tests/unit/test_static_checks.py` (42 tests) | Each rule with a planted defect; clean model; case-insensitive names; the four fixtures (HISTORICAL shows the known `Add Column2` finding only) | PASS |
 | `tests/unit/test_staging.py` (24 tests) | Staging writes, hash binding, review files, refused inputs write nothing, approve, apply and verify after staging, tampered candidate refused, categories in review files | PASS |
 | `tests/unit/test_breaking_changes.py` (31 tests) | Each category rule on synthetic changes; real edits to a fixture (expression, added measure, rename, data type, removed relationship, description); payload holds no expression text | PASS |
+| `tests/unit/test_llm_config.py` (16 tests) | Required and optional settings, defaults, blank values, API key hidden from `repr`, number ranges | PASS |
+| `tests/unit/test_llm_endpoint.py` (14 tests) | Loopback allowed; remote refused unless allowlisted and https; credentials, schemes and missing host refused | PASS |
+| `tests/unit/test_llm_openai_client.py` (16 tests, MOCKED SERVER) | Request shape, bearer header, reply parsing, HTTP errors, timeout, unreachable endpoint, redirect refused, oversized reply, proxy ignored. Uses a local fake server, not a model. | PASS |
+| `tests/unit/test_llm_structured_output.py` (15 tests, MOCKED CLIENT) | One JSON object only, fenced block, typed fields, boolean is not an integer, refused reply recorded without its text | PASS |
+| `tests/integration/test_llm_live.py` (1 test, LIVE) | One prompt to the configured endpoint; runs only when `SSAS_AGENT_LLM_BASE_URL` and `SSAS_AGENT_LLM_MODEL` are set | NOT_RUN |
 | Steps 5–10 | Not written yet | NOT_RUN |
 
-Mocked tests are labeled as mocked when they exist. No Phase 1 test contacts SSAS, Oracle or an LLM.
+Mocked tests are labeled as mocked. The live test contacts the configured endpoint only when its environment variables are set. No Phase 1 test contacts SSAS or Oracle.
 
 ## 7. Decision log
 
