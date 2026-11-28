@@ -1,0 +1,1557 @@
+{
+  "name": "SemanticModel",
+  "compatibilityLevel": 1500,
+  "model": {
+    "culture": "en-US",
+    "dataSources": [
+      {
+        "type": "structured",
+        "name": "Oracle/oracle-host:1521/oracle_service",
+        "connectionDetails": {
+          "protocol": "oracle",
+          "address": {
+            "server": "oracle-host:1521/oracle_service"
+          },
+          "authentication": null,
+          "query": null
+        },
+        "options": {
+          "hierarchicalNavigation": true
+        },
+        "credential": {
+          "AuthenticationKind": "UsernamePassword",
+          "kind": "Oracle",
+          "path": "oracle-host:1521/oracle_service",
+          "Username": "oracle_user"
+        }
+      }
+    ],
+    "tables": [
+      {
+        "name": "TRX",
+        "columns": [
+          {
+            "name": "SETTLEMENT_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "SETTLEMENT_DATE"
+          },
+          {
+            "name": "BUSINESS_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "BUSINESS_DATE"
+          },
+          {
+            "name": "CHANNEL_ID",
+            "dataType": "double",
+            "sourceColumn": "CHANNEL_ID"
+          },
+          {
+            "name": "FE_ID",
+            "dataType": "double",
+            "sourceColumn": "FE_ID"
+          },
+          {
+            "name": "TRX_COUNT",
+            "dataType": "double",
+            "sourceColumn": "TRX_COUNT"
+          },
+          {
+            "name": "AMOUNT",
+            "dataType": "double",
+            "sourceColumn": "AMOUNT"
+          },
+          {
+            "name": "SERVICE_CODE",
+            "dataType": "string",
+            "sourceColumn": "SERVICE_CODE"
+          },
+          {
+            "name": "GOVERNORATE_NAME",
+            "dataType": "string",
+            "sourceColumn": "GOVERNORATE_NAME"
+          },
+          {
+            "name": "ACCOUNT_TYPE",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_TYPE"
+          },
+          {
+            "name": "BUDGET_CATEGORY",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY"
+          },
+          {
+            "name": "IS_COMMERCIAL",
+            "dataType": "double",
+            "sourceColumn": "IS_COMMERCIAL"
+          },
+          {
+            "name": "UNIT_CODE",
+            "dataType": "string",
+            "sourceColumn": "UNIT_CODE"
+          },
+          {
+            "name": "SOURCE_SYSTEM",
+            "dataType": "string",
+            "sourceColumn": "SOURCE_SYSTEM"
+          },
+          {
+            "name": "IS_INTEGRATED",
+            "dataType": "double",
+            "sourceColumn": "IS_INTEGRATED"
+          },
+          {
+            "type": "calculated",
+            "name": "DATE_KEY",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(TRX[SETTLEMENT_DATE], \"YYYYMMDD\")"
+          },
+          {
+            "name": "GOVERNORATE_NAME_EN",
+            "dataType": "string",
+            "sourceColumn": "GOVERNORATE_NAME_EN"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "2026",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "select * from reta_trx_agg",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>let",
+                  "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                  "",
+                  "WITH pos_gov AS (",
+                  "    SELECT DISTINCT",
+                  "        tblinistitution_id,",
+                  "        ins.inistitcode,",
+                  "        ins.inistitname,",
+                  "        bra.inistitbarchcode,",
+                  "        inistitbarchname,",
+                  "        inistitbarchnamearb,",
+                  "        bra.accno,",
+                  "        zone_code,",
+                  "        name zone,",
+                  "        CASE",
+                  "            WHEN zon.name LIKE '%القاهرة%'",
+                  "                 OR zon.name LIKE '%القاهره%'",
+                  "                 OR zon.name LIKE '%شمال القاهرة%'",
+                  "                 OR zon.name LIKE '%شمال القاهره%'",
+                  "                 OR zon.name LIKE '%جنوب القاهرة%'",
+                  "                 OR zon.name LIKE '%جنوب القاهره%'",
+                  "                 OR zon.name LIKE '%شرق القاهرة%'",
+                  "                 OR zon.name LIKE '%شرق القاهره%'",
+                  "                 OR zon.name LIKE '%وسط القاهرة%'",
+                  "                 OR zon.name LIKE '%وسط القاهره%'",
+                  "                 OR zon.name LIKE '%حلوان%'",
+                  "                 OR zon.name LIKE '%مصر القديمة%'",
+                  "                 OR zon.name LIKE '%العاشر من رمضان%' THEN",
+                  "                'القاهرة'",
+                  "            WHEN zon.name LIKE '%الجيزة%'",
+                  "                 OR zon.name LIKE '%شمال الجيزة%' THEN",
+                  "                'الجيزة'",
+                  "            WHEN zon.name LIKE '%الاسكندرية%'",
+                  "                 OR zon.name LIKE '%الإسكندرية%'",
+                  "                 OR zon.name LIKE '%شرق الاسكندرية%'",
+                  "                 OR zon.name LIKE '%غرب الاسكندرية%' THEN",
+                  "                'الإسكندرية'",
+                  "            WHEN zon.name LIKE '%القليوبية%'",
+                  "                 OR zon.name LIKE '%القليوبيه%'",
+                  "                 OR zon.name LIKE '%بنها%' THEN",
+                  "                'القليوبية'",
+                  "            WHEN zon.name LIKE '%الدقهلية%'",
+                  "                 OR zon.name LIKE '%الدقهليه%'",
+                  "                 OR zon.name LIKE '%المنصورة%'",
+                  "                 OR zon.name LIKE '%المنصوره%' THEN",
+                  "                'الدقهلية'",
+                  "            WHEN zon.name LIKE '%الغربية%'",
+                  "                 OR zon.name LIKE '%الغربيه%' THEN",
+                  "                'الغربية'",
+                  "            WHEN zon.name LIKE '%المنوفية%'",
+                  "                 OR zon.name LIKE '%المنوفيه%'",
+                  "                 OR zon.name LIKE '%شبين الكوم%' THEN",
+                  "                'المنوفية'",
+                  "            WHEN zon.name LIKE '%البحيرة%'",
+                  "                 OR zon.name LIKE '%دمنهور%' THEN",
+                  "                'البحيرة'",
+                  "            WHEN zon.name LIKE '%كفر الشيخ%' THEN",
+                  "                'كفر الشيخ'",
+                  "            WHEN zon.name LIKE '%دمياط%' THEN",
+                  "                'دمياط'",
+                  "            WHEN zon.name LIKE '%بورسعيد%'",
+                  "                 OR zon.name LIKE '%بور سعيد%' THEN",
+                  "                'بورسعيد'",
+                  "            WHEN zon.name LIKE '%الإسماعيلية%'",
+                  "                 OR zon.name LIKE '%الاسماعيلية%'",
+                  "                 OR zon.name LIKE '%الاسماعيليه%' THEN",
+                  "                'الإسماعيلية'",
+                  "            WHEN zon.name LIKE '%السويس%' THEN",
+                  "                'السويس'",
+                  "            WHEN zon.name LIKE '%شمال سيناء%' THEN",
+                  "                'شمال سيناء'",
+                  "            WHEN zon.name LIKE '%جنوب سيناء%' THEN",
+                  "                'جنوب سيناء'",
+                  "            WHEN zon.name LIKE '%الفيوم%' THEN",
+                  "                'الفيوم'",
+                  "            WHEN zon.name LIKE '%بني سويف%'",
+                  "                 OR zon.name LIKE '%بنى سويف%' THEN",
+                  "                'بني سويف'",
+                  "            WHEN zon.name LIKE '%المنيا%' THEN",
+                  "                'المنيا'",
+                  "            WHEN zon.name LIKE '%أسيوط%'",
+                  "                 OR zon.name LIKE '%اسيوط%' THEN",
+                  "                'أسيوط'",
+                  "            WHEN zon.name LIKE '%سوهاج%' THEN",
+                  "                'سوهاج'",
+                  "            WHEN zon.name LIKE '%قنا%' THEN",
+                  "                'قنا'",
+                  "            WHEN zon.name LIKE '%الأقصر%'",
+                  "                 OR zon.name LIKE '%الاقصر%' THEN",
+                  "                'الأقصر'",
+                  "            WHEN zon.name LIKE '%أسوان%'",
+                  "                 OR zon.name LIKE '%اسوان%' THEN",
+                  "                'أسوان'",
+                  "            WHEN zon.name LIKE '%البحر الأحمر%'",
+                  "                 OR zon.name LIKE '%البحر الاحمر%' THEN",
+                  "                'البحر الأحمر'",
+                  "            WHEN zon.name LIKE '%الوادى الجديد%'",
+                  "                 OR zon.name LIKE '%الوادى الجديد%'",
+                  "                 OR zon.name LIKE '%الوادي الجديد%' THEN",
+                  "                'الوادي الجديد'",
+                  "            WHEN zon.name LIKE '%مطروح%'",
+                  "                 OR zon.name LIKE '%مرسى مطروح%' THEN",
+                  "                'مطروح'",
+                  "            WHEN zon.name LIKE '%الشرقية%' THEN",
+                  "                'الشرقية'",
+                  "            ELSE",
+                  "                'الديوان العام'",
+                  "        END  governorate_name",
+                  "    FROM",
+                  "        sts_tblinistitution ins",
+                  "        LEFT JOIN sts_tblinistbranchs bra ON bra.inistitcode = ins.inistitcode",
+                  "        LEFT JOIN sts_zone            zon ON bra.zonecode = zon.zone_code",
+                  "    WHERE",
+                  "        bra.inistitcode = '94'",
+                  "), epay_gov AS (",
+                  "    SELECT",
+                  "        rb.id          biller_id,",
+                  "        rb.ar_name     biller_name,",
+                  "        rb.id          sub_biller_id,",
+                  "        rp.name        service_name,",
+                  "        rp.code        acc_off_dtl_id,",
+                  "        rp.rc_acc_name sub_service,",
+                  "        CASE",
+                  "            WHEN rp.rc_acc_name LIKE '%القاهرة%' THEN",
+                  "                'القاهرة'",
+                  "            WHEN rp.rc_acc_name LIKE '%الجيزة%' THEN",
+                  "                'الجيزة'",
+                  "            WHEN rp.rc_acc_name LIKE '%الإسكندرية%'",
+                  "                 OR rp.rc_acc_name LIKE '%الاسكندرية%' THEN",
+                  "                'الإسكندرية'",
+                  "            WHEN rp.rc_acc_name LIKE '%القليوبية%' THEN",
+                  "                'القليوبية'",
+                  "            WHEN rp.rc_acc_name LIKE '%الدقهلية%' THEN",
+                  "                'الدقهلية'",
+                  "            WHEN rp.rc_acc_name LIKE '%الشرقية%' THEN",
+                  "                'الشرقية'",
+                  "            WHEN rp.rc_acc_name LIKE '%الغربية%' THEN",
+                  "                'الغربية'",
+                  "            WHEN rp.rc_acc_name LIKE '%المنوفية%' THEN",
+                  "                'المنوفية'",
+                  "            WHEN rp.rc_acc_name LIKE '%البحيرة%' THEN",
+                  "                'البحيرة'",
+                  "            WHEN rp.rc_acc_name LIKE '%كفر الشيخ%' THEN",
+                  "                'كفر الشيخ'",
+                  "            WHEN rp.rc_acc_name LIKE '%دمياط%' THEN",
+                  "                'دمياط'",
+                  "            WHEN rp.rc_acc_name LIKE '%بورسعيد%'",
+                  "                 OR rp.rc_acc_name LIKE '%بور سعيد%' THEN",
+                  "                'بورسعيد'",
+                  "            WHEN rp.rc_acc_name LIKE '%الإسماعيلية%'",
+                  "                 OR rp.rc_acc_name LIKE '%الاسماعيلية%' THEN",
+                  "                'الإسماعيلية'",
+                  "            WHEN rp.rc_acc_name LIKE '%السويس%' THEN",
+                  "                'السويس'",
+                  "            WHEN rp.rc_acc_name LIKE '%شمال سيناء%' THEN",
+                  "                'شمال سيناء'",
+                  "            WHEN rp.rc_acc_name LIKE '%جنوب سيناء%' THEN",
+                  "                'جنوب سيناء'",
+                  "            WHEN rp.rc_acc_name LIKE '%الفيوم%' THEN",
+                  "                'الفيوم'",
+                  "            WHEN rp.rc_acc_name LIKE '%بني سويف%'",
+                  "                 OR rp.rc_acc_name LIKE '%بنى سويف%' THEN",
+                  "                'بني سويف'",
+                  "            WHEN rp.rc_acc_name LIKE '%المنيا%' THEN",
+                  "                'المنيا'",
+                  "            WHEN rp.rc_acc_name LIKE '%أسيوط%'",
+                  "                 OR rp.rc_acc_name LIKE '%اسيوط%' THEN",
+                  "                'أسيوط'",
+                  "            WHEN rp.rc_acc_name LIKE '%سوهاج%' THEN",
+                  "                'سوهاج'",
+                  "            WHEN rp.rc_acc_name LIKE '%قنا%' THEN",
+                  "                'قنا'",
+                  "            WHEN rp.rc_acc_name LIKE '%الأقصر%'",
+                  "                 OR rp.rc_acc_name LIKE '%الاقصر%' THEN",
+                  "                'الأقصر'",
+                  "            WHEN rp.rc_acc_name LIKE '%أسوان%'",
+                  "                 OR rp.rc_acc_name LIKE '%اسوان%' THEN",
+                  "                'أسوان'",
+                  "            WHEN rp.rc_acc_name LIKE '%البحر الأحمر%'",
+                  "                 OR rp.rc_acc_name LIKE '%البحر الاحمر%' THEN",
+                  "                'البحر الأحمر'",
+                  "            WHEN rp.rc_acc_name LIKE '%الوادي الجديد%'",
+                  "                 OR rp.rc_acc_name LIKE '%الوادى الجديد%' THEN",
+                  "                'الوادي الجديد'",
+                  "            WHEN rp.rc_acc_name LIKE '%مطروح%' THEN",
+                  "                'مطروح'",
+                  "            ELSE",
+                  "                'الديوان العام'",
+                  "        END            AS governorate_name",
+                  "    FROM",
+                  "        reporting_biller                rb",
+                  "        LEFT JOIN reporting_settlement_account_rp rp ON rb.id = rp.biller_id",
+                  "    WHERE",
+                  "        rb.id = '42008'",
+                  "), trx AS (",
+                  "    SELECT",
+                  "        a.settlement_date                             AS settlement_date,",
+                  "        a.business_date,",
+                  "        a.channel_id,",
+                  "        a.fe_id,",
+                  "        COUNT(DISTINCT a.epay_txn_no)                 trx_count,",
+                  "        SUM(sd.amt)                                   AS amount,",
+                  "        'EP-'",
+                  "        || a.sp_id",
+                  "        || '-'",
+                  "        || sd.acc_off_dtl_id                          service_code,",
+                  "        gov.governorate_name,",
+                  "        coalesce(ent.account_type, u'COMM')           account_type,",
+                  "        coalesce(to_char(ent.budget_category), '000') budget_category,",
+                  "        coalesce(ent.is_commercial, 0)                is_commercial,",
+                  "        coalesce(to_char(ent.unit_code), '00000000')  unit_code,",
+                  "        'EPAY'                                        source_system,",
+                  "        1                                             is_integrated",
+                  "    FROM",
+                  "             epaysettm.epay_transaction a",
+                  "        INNER JOIN oracle_user.txn_settlement_dtl sd ON a.epay_txn_no = sd.epay_txn_no",
+                  "                                                      AND sd.entity_id = a.sp_id",
+                  "        LEFT JOIN mdm_lkp_ent_accounts         ent ON sd.entity_id = ent.entity_id",
+                  "                                              AND sd.acc_off_dtl_id = ent.acc_off_dtl_id",
+                  "                                              AND sd.rc_account_no = ent.rc_acc_no",
+                  "        LEFT JOIN epay_gov                     gov ON sd.acc_off_dtl_id = gov.acc_off_dtl_id",
+                  "    WHERE",
+                  "        a.settlement_date BETWEEN '01-JAN-2026' AND trunc(sysdate)",
+                  "        AND a.sp_id = 42008",
+                  "        AND a.channel_id <> 3",
+                  "        AND sd.amt_sign = 'C'",
+                  "    GROUP BY",
+                  "        a.sp_id,",
+                  "        a.settlement_date,",
+                  "        a.business_date,",
+                  "        a.channel_id,",
+                  "        a.fe_id,",
+                  "        sd.acc_off_dtl_id,",
+                  "        ent.account_type,",
+                  "        ent.budget_category,",
+                  "        ent.is_commercial,",
+                  "        ent.unit_code,",
+                  "        gov.governorate_name",
+                  "--------------------------------------------------------------------------------",
+                  "    UNION ALL",
+                  "--------------------------------------------------------------------------------  ",
+                  "    SELECT",
+                  "        a.settlement_date                                     AS settlement_date,",
+                  "        a.business_date,",
+                  "        a.channel_id,",
+                  "        a.fe_id,",
+                  "        COUNT(DISTINCT a.epay_txn_no)                         trx_count,",
+                  "        SUM(sd.amt)                                           AS amount,",
+                  "        'EP-'",
+                  "        || a.sp_id",
+                  "        || '-'",
+                  "        || sd.acc_off_dtl_id                                  service_code,",
+                  "        'الديوان العام'                                       governorate_name,",
+                  "        coalesce(ent.account_type, n'COMM')                   account_type,",
+                  "        coalesce(to_char(substr(ent.rc_acc_no, 1, 3)), '301') budget_category,",
+                  "        coalesce(ent.is_commercial, 0)                        is_commercial,",
+                  "        coalesce(substr(a.billing_account, 1, 8), '00000000') unit_code,",
+                  "        'EPAY'                                                source_system,",
+                  "        1                                                     is_integrated",
+                  "    FROM",
+                  "             epaysettm.epay_transaction a",
+                  "        INNER JOIN oracle_user.txn_settlement_dtl sd ON a.epay_txn_no = sd.epay_txn_no",
+                  "                                                      AND sd.entity_id = a.sp_id",
+                  "        LEFT JOIN mdm_lkp_ent_accounts         ent ON a.sp_id = ent.entity_id",
+                  "                                              AND sd.acc_off_dtl_id = ent.acc_off_dtl_id",
+                  "                                              AND sd.rc_account_no = ent.rc_acc_no",
+                  "    WHERE",
+                  "        a.sp_id IN (",
+                  "            SELECT DISTINCT",
+                  "                sp_id",
+                  "            FROM",
+                  "                mdm_lkp_service_hierarchy",
+                  "            WHERE",
+                  "                unit_code = '00000001'",
+                  "        )",
+                  "        AND substr(a.billing_account, 1, 6) = '106005'",
+                  "        AND a.settlement_date BETWEEN '01-JAN-2026' AND trunc(sysdate)",
+                  "        AND sd.amt_sign = 'C'",
+                  "    GROUP BY",
+                  "        a.sp_id,",
+                  "        a.settlement_date,",
+                  "        a.business_date,",
+                  "        a.channel_id,",
+                  "        a.fe_id,",
+                  "        sd.acc_off_dtl_id,",
+                  "        ent.account_type,",
+                  "        substr(ent.rc_acc_no, 1, 3),",
+                  "        ent.is_commercial,",
+                  "        substr(a.billing_account, 1, 8)      ",
+                  "--------------------------------------------------------------------------------",
+                  "    UNION ALL",
+                  "--------------------------------------------------------------------------------   ",
+                  "    SELECT",
+                  "        s.cbe_date                                    AS settlement_date,",
+                  "        a.business_date,",
+                  "        a.channel_id,",
+                  "        a.fe_id,",
+                  "        COUNT(DISTINCT a.epay_txn_no)                 trx_count,",
+                  "        SUM(",
+                  "            CASE",
+                  "                WHEN length(sd.rc_account_no) = 10",
+                  "                     AND s.setldate < DATE '2026-11-01' THEN",
+                  "                    sd.amt * 0.99479",
+                  "                ELSE",
+                  "                    sd.amt",
+                  "            END",
+                  "        )                                             AS amount,",
+                  "        'EP-'",
+                  "        || sd.entity_id",
+                  "        || '-'",
+                  "        || sd.acc_off_dtl_id                          service_code,",
+                  "        gov.governorate_name,",
+                  "        coalesce(ent.account_type, u'COMM')           account_type,",
+                  "        coalesce(to_char(ent.budget_category), '000') budget_category,",
+                  "        coalesce(ent.is_commercial, 0)                is_commercial,",
+                  "        coalesce(to_char(ent.unit_code), '00000000')  unit_code,",
+                  "        'GOV'                                         source_system,",
+                  "        1                                             is_integrated",
+                  "    FROM",
+                  "             sts_tblhistorylog_bk s",
+                  "        INNER JOIN epaysettm.epay_transaction   a ON a.epay_txn_no = regexp_substr(s.acqcurr, '[^|]+', 1, 2)",
+                  "                                                   AND a.sp_id = 42008",
+                  "        INNER JOIN oracle_user.txn_settlement_dtl sd ON regexp_substr(s.acqcurr, '[^|]+', 1, 2) = sd.epay_txn_no",
+                  "                                                      AND sd.entity_id = 42008",
+                  "        LEFT JOIN mdm_lkp_ent_accounts         ent ON sd.entity_id = ent.entity_id",
+                  "                                              AND sd.acc_off_dtl_id = ent.acc_off_dtl_id",
+                  "                                              AND sd.rc_account_no = ent.rc_acc_no",
+                  "        LEFT JOIN epay_gov                     gov ON sd.acc_off_dtl_id = gov.acc_off_dtl_id",
+                  "    WHERE",
+                  "        s.cbe_date BETWEEN '01-JAN-2026' AND trunc(sysdate)",
+                  "            --AND sp.sp_id = 42008",
+                  "            --AND a.channel_id = 3",
+                  "        AND s.trnsorc = '94'",
+                  "        AND s.networkcode IN ( '42', '43', '10' )",
+                  "        AND s.inistituion_id = '67'",
+                  "        AND instr(s.acqcurr, '-') = 0",
+                  "        AND s.actioncod IN ( '0', '112' )",
+                  "        AND sd.amt_sign = 'C'",
+                  "    GROUP BY",
+                  "        sd.entity_id,",
+                  "        s.cbe_date,",
+                  "        a.business_date,",
+                  "        a.channel_id,",
+                  "        a.fe_id,",
+                  "        sd.acc_off_dtl_id,",
+                  "        ent.account_type,",
+                  "        ent.budget_category,",
+                  "        ent.is_commercial,",
+                  "        ent.unit_code,",
+                  "        gov.governorate_name",
+                  "--------------------------------------------------------------------------------",
+                  "    UNION ALL",
+                  "--------------------------------------------------------------------------------        ",
+                  "    SELECT",
+                  "        bk.cbe_date,",
+                  "        bk.setldate      AS business_date,",
+                  "        3                channel_id,",
+                  "        2096             fe_id,",
+                  "        COUNT(bk.id)     cnt,",
+                  "        SUM(bk.setlamnt) amount,",
+                  "        'MER-' || bk.merid,",
+                  "        gov.governorate_name,",
+                  "        u'TSA'           account_type,",
+                  "        cb.code          budget_category,",
+                  "        0                is_commercial,",
+                  "        bra.accno        unit_code,",
+                  "        'GOV'            source_system,",
+                  "        0                is_integrated",
+                  "    FROM",
+                  "        sts_tblhistorylog_bk bk",
+                  "        LEFT JOIN sts_tblinistbranchs  bra ON bk.merid = bra.inistitbarchcode",
+                  "        LEFT JOIN sts_zone             zon ON bra.zonecode = zon.zone_code",
+                  "                                  AND bra.inistitcode = zon.pen_typ",
+                  "        LEFT JOIN pos_gov              gov ON zon.zone_code = gov.zone_code",
+                  "                                 AND zon.tblinistitution_id = gov.tblinistitution_id",
+                  "                                 AND gov.inistitbarchcode = bra.inistitbarchcode",
+                  "        LEFT JOIN sts_cbe_lookup       cb ON substr(bk.acqcurr, 1, 3) = cb.settlement_budget_code",
+                  "    WHERE",
+                  "        cbe_date BETWEEN '01-JAN-2026' AND trunc(sysdate)",
+                  "        AND trnsorc IN ( '94' )",
+                  "        AND instr(acqcurr, '-') <> 0",
+                  "        AND networkcode IN ( '42', '43', '10' )",
+                  "    GROUP BY",
+                  "        cbe_date,",
+                  "        bk.setldate,",
+                  "        cb.code,",
+                  "        bra.accno,",
+                  "        bk.merid,",
+                  "        gov.governorate_name",
+                  ")",
+                  "SELECT /*+ PARALLEL(4) */",
+                  "    *",
+                  "FROM",
+                  "    trx",
+                  "",
+                  "\")",
+                  "in",
+                  "    Source</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "measures": [
+          {
+            "name": "_TRX_COUNT_DETAILED",
+            "expression": " SUM(TRX[TRX_COUNT])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "_TRX_AMOUNT",
+            "expression": "SUM ( 'TRX'[AMOUNT] ) + 0",
+            "formatString": "#,0.00"
+          }
+        ]
+      },
+      {
+        "name": "LKP_FE",
+        "columns": [
+          {
+            "name": "ENT_ID",
+            "dataType": "string",
+            "sourceColumn": "ENT_ID"
+          },
+          {
+            "name": "ENT_CODE",
+            "dataType": "string",
+            "sourceColumn": "ENT_CODE"
+          },
+          {
+            "name": "ENT_NAME_AR",
+            "dataType": "string",
+            "sourceColumn": "ENT_NAME_AR"
+          },
+          {
+            "name": "ENT_NAME_EN",
+            "dataType": "string",
+            "sourceColumn": "ENT_NAME_EN"
+          },
+          {
+            "name": "ENT_UNIFIED_ID",
+            "dataType": "string",
+            "sourceColumn": "ENT_UNIFIED_ID"
+          },
+          {
+            "name": "ENT_UNIFIED_NAME",
+            "dataType": "string",
+            "sourceColumn": "ENT_UNIFIED_NAME"
+          },
+          {
+            "name": "COLLECTION_ENT_ID",
+            "dataType": "string",
+            "sourceColumn": "COLLECTION_ENT_ID"
+          },
+          {
+            "name": "COLLECTION_ENT_CODE",
+            "dataType": "string",
+            "sourceColumn": "COLLECTION_ENT_CODE"
+          },
+          {
+            "name": "COLLECTION_UNIFIED_ID",
+            "dataType": "string",
+            "sourceColumn": "COLLECTION_UNIFIED_ID"
+          },
+          {
+            "name": "COLLECTION_UNIFIED_NAME",
+            "dataType": "string",
+            "sourceColumn": "COLLECTION_UNIFIED_NAME"
+          },
+          {
+            "name": "SOURCE",
+            "dataType": "string",
+            "sourceColumn": "SOURCE"
+          },
+          {
+            "name": "IS_MAIN_BANK",
+            "dataType": "int64",
+            "sourceColumn": "IS_MAIN_BANK"
+          },
+          {
+            "name": "NOT_EPAY",
+            "dataType": "int64",
+            "sourceColumn": "NOT_EPAY"
+          },
+          {
+            "name": "IS_GPS",
+            "dataType": "int64",
+            "sourceColumn": "IS_GPS"
+          },
+          {
+            "name": "IS_TSA",
+            "dataType": "int64",
+            "sourceColumn": "IS_TSA"
+          },
+          {
+            "name": "IS_CPS",
+            "dataType": "int64",
+            "sourceColumn": "IS_CPS"
+          },
+          {
+            "name": "IS_PFO",
+            "dataType": "int64",
+            "sourceColumn": "IS_PFO"
+          },
+          {
+            "name": "ACCEPT_PAYROLL",
+            "dataType": "int64",
+            "sourceColumn": "ACCEPT_PAYROLL"
+          },
+          {
+            "name": "ACCEPT_PENSION",
+            "dataType": "int64",
+            "sourceColumn": "ACCEPT_PENSION"
+          },
+          {
+            "name": "CARD_ISSUING",
+            "dataType": "int64",
+            "sourceColumn": "CARD_ISSUING"
+          },
+          {
+            "name": "TYPE_ID",
+            "dataType": "int64",
+            "sourceColumn": "TYPE_ID"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    mdm_lkp_fulfillment_entity",
+                "WHERE",
+                "    not_epay = 0",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_CHANNEL",
+        "columns": [
+          {
+            "name": "CHANNEL_ID",
+            "dataType": "double",
+            "sourceColumn": "CHANNEL_ID"
+          },
+          {
+            "name": "CHANNEL_ENG_NAME",
+            "dataType": "string",
+            "sourceColumn": "CHANNEL_ENG_NAME"
+          },
+          {
+            "name": "CHANNEL_ARB_NAME",
+            "dataType": "string",
+            "sourceColumn": "CHANNEL_ARB_NAME"
+          },
+          {
+            "name": "SOURCE",
+            "dataType": "string",
+            "sourceColumn": "SOURCE"
+          },
+          {
+            "name": "TYPE",
+            "dataType": "string",
+            "sourceColumn": "TYPE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    channel",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_SERVICE",
+        "columns": [
+          {
+            "name": "SERVICE_CODE",
+            "dataType": "string",
+            "sourceColumn": "SERVICE_CODE"
+          },
+          {
+            "name": "SP_ID",
+            "dataType": "string",
+            "sourceColumn": "SP_ID"
+          },
+          {
+            "name": "SOURCE_SYSTEM",
+            "dataType": "string",
+            "sourceColumn": "SOURCE_SYSTEM"
+          },
+          {
+            "name": "SP_NAME",
+            "dataType": "string",
+            "sourceColumn": "SP_NAME"
+          },
+          {
+            "name": "SERVICE_NAME",
+            "dataType": "string",
+            "sourceColumn": "SERVICE_NAME"
+          },
+          {
+            "name": "ACC_OFF_DTL_ID",
+            "dataType": "string",
+            "sourceColumn": "ACC_OFF_DTL_ID"
+          },
+          {
+            "name": "SUB_SERVICE",
+            "dataType": "string",
+            "sourceColumn": "SUB_SERVICE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "WITH epay_gov AS (",
+                "    SELECT",
+                "        rb.id          biller_id,",
+                "        rb.ar_name     biller_name,",
+                "        rb.id          sub_biller_id,",
+                "        rp.name        service_name,",
+                "        rp.code        acc_off_dtl_id,",
+                "        rp.rc_acc_name sub_service,",
+                "        CASE",
+                "            WHEN rp.rc_acc_name LIKE '%القاهرة%' THEN",
+                "                'القاهرة'",
+                "            WHEN rp.rc_acc_name LIKE '%الجيزة%' THEN",
+                "                'الجيزة'",
+                "            WHEN rp.rc_acc_name LIKE '%الإسكندرية%'",
+                "                 OR rp.rc_acc_name LIKE '%الاسكندرية%' THEN",
+                "                'الإسكندرية'",
+                "            WHEN rp.rc_acc_name LIKE '%القليوبية%' THEN",
+                "                'القليوبية'",
+                "            WHEN rp.rc_acc_name LIKE '%الدقهلية%' THEN",
+                "                'الدقهلية'",
+                "            WHEN rp.rc_acc_name LIKE '%الشرقية%' THEN",
+                "                'الشرقية'",
+                "            WHEN rp.rc_acc_name LIKE '%الغربية%' THEN",
+                "                'الغربية'",
+                "            WHEN rp.rc_acc_name LIKE '%المنوفية%' THEN",
+                "                'المنوفية'",
+                "            WHEN rp.rc_acc_name LIKE '%البحيرة%' THEN",
+                "                'البحيرة'",
+                "            WHEN rp.rc_acc_name LIKE '%كفر الشيخ%' THEN",
+                "                'كفر الشيخ'",
+                "            WHEN rp.rc_acc_name LIKE '%دمياط%' THEN",
+                "                'دمياط'",
+                "            WHEN rp.rc_acc_name LIKE '%بورسعيد%'",
+                "                 OR rp.rc_acc_name LIKE '%بور سعيد%' THEN",
+                "                'بورسعيد'",
+                "            WHEN rp.rc_acc_name LIKE '%الإسماعيلية%'",
+                "                 OR rp.rc_acc_name LIKE '%الاسماعيلية%' THEN",
+                "                'الإسماعيلية'",
+                "            WHEN rp.rc_acc_name LIKE '%السويس%' THEN",
+                "                'السويس'",
+                "            WHEN rp.rc_acc_name LIKE '%شمال سيناء%' THEN",
+                "                'شمال سيناء'",
+                "            WHEN rp.rc_acc_name LIKE '%جنوب سيناء%' THEN",
+                "                'جنوب سيناء'",
+                "            WHEN rp.rc_acc_name LIKE '%الفيوم%' THEN",
+                "                'الفيوم'",
+                "            WHEN rp.rc_acc_name LIKE '%بني سويف%'",
+                "                 OR rp.rc_acc_name LIKE '%بنى سويف%' THEN",
+                "                'بني سويف'",
+                "            WHEN rp.rc_acc_name LIKE '%المنيا%' THEN",
+                "                'المنيا'",
+                "            WHEN rp.rc_acc_name LIKE '%أسيوط%'",
+                "                 OR rp.rc_acc_name LIKE '%اسيوط%' THEN",
+                "                'أسيوط'",
+                "            WHEN rp.rc_acc_name LIKE '%سوهاج%' THEN",
+                "                'سوهاج'",
+                "            WHEN rp.rc_acc_name LIKE '%قنا%' THEN",
+                "                'قنا'",
+                "            WHEN rp.rc_acc_name LIKE '%الأقصر%'",
+                "                 OR rp.rc_acc_name LIKE '%الاقصر%' THEN",
+                "                'الأقصر'",
+                "            WHEN rp.rc_acc_name LIKE '%أسوان%'",
+                "                 OR rp.rc_acc_name LIKE '%اسوان%' THEN",
+                "                'أسوان'",
+                "            WHEN rp.rc_acc_name LIKE '%البحر الأحمر%'",
+                "                 OR rp.rc_acc_name LIKE '%البحر الاحمر%' THEN",
+                "                'البحر الأحمر'",
+                "            WHEN rp.rc_acc_name LIKE '%الوادي الجديد%'",
+                "                 OR rp.rc_acc_name LIKE '%الوادى الجديد%' THEN",
+                "                'الوادي الجديد'",
+                "            WHEN rp.rc_acc_name LIKE '%مطروح%' THEN",
+                "                'مطروح'",
+                "            ELSE",
+                "                'الديوان العام'",
+                "        END            AS governorate_name",
+                "    FROM",
+                "        reporting_biller                rb",
+                "        LEFT JOIN reporting_settlement_account_rp rp ON rb.id = rp.biller_id",
+                "    WHERE",
+                "        rb.id = '42008'",
+                ")",
+                "SELECT DISTINCT",
+                "    sh.sp_id,",
+                "    sh.unified_name                                sp_name,",
+                "    coalesce(ep.service_name, sh.unified_name)  service_name,",
+                "    sh.service_code,",
+                "    coalesce(to_char(ep.acc_off_dtl_id),regexp_substr(sh.service_code, '[^-]+$', 1, 1))acc_off_dtl_id,",
+                "    coalesce(ep.sub_service, sh.service_name_ar)sub_service,",
+                "--    coalesce(ep.governorate_name, 'الديوان العام') governorate_name,",
+                "--    sh.unit_code,",
+                "    sh.source_system",
+                "FROM",
+                "    mdm_lkp_service_hierarchy sh",
+                "    LEFT JOIN epay_gov                  ep ON regexp_substr(sh.service_code, '[^-]+$', 1, 1) = ep.acc_off_dtl_id",
+                "",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_ACCOUNTING_UNITS",
+        "columns": [
+          {
+            "name": "UNIT_CODE",
+            "dataType": "string",
+            "sourceColumn": "UNIT_CODE"
+          },
+          {
+            "name": "UNIT_NAME",
+            "dataType": "string",
+            "sourceColumn": "UNIT_NAME"
+          },
+          {
+            "name": "AREA_CODE",
+            "dataType": "string",
+            "sourceColumn": "AREA_CODE"
+          },
+          {
+            "name": "AREA_NAME",
+            "dataType": "string",
+            "sourceColumn": "AREA_NAME"
+          },
+          {
+            "name": "INSTITUTION_CODE",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTION_CODE"
+          },
+          {
+            "name": "INSTITUTION_NAME",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTION_NAME"
+          },
+          {
+            "name": "MINISTRY_CODE",
+            "dataType": "string",
+            "sourceColumn": "MINISTRY_CODE"
+          },
+          {
+            "name": "MINISTRY",
+            "dataType": "string",
+            "sourceColumn": "MINISTRY"
+          },
+          {
+            "name": "INSTITUTIONAL_SECTOR_CODE",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTIONAL_SECTOR_CODE"
+          },
+          {
+            "name": "INSTITUTIONAL_SECTOR_NAME",
+            "dataType": "string",
+            "sourceColumn": "INSTITUTIONAL_SECTOR_NAME"
+          },
+          {
+            "name": "FUNCTIONAL_SECTOR_ID",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_SECTOR_ID"
+          },
+          {
+            "name": "FUNCTIONAL_SECTOR",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_SECTOR"
+          },
+          {
+            "name": "FUNCTIONAL_CHILD_ID",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_CHILD_ID"
+          },
+          {
+            "name": "FUNCTIONAL_CHILD",
+            "dataType": "string",
+            "sourceColumn": "FUNCTIONAL_CHILD"
+          },
+          {
+            "name": "UNIT_TYPE",
+            "dataType": "string",
+            "sourceColumn": "UNIT_TYPE"
+          },
+          {
+            "name": "GOVERNORATE_ID",
+            "dataType": "double",
+            "sourceColumn": "GOVERNORATE_ID"
+          },
+          {
+            "name": "IS_ACTIVE",
+            "dataType": "double",
+            "sourceColumn": "IS_ACTIVE"
+          },
+          {
+            "name": "UNIT_TSA_ID",
+            "dataType": "string",
+            "sourceColumn": "UNIT_TSA_ID"
+          },
+          {
+            "name": "UNIT_GPS_ID",
+            "dataType": "string",
+            "sourceColumn": "UNIT_GPS_ID"
+          },
+          {
+            "name": "EFFECTIVE_DATE_FROM",
+            "dataType": "dateTime",
+            "sourceColumn": "EFFECTIVE_DATE_FROM"
+          },
+          {
+            "name": "EFFECTIVE_DATE_TO",
+            "dataType": "dateTime",
+            "sourceColumn": "EFFECTIVE_DATE_TO"
+          },
+          {
+            "name": "SOURCE",
+            "dataType": "string",
+            "sourceColumn": "SOURCE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "",
+                "SELECT",
+                "    unit_code,",
+                "    unit_name,",
+                "    area_code,",
+                "    area_name,",
+                "    institution_code,",
+                "    institution_name,",
+                "    ministry_code,",
+                "    ministry,",
+                "    institutional_sector_code,",
+                "    institutional_sector_name,",
+                "    functional_sector_id,",
+                "    functional_sector,",
+                "    functional_child_id,",
+                "    functional_child,",
+                "    unit_type,",
+                "    governorate_id,",
+                "    is_active,",
+                "    unit_tsa_id,",
+                "    unit_gps_id,",
+                "    effective_date_from,",
+                "    effective_date_to,",
+                "    source",
+                "FROM",
+                "    mdm_lkp_accounting_units",
+                "UNION ALL",
+                "SELECT",
+                "    '00000000'                    AS unit_code,",
+                "    'حساب بنك مركزي'               AS unit_name,",
+                "    NULL                           AS area_code,",
+                "    'حساب بنك مركزي'               AS area_name,",
+                "    NULL                           AS institution_code,",
+                "    'حساب بنك مركزي'               AS institution_name,",
+                "    NULL                           AS ministry_code,",
+                "    'حساب بنك مركزي'               AS ministry,",
+                "    NULL                           AS institutional_sector_code,",
+                "    'حساب بنك مركزي'               AS institutional_sector_name,",
+                "    NULL                           AS functional_sector_id,",
+                "    'حساب بنك مركزي'               AS functional_sector,",
+                "    NULL                           AS functional_child_id,",
+                "    'حساب بنك مركزي'               AS functional_child,",
+                "    'حساب بنك مركزي'               AS unit_type,",
+                "    NULL                           AS governorate_id,",
+                "    1                              AS is_active,",
+                "    NULL                           AS unit_tsa_id,",
+                "    NULL                           AS unit_gps_id,",
+                "    to_date('01-JAN-2020')                  AS effective_date_from,",
+                "    add_months(trunc(sysdate), 12) AS effective_date_to,",
+                "    NULL                           AS source",
+                "FROM",
+                "    dual",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LKP_BUDGET_CATEGORY",
+        "columns": [
+          {
+            "name": "TSA_BUDGET_CATEGORY_CODE",
+            "dataType": "string",
+            "sourceColumn": "TSA_BUDGET_CATEGORY_CODE"
+          },
+          {
+            "name": "GFMIS_BUDGET_CATEGORY_CODE",
+            "dataType": "string",
+            "sourceColumn": "GFMIS_BUDGET_CATEGORY_CODE"
+          },
+          {
+            "name": "SW_BUDGET_CATEGORY_CODE",
+            "dataType": "string",
+            "sourceColumn": "SW_BUDGET_CATEGORY_CODE"
+          },
+          {
+            "name": "EPAY_BUDGET_CATEGORY_CODE",
+            "dataType": "string",
+            "sourceColumn": "EPAY_BUDGET_CATEGORY_CODE"
+          },
+          {
+            "name": "CCMS_BUDGET_CATEGORY_CODE",
+            "dataType": "string",
+            "sourceColumn": "CCMS_BUDGET_CATEGORY_CODE"
+          },
+          {
+            "name": "BUDGET_CATEGORY",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY"
+          },
+          {
+            "name": "BUDGET_CATEGORY_TYPE_CODE",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_TYPE_CODE"
+          },
+          {
+            "name": "BUDGET_CATEGORY_TYPE_NAME",
+            "dataType": "string",
+            "sourceColumn": "BUDGET_CATEGORY_TYPE_NAME"
+          },
+          {
+            "name": "IN_GFMIS",
+            "dataType": "double",
+            "sourceColumn": "IN_GFMIS"
+          },
+          {
+            "name": "ACCOUNT_TYPE",
+            "dataType": "string",
+            "sourceColumn": "ACCOUNT_TYPE"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "SELECT",
+                "    b.*,",
+                "    'كود مؤسسي' account_type",
+                "FROM",
+                "    mdm_lkp_budget_category b",
+                "UNION ALL",
+                "SELECT",
+                "    '000'            AS tsa_budget_category_code,",
+                "    NULL             AS gfmis_budget_category_code,",
+                "    NULL             AS sw_budget_category_code,",
+                "    '000'            AS epay_budget_category_code,",
+                "    NULL             AS ccms_budget_category_code,",
+                "    'حساب بنك مركزي' AS budget_category,",
+                "    NULL             AS budget_category_type_code,",
+                "    NULL             AS budget_category_type_name,",
+                "    NULL             AS in_gfmis,",
+                "    'حساب بنك مركزي' AS account_type",
+                "FROM",
+                "    dual",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DIM_DATE",
+        "dataCategory": "Time",
+        "columns": [
+          {
+            "name": "calendar_date",
+            "dataType": "dateTime",
+            "isKey": true,
+            "sourceColumn": "calendar_date"
+          },
+          {
+            "name": "date_key",
+            "dataType": "string",
+            "sourceColumn": "date_key"
+          },
+          {
+            "name": "calendar_date_formatted",
+            "dataType": "string",
+            "sourceColumn": "calendar_date_formatted"
+          },
+          {
+            "name": "year",
+            "dataType": "string",
+            "sourceColumn": "year"
+          },
+          {
+            "name": "quarter",
+            "dataType": "string",
+            "sourceColumn": "quarter"
+          },
+          {
+            "name": "quarter_name",
+            "dataType": "string",
+            "sourceColumn": "quarter_name"
+          },
+          {
+            "name": "month",
+            "dataType": "int64",
+            "sourceColumn": "month"
+          },
+          {
+            "name": "month_ch",
+            "dataType": "string",
+            "sourceColumn": "month_ch"
+          },
+          {
+            "name": "month_name",
+            "dataType": "string",
+            "sourceColumn": "month_name"
+          },
+          {
+            "name": "month_short_name",
+            "dataType": "string",
+            "sourceColumn": "month_short_name"
+          },
+          {
+            "name": "month_year",
+            "dataType": "string",
+            "sourceColumn": "month_year"
+          },
+          {
+            "name": "week",
+            "dataType": "string",
+            "sourceColumn": "week"
+          },
+          {
+            "name": "day",
+            "dataType": "string",
+            "sourceColumn": "day"
+          },
+          {
+            "name": "day_name",
+            "dataType": "string",
+            "sourceColumn": "day_name"
+          },
+          {
+            "name": "day_short_name",
+            "dataType": "string",
+            "sourceColumn": "day_short_name"
+          },
+          {
+            "name": "start_of_month",
+            "dataType": "dateTime",
+            "sourceColumn": "start_of_month"
+          },
+          {
+            "name": "end_of_month",
+            "dataType": "dateTime",
+            "sourceColumn": "end_of_month"
+          },
+          {
+            "name": "start_of_quarter",
+            "dataType": "dateTime",
+            "sourceColumn": "start_of_quarter"
+          },
+          {
+            "name": "end_of_quarter",
+            "dataType": "dateTime",
+            "sourceColumn": "end_of_quarter"
+          },
+          {
+            "name": "fiscal_year",
+            "dataType": "int64",
+            "sourceColumn": "fiscal_year"
+          },
+          {
+            "name": "fiscal_year_range",
+            "dataType": "string",
+            "sourceColumn": "fiscal_year_range"
+          },
+          {
+            "name": "fiscal_month",
+            "dataType": "int64",
+            "sourceColumn": "fiscal_month"
+          },
+          {
+            "name": "last_refresh",
+            "dataType": "dateTime",
+            "sourceColumn": "last_refresh"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #date(2024, 1, 1),",
+                "    Today = Date.From(DateTime.LocalNow()),",
+                "    DateList = List.Dates(Source, Duration.Days(Today - Source) + 1, #duration(1,0,0,0)),",
+                "    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {\"calendar_date\"}),",
+                "",
+                "    // Format and enrich columns",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(DateTable,{{\"calendar_date\", type date}}),",
+                "    #\"Added date_key\" = Table.AddColumn(#\"Changed Type\", \"date_key\", each Date.ToText([calendar_date], \"yyyyMMdd\"), type text),",
+                "    #\"Added calendar_date_formatted\" = Table.AddColumn(#\"Added date_key\", \"calendar_date_formatted\", each Date.ToText([calendar_date], \"yyyy-MM-dd\"), type text),",
+                "    #\"Added year\" = Table.AddColumn(#\"Added calendar_date_formatted\", \"year\", each Date.ToText([calendar_date], \"yyyy\"), type text),",
+                "    #\"Added quarter\" = Table.AddColumn(#\"Added year\", \"quarter\", each Text.From(Date.QuarterOfYear([calendar_date])), type text),",
+                "    #\"Added quarter_name\" = Table.AddColumn(#\"Added quarter\", \"quarter_name\", each \"Q\" & Text.From(Date.QuarterOfYear([calendar_date])), type text),",
+                "    #\"Added month\" = Table.AddColumn(#\"Added quarter_name\", \"month\", each Date.Month([calendar_date]), Int64.Type),",
+                "    #\"Added month_ch\" = Table.AddColumn(#\"Added month\", \"month_ch\", each Date.ToText([calendar_date], \"MM\"), type text),",
+                "    #\"Added month_name\" = Table.AddColumn(#\"Added month_ch\", \"month_name\", each Text.Upper(Date.ToText([calendar_date], \"MMMM\")), type text),",
+                "    #\"Added month_short_name\" = Table.AddColumn(#\"Added month_name\", \"month_short_name\", each Text.Upper(Date.ToText([calendar_date], \"MMM\")), type text),",
+                "    #\"Added month_year\" = Table.AddColumn(#\"Added month_short_name\", \"month_year\", each Text.Upper(Date.ToText([calendar_date], \"MMM\")) & \"-\" & Date.ToText([calendar_date], \"yyyy\"), type text),",
+                "    #\"Added week\" = Table.AddColumn(#\"Added month_year\", \"week\", each Date.ToText([calendar_date], \"ww\"), type text),",
+                "    #\"Added day\" = Table.AddColumn(#\"Added week\", \"day\", each Date.ToText([calendar_date], \"dd\"), type text),",
+                "    #\"Added day_name\" = Table.AddColumn(#\"Added day\", \"day_name\", each Text.Upper(Date.ToText([calendar_date], \"dddd\")), type text),",
+                "    #\"Added day_short_name\" = Table.AddColumn(#\"Added day_name\", \"day_short_name\", each Text.Upper(Date.ToText([calendar_date], \"ddd\")), type text),",
+                "    #\"Added start_of_month\" = Table.AddColumn(#\"Added day_short_name\", \"start_of_month\", each Date.StartOfMonth([calendar_date]), type date),",
+                "    #\"Added end_of_month\" = Table.AddColumn(#\"Added start_of_month\", \"end_of_month\", each Date.EndOfMonth([calendar_date]), type date),",
+                "    #\"Added start_of_quarter\" = Table.AddColumn(#\"Added end_of_month\", \"start_of_quarter\", each Date.StartOfQuarter([calendar_date]), type date),",
+                "    #\"Added end_of_quarter\" = Table.AddColumn(#\"Added start_of_quarter\", \"end_of_quarter\", each Date.EndOfQuarter([calendar_date]), type date),",
+                "",
+                "    // Fiscal logic",
+                "    #\"Added fiscal_year\" = Table.AddColumn(#\"Added end_of_quarter\", \"fiscal_year\", each if Date.Month([calendar_date]) >= 7 then Date.Year([calendar_date]) + 1 else Date.Year([calendar_date]), Int64.Type),",
+                "    #\"Added fiscal_year_range\" = Table.AddColumn(#\"Added fiscal_year\", \"fiscal_year_range\", each if Date.Month([calendar_date]) >= 7 then Text.From(Date.Year([calendar_date])) & \"-\" & Text.From(Date.Year([calendar_date]) + 1) else Text.From(Date.Year([calendar_date]) - 1) & \"-\" & Text.From(Date.Year([calendar_date])), type text),",
+                "    #\"Added fiscal_month\" = Table.AddColumn(#\"Added fiscal_year_range\", \"fiscal_month\", each if Date.Month([calendar_date]) >= 7 then Date.Month([calendar_date]) - 6 else Date.Month([calendar_date]) + 6, Int64.Type),",
+                "",
+                "    // Last refresh timestamp",
+                "    #\"Added last_refresh\" = Table.AddColumn(#\"Added fiscal_month\", \"last_refresh\", each DateTime.LocalNow(), type datetime)",
+                "in",
+                "    #\"Added last_refresh\""
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "TRX_COUNT",
+        "columns": [
+          {
+            "name": "SUM(A.TRXCOUNT)",
+            "dataType": "double",
+            "sourceColumn": "SUM(A.TRXCOUNT)"
+          },
+          {
+            "name": "SETTLEMENT_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "SETTLEMENT_DATE"
+          },
+          {
+            "name": "BUSINESS_DATE",
+            "dataType": "dateTime",
+            "sourceColumn": "BUSINESS_DATE"
+          },
+          {
+            "name": "CHANNEL_ID",
+            "dataType": "double",
+            "sourceColumn": "CHANNEL_ID"
+          },
+          {
+            "name": "FE_ID",
+            "dataType": "double",
+            "sourceColumn": "FE_ID"
+          },
+          {
+            "name": "IS_INTEGRATED",
+            "dataType": "double",
+            "sourceColumn": "IS_INTEGRATED"
+          },
+          {
+            "type": "calculated",
+            "name": "DATE_KEY",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(TRX_COUNT[SETTLEMENT_DATE], \"YYYYMMDD\")"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Value.NativeQuery(#\"Oracle/oracle-host:1521/oracle_service\", \"",
+                "SELECT",
+                "    SUM(a.trxcount),",
+                "    a.settlement_date,",
+                "    a.business_date,",
+                "    a.channel_id,",
+                "    a.fe_id,",
+                "    1 is_integrated",
+                "FROM",
+                "    epaysettm.epay_trx_agg a",
+                "WHERE",
+                "        sp_id = '42008'",
+                "    AND business_date >= '01-JAN-2024'",
+                "GROUP BY",
+                "    a.settlement_date,",
+                "    a.business_date,",
+                "    a.channel_id,",
+                "    a.fe_id",
+                "--------------------------------------------------------------------------------",
+                "UNION ALL",
+                "--------------------------------------------------------------------------------",
+                "SELECT",
+                "    COUNT(DISTINCT s.id) trx_count,",
+                "    s.cbe_date           AS settlement_date,",
+                "    s.setldate,",
+                "    7                    channel_id,",
+                "    CASE",
+                "        WHEN s.networkcode IN ( '43', '42', '10' ) THEN",
+                "                CASE substr(s.terid, 1, 2)",
+                "                    WHEN '94' THEN",
+                "                        2096 -- BM",
+                "                    WHEN '87' THEN",
+                "                        2031 -- NBE",
+                "                END",
+                "    END                  fe_id,",
+                "    CASE",
+                "        WHEN instr(s.acqcurr, '-') = 0 THEN",
+                "            1",
+                "        ELSE",
+                "            0",
+                "    END                  is_integrated",
+                "FROM",
+                "    sts_tblhistorylog_bk s",
+                "WHERE",
+                "    setldate >= '01-JAN-2024'",
+                "    AND s.trnsorc = '94'",
+                "    AND s.networkcode IN ( '42', '43', '10' )",
+                "    AND s.inistituion_id = '67'",
+                "    AND s.actioncod IN ( '0', '112' )",
+                "GROUP BY",
+                "    s.cbe_date,",
+                "    s.setldate,",
+                "    CASE",
+                "        WHEN s.networkcode IN ( '43', '42', '10' ) THEN",
+                "                    CASE substr(s.terid, 1, 2)",
+                "                        WHEN '94' THEN",
+                "                            2096 -- BM",
+                "                        WHEN '87' THEN",
+                "                            2031 -- NBE",
+                "                    END",
+                "    END,",
+                "    CASE",
+                "        WHEN instr(s.acqcurr, '-') = 0 THEN",
+                "                1",
+                "        ELSE",
+                "            0",
+                "    END",
+                "",
+                "\")",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "_TRX_COUNT",
+            "expression": [
+              "",
+              "IF (",
+              "        ISFILTERED(LKP_ACCOUNTING_UNITS)",
+              "        || ISFILTERED(LKP_BUDGET_CATEGORY)",
+              "        || ISFILTERED(LKP_FE)",
+              "        || ISFILTERED(LKP_SERVICE)",
+              "        || ISFILTERED(TRX[GOVERNORATE_NAME])",
+              "        || ISFILTERED(TRX[GOVERNORATE_NAME_EN]),",
+              "    [_TRX_COUNT_DETAILED],",
+              "    [_TRX_COUNT_TOTAL]",
+              ")"
+            ],
+            "formatString": "#,0"
+          },
+          {
+            "name": "_TRX_COUNT_TOTAL",
+            "expression": " SUM(TRX_COUNT[SUM(A.TRXCOUNT)])"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "5f0da24c-2330-43b0-b424-f4b6eee41cb0",
+        "fromTable": "TRX",
+        "fromColumn": "CHANNEL_ID",
+        "toTable": "LKP_CHANNEL",
+        "toColumn": "CHANNEL_ID"
+      },
+      {
+        "name": "1094d31e-767d-4472-a84f-00e8b7050049",
+        "fromTable": "TRX",
+        "fromColumn": "SERVICE_CODE",
+        "toTable": "LKP_SERVICE",
+        "toColumn": "SERVICE_CODE"
+      },
+      {
+        "name": "5e1ab035-e9cd-4a24-86a1-3b0fcca3c3a4",
+        "fromTable": "TRX",
+        "fromColumn": "UNIT_CODE",
+        "toTable": "LKP_ACCOUNTING_UNITS",
+        "toColumn": "UNIT_CODE"
+      },
+      {
+        "name": "6bf0ad70-0c3d-436c-ba7d-a09326cfb4d3",
+        "fromTable": "TRX",
+        "fromColumn": "BUDGET_CATEGORY",
+        "toTable": "LKP_BUDGET_CATEGORY",
+        "toColumn": "EPAY_BUDGET_CATEGORY_CODE"
+      },
+      {
+        "name": "6e8e8bb9-4d88-4ec7-b17b-5586d7e7cd1e",
+        "fromTable": "TRX",
+        "fromColumn": "DATE_KEY",
+        "toTable": "DIM_DATE",
+        "toColumn": "date_key"
+      },
+      {
+        "name": "501e36a4-9c44-48d1-8b8b-176d6496a95b",
+        "fromTable": "TRX",
+        "fromColumn": "FE_ID",
+        "toTable": "LKP_FE",
+        "toColumn": "ENT_ID"
+      },
+      {
+        "name": "17fedcda-74fa-434a-b15a-c10b2624834c",
+        "fromTable": "TRX_COUNT",
+        "fromColumn": "DATE_KEY",
+        "toTable": "DIM_DATE",
+        "toColumn": "date_key"
+      },
+      {
+        "name": "45a52491-54c5-4933-b36c-ff2be1ac04a5",
+        "fromTable": "TRX_COUNT",
+        "fromColumn": "CHANNEL_ID",
+        "toTable": "LKP_CHANNEL",
+        "toColumn": "CHANNEL_ID"
+      },
+      {
+        "name": "cffb680f-6f32-4196-b7e9-affafa9660dc",
+        "fromTable": "TRX_COUNT",
+        "fromColumn": "FE_ID",
+        "toTable": "LKP_FE",
+        "toColumn": "ENT_ID"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "ClientCompatibilityLevel",
+        "value": "600"
+      }
+    ]
+  },
+  "id": "SemanticModel"
+}

@@ -5,6 +5,7 @@ from ssas_agent.delivery.apply import (
     DeliveryResult,
     apply_and_verify,
     approve_change,
+    open_workflow,
     verify_target,
 )
 
@@ -13,5 +14,6 @@ __all__ = [
     "DeliveryResult",
     "apply_and_verify",
     "approve_change",
+    "open_workflow",
     "verify_target",
 ]

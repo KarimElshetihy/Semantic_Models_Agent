@@ -12,12 +12,14 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
-from ssas_agent.approval import ApplyOutcome, ApprovalWorkflow, ProposalBinding, State
+from ssas_agent.approval import ApplyOutcome, ApprovalWorkflow, ProposalBinding, State, WorkflowStore
 from ssas_agent.approval.proposal import file_sha256
 from ssas_agent.audit import RunRecorder, validate_run_id
 from ssas_agent.bim.document import BimDocument, InvalidBimError
 from ssas_agent.policy import Operation, PathPolicy
 from ssas_agent.staging.service import ARTIFACTS_FOLDER, CANDIDATE_FILE, WORKSPACES_FOLDER
+
+WORKFLOW_DATABASE = Path(ARTIFACTS_FOLDER) / "state" / "workflow.sqlite3"
 
 
 class DeliveryEvent(StrEnum):
@@ -38,6 +40,11 @@ class DeliveryResult:
     @property
     def verified(self) -> bool:
         return self.state is State.VERIFIED
+
+
+def open_workflow(policy: PathPolicy) -> ApprovalWorkflow:
+    """The approval workflow backed by the project's single workflow database."""
+    return ApprovalWorkflow(policy, WorkflowStore(policy, WORKFLOW_DATABASE))
 
 
 def approve_change(workflow: ApprovalWorkflow, policy: PathPolicy, run_id: str, actor: str) -> ProposalBinding:

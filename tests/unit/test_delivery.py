@@ -19,8 +19,8 @@ from ssas_agent.approval import (
 )
 from ssas_agent.bim.document import sha256_hex
 from ssas_agent.cli import main
-from ssas_agent.cli.main import describe_proposal
 from ssas_agent.delivery import DeliveryEvent, apply_and_verify, approve_change, verify_target
+from ssas_agent.delivery.prompts import describe_proposal
 from ssas_agent.edit import replace_measure_expression
 from ssas_agent.policy import (
     DEFAULT_APPLY_FOLDER,
