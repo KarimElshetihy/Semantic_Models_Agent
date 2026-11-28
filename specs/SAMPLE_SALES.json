@@ -1,0 +1,55 @@
+{
+  "spec_version": 1,
+  "project_name": "SAMPLE_SALES",
+  "compatibility_level": 1500,
+  "culture": "en-US",
+  "data_source": {
+    "name": "Oracle sample",
+    "kind": "oracle",
+    "server": "<set in Visual Studio>"
+  },
+  "tables": [
+    {
+      "name": "FACT_SALES",
+      "grain": "one row per sale line",
+      "power_query": "let\n    Source = Value.NativeQuery(#\"Oracle sample\", \"select sale_id, customer_id, sale_date, amount from sample.fact_sales\", null, [EnableFolding=true])\nin\n    Source",
+      "columns": [
+        {"name": "SALE_ID", "data_type": "int64", "is_key": true},
+        {"name": "CUSTOMER_ID", "data_type": "int64"},
+        {"name": "SALE_DATE", "data_type": "dateTime"},
+        {"name": "AMOUNT", "data_type": "decimal", "source_column": "SALE_AMOUNT"}
+      ]
+    },
+    {
+      "name": "DIM_CUSTOMER",
+      "grain": "one row per customer",
+      "power_query": null,
+      "columns": [
+        {"name": "CUSTOMER_ID", "data_type": "int64", "is_key": true},
+        {"name": "CUSTOMER_NAME", "data_type": "string"}
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "from_table": "FACT_SALES",
+      "from_column": "CUSTOMER_ID",
+      "to_table": "DIM_CUSTOMER",
+      "to_column": "CUSTOMER_ID"
+    }
+  ],
+  "measures": [
+    {
+      "table": "FACT_SALES",
+      "name": "Total Sales",
+      "expression": "SUM(FACT_SALES[AMOUNT])",
+      "kpi": "Total sales"
+    },
+    {
+      "table": "FACT_SALES",
+      "name": "01.Sale Count",
+      "expression": "COUNTROWS(FACT_SALES)",
+      "kpi": "Number of sale lines"
+    }
+  ]
+}

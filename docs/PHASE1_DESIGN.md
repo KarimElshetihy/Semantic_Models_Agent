@@ -1,6 +1,6 @@
 # Phase 1 Design (Draft)
 
-**Status:** DRAFT. Steps 1–7 and the LLM client layer (section 3a) are implemented and tested. Steps 8–10 are not written yet.
+**Status:** DRAFT. Steps 1–8 and the LLM client layer (section 3a) are implemented and tested. Steps 9–10 are not written yet.
 **Scope:** Phase 1 (AI Engineering Assistant, MVP) from `requirements.md` section 12, plus the features it lists in sections 15 to 20.
 **Offline by default:** tests make no LLM calls (the one live test runs only when its environment variables are set), no SSAS connection, no Oracle connection, no writes to `example_models/` or `tests/fixtures/`.
 **Spec file:** `requirements.md` is unchanged and is the reference for comparison. Known differences are listed in section 5.
@@ -37,7 +37,8 @@ Each step has its own tests. A step is done only when its tests pass and the ful
 | 5 | Knowledge retrieval with provenance: index a `knowledge/` folder of approved standards and examples, return matches with source file and hash. Retrieved text is data, never instructions. (CORE-10, FR-11) | decision 4 (answered: `knowledge/` folder; sample files until your files arrive) | **DONE:** code in `src/ssas_agent/knowledge/`, 21 tests in `tests/unit/test_knowledge.py` (1 symlink test skipped on this machine). Full suite: 507 PASS, 2 skipped. Keyword retrieval only; no embeddings yet. |
 | 6 | Requirements assistant: a fixed template of the eight section 4 fields (business objectives, KPIs, data sources, table grain, keys, refresh, security, target SSAS version). Your entries and the model's drafts fill it; model drafts are kept only if every word is in the request. Writes artifacts/{run_id}/spec.md with the sources and a missing-definitions list. (BIZ-01 phase 1 part) | decision 1 (LLM connected) | **DONE:** code in src/ssas_agent/requirements/, 15 tests in tests/unit/test_requirements_assistant.py (mocked model). Full suite: 522 PASS, 2 skipped. A live check with the test model showed weak drafts (for example, keys placed under the wrong field); human review is required. |
 | 7 | DAX and SQL generation through a provider-independent interface. DAX: the model proposes one new measure (JSON with table, name, expression); it is checked by the static checks (new errors only, and a measure the scanner cannot read is refused), then staged for approval. SQL: text-only rule checks on an Oracle statement; the result is an artifact, never written to a project. (CORE-04, CORE-05, FR-04, FR-05) | decision 1, decision 2 | **DONE:** code in `src/ssas_agent/generation/`, 36 tests (14 in `tests/unit/test_generation_dax.py`, 22 in `tests/unit/test_generation_sql.py`), mocked model. Full suite: 558 PASS, 2 skipped. Live check with the test model: SQL draft passed the checks; the DAX draft was not valid JSON in 3 attempts, so nothing was staged. After JSON-only replies were added (see decision log), 5 of 5 replies were valid JSON, but the content was weak (`=` in the expression, a name with parentheses). Staging accepted those bad values, so the form rules were added (see decision log). Full suite now: 564 PASS, 2 skipped. |
-| 8 | New model creation from a supplied schema spec. (CORE-01, AC-01) | decision 5 | not started |
+| 8 | New model creation from a JSON spec you write (section 3b). Builds `Model.bim` and the `.smproj` project file into `workspaces/{run_id}/{project}/`, and a source mapping (KPI to measure) into `artifacts/{run_id}/mapping.json`. Refused specs and refused models write nothing. (CORE-01, AC-01) | decision 5 (answered: JSON spec, format approved 28 Nov 2026) | **DONE:** code in `src/ssas_agent/newmodel/`, 36 tests in `tests/unit/test_new_model.py`. Full suite: 600 PASS, 2 skipped (symlink tests). Not opened in Visual Studio 2019 yet; that check is yours. |
+| 8a | Offline M source reader (added 28 Nov 2026, user choice). Reads a Power Query partition's M text and lists the data source name, the Oracle schema.table references and the columns read, with its evidence. Only patterns found in the example models are understood; anything else is reported as "not understood", never guessed. No SQL parser (sqlglot not approved). No database contact. Output: a source list in `artifacts/{run_id}/`. (FR-03, FR-02; supports later connected work) | none (offline) | **PLANNED:** scope proposed here, not built. Build starts after your OK on this scope. |
 | 9 | Approved local application to the destination chosen in decision 2. (FR-10, AC-06, AC-07) | decision 2 | not started |
 | 10 | Phase 1 demonstration: a new sample model and a safe edit to an existing model, with a report. Exit gate. | steps 1–9 | not started |
 
@@ -92,6 +93,22 @@ The agent is LLM-driven. The LLM proposes plans, DAX, SQL and candidate edits. D
 - **Output contract:** the LLM returns structured output that is parsed and validated. Invalid output is refused and recorded, never applied.
 - **Target projects:** generated and edited projects are similar to the examples: SSAS 2019 Tabular, compatibility level 1500, Oracle sources, Power Query partitions, Visual Studio layout.
 
+## 3b. New model spec (step 8, format approved 28 Nov 2026)
+
+You write one JSON file per model. It describes structure only. It holds no credentials: a key that looks like a password, secret, token, username or credential is refused, and its value is never shown.
+
+- Where: `specs/` in the project root. The agent can read it and cannot write to it. This folder was added to the read policy on 28 Nov 2026 (user choice). The spec is read through the path policy (`read_spec_file`).
+- Top level: `spec_version` (1), `project_name` (letter first, then letters, digits or `_`, max 64), `compatibility_level` (1500 only), `culture` (optional, default `en-US`), `data_source`, `tables`, `relationships`, `measures`. Unknown keys are refused.
+- `data_source`: `name` (Power Query must refer to this same name, for example `#"Oracle sample"`), `kind` (`oracle` only), `server` (a placeholder such as `<set in Visual Studio>`).
+- `tables[]`: `name`, `grain` (text), `power_query` (Oracle M text, or null for no partition), `columns[]`.
+- `columns[]`: `name`, `data_type` (string, int64, decimal, double, boolean, dateTime), `source_column` (optional, default the name), `is_key` (optional, default false).
+- `relationships[]`: `from_table`, `from_column`, `to_table`, `to_column`. Both ends must exist.
+- `measures[]`: `table`, `name`, `expression` (DAX, no leading `=`), `kpi` (the requirement this measure answers; required, so every measure is traceable).
+
+Rules that apply to measures are the step 7 form rules (`validation/measure_form.py`). The built model must pass the static checks with no errors. Power Query text is copied as written and listed as not checked.
+
+Output: `workspaces/{run_id}/{project}/Model.bim` and `{project}.smproj` (no deployment server, no user settings, CRLF); `artifacts/{run_id}/mapping.json` (tables, columns, relationships, measures with their KPIs; no Power Query text, no server). Nothing is written to a real project; applying the candidate is step 9.
+
 ## 4. Decisions needed from you
 
 These affect the steps listed above. Recommendations are marked.
@@ -135,7 +152,8 @@ These affect the steps listed above. Recommendations are marked.
 | `tests/integration/test_llm_live.py` (2 tests, LIVE) | One plain prompt, and one structured reply (up to 3 attempts), to the configured endpoint. Runs when settings are complete (environment or `.env`); NOT_RUN otherwise. | PASS on 27 Nov 2026 against local Ollama, model `qwen2.5:0.5b` (connectivity test only) |
 | `tests/unit/test_generation_dax.py` (17 tests, MOCKED MODEL) | Staging a new measure on a copy of RETA, candidate and review files written, prompt context, unknown column refused (SC-020), unreadable DAX not checked, duplicate name, unknown table, blank fields, bad replies retried up to 3 attempts, unreachable model not retried, brackets in name refused, leading `=` refused, dotted name allowed | PASS |
 | `tests/unit/test_generation_sql.py` (22 tests) | Clean and refused statements, literals and comments not scanned, one statement only, balanced parentheses, unclosed literal or comment, warnings, not-checked notes, artifact-only recording, event without statement text | PASS |
-| Steps 8–10 | Not written yet | NOT_RUN |
+| `tests/unit/test_new_model.py` (36 tests) | Valid spec parsed into typed objects; 14 refusal cases with reasons (compatibility level, spec version, project name, source kind, unknown keys, data type, empty tables, duplicate names ignoring case, missing reference, unknown table, brackets and leading `=` in measures, required flags); a credential key refused without showing its value; built model has no credential, round-trips byte for byte and passes the static checks; project file has CRLF and no user or deployment settings; candidate written only under `workspaces/`; mapping has KPIs and no Power Query text or server; refused model writes nothing; existing folder never overwritten; invalid run ID refused; `specs/` readable but not writable; spec read through the policy; a spec outside readable folders refused; missing and non-UTF-8 spec files refused | PASS |
+| Steps 9–10 | Not written yet | NOT_RUN |
 
 Mocked tests are labeled as mocked. The live test contacts the configured endpoint only when its environment variables are set. No Phase 1 test contacts SSAS or Oracle.
 
@@ -174,3 +192,11 @@ Mocked tests are labeled as mocked. The live test contacts the configured endpoi
 | Structured replies ask the server for a JSON object only (`response_format: json_object`); plain text replies are unchanged. Checked with the local test server, 27 Nov 2026 | User chose this option, 27 Nov 2026 |
 | Step 7 form rules: a measure name with `[` or `]` is refused, and an expression starting with `=` is refused. Dots and `#` stay allowed because 42 production names use dots and 12 use `#` (scan of all 8 models: no brackets, no leading `=`). Parentheses are not in production but are legal in SSAS names, so they stay allowed (a choice you can change). Found by a test run, fixed 27 Nov 2026 | User chose to compare with production models; agent applied the rule, 27 Nov 2026 |
 | The word rule (every word from the request) applies to requirements drafts only, not to DAX or SQL | Agent proposed, 27 Nov 2026 (to confirm) |
+| Step 8 output: Model.bim plus the `.smproj` project file; no other Visual Studio files | User, 28 Nov 2026 |
+| Step 8 Power Query: you write the Oracle M text in the spec; the code copies it and lists it as not checked | User, 28 Nov 2026 |
+| Step 8 spec format (section 3b) approved as the starting point | User, 28 Nov 2026 |
+| Measure form rules (refuse `[` `]` in names and a leading `=`) shared by steps 7 and 8 from `validation/measure_form.py`; dots and `#` allowed | Agent applied after comparing with the 8 example models, 27 Nov 2026 |
+| Spec file location: a new read-only `specs/` folder (policy change: read added, write not added) | User chose this option, 28 Nov 2026 |
+| Local Ollama server restarted on 28 Nov 2026 (it was not running); live tests then passed | Operational note |
+| Plan: an offline M source reader is added to Phase 1 as step 8a (no database). Connected reads of the SQL engine and live schema inspection stay in Phase 2 | User chose this option, 28 Nov 2026 |
+| Step 8 sample spec `specs/SAMPLE_SALES.json` and its output (`workspaces/run-sample-spec-001/`, `artifacts/run-sample-spec-001/`) generated 28 Nov 2026; not yet opened in Visual Studio 2019 | Agent, 28 Nov 2026; user will test in VS 2019 later |

@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 PROTECTED_FOLDERS = ("example_models", "tests/fixtures")
-READABLE_FOLDERS = ("example_models", "tests/fixtures", "workspaces", "artifacts", "knowledge")
+READABLE_FOLDERS = ("example_models", "tests/fixtures", "workspaces", "artifacts", "knowledge", "specs")
 WRITABLE_FOLDERS = ("workspaces", "artifacts")
 # Exact files at the project root that may be read (never written). Only the local settings file.
 READABLE_FILES = (".env",)
