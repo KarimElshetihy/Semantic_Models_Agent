@@ -78,12 +78,16 @@ class ApprovalWorkflow:
     def approve(self, run_id: str, actor: str) -> ProposalBinding:
         with self._refusals_recorded(run_id, Action.APPROVE, actor):
             next_state(self._store.current_state(run_id), Action.APPROVE)
-            payload = self._store.last_payload(run_id, Action.SUBMIT)
-            if payload is None:
-                raise ApprovalRequiredError("nothing has been submitted for approval")
-            proposal = ProposalBinding.from_payload(payload)
+            proposal = self.submitted_proposal(run_id)
             self._transition(run_id, Action.APPROVE, actor, payload=proposal.to_payload())
         return proposal
+
+    def submitted_proposal(self, run_id: str) -> ProposalBinding:
+        """The proposal last submitted for this run: what an approver is shown before approving."""
+        payload = self._store.last_payload(run_id, Action.SUBMIT)
+        if payload is None:
+            raise ApprovalRequiredError("nothing has been submitted for approval")
+        return ProposalBinding.from_payload(payload)
 
     def request_revision(self, run_id: str, actor: str, reason: str) -> None:
         self._simple_transition(run_id, Action.REQUEST_REVISION, actor, {"reason": reason})
